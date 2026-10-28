@@ -64,11 +64,11 @@ func (r *Todo) List(ctx context.Context) ([]model.Todo, error) {
 
 func (r *Todo) Upsert(ctx context.Context, m model.Todo) (bool, error) {
 	n, err := r.q.UpsertTodo(ctx, queries.UpsertTodoParams{
-		ID:    m.ID,
-		Title: m.Title,
+		ID:          m.ID,
+		Title:       m.Title,
 		CompletedAt: ptr.Map(m.CompletedAt, model.CompletedAt.Time),
-		CreatedAt: m.CreatedAt,
-		UpdatedAt: m.UpdatedAt,
+		CreatedAt:   m.CreatedAt,
+		UpdatedAt:   m.UpdatedAt,
 	})
 	if err != nil {
 		return false, fmt.Errorf("upsert todo: %w", err)
