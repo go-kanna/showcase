@@ -66,9 +66,7 @@ func (r *Todo) Upsert(ctx context.Context, m model.Todo) (bool, error) {
 	n, err := r.q.UpsertTodo(ctx, queries.UpsertTodoParams{
 		ID:    m.ID,
 		Title: m.Title,
-		CompletedAt: ptr.Map(m.CompletedAt, func(v model.CompletedAt) time.Time {
-			return v.Get()
-		}),
+		CompletedAt: ptr.Map(m.CompletedAt, model.CompletedAt.Time),
 		CreatedAt: m.CreatedAt,
 		UpdatedAt: m.UpdatedAt,
 	})

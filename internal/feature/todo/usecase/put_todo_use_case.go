@@ -20,7 +20,7 @@ import (
 type PutTodoInput struct {
 	ID          string     `json:"id"           validate:"required,uuid"`
 	Title       string     `json:"title"        validate:"required,min=1,max=200"`
-	CompletedAt *time.Time `json:"completed_at" validate:"rule=model.CompletedAtRule"`
+	CompletedAt *time.Time `json:"completed_at" validate:"rule=model.CompletedAt"`
 }
 
 type PutTodoOutput struct {

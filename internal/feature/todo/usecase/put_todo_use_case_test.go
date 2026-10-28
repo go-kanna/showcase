@@ -40,7 +40,7 @@ func TestPutTodo_Insert(t *testing.T) {
 	assert.Equal(t, m.ID, got.ID)
 	assert.Equal(t, m.Title, got.Title)
 	require.NotNil(t, got.CompletedAt)
-	assert.WithinDuration(t, completedAt, got.CompletedAt.Get(), time.Millisecond)
+	assert.WithinDuration(t, completedAt, got.CompletedAt.Time(), time.Millisecond)
 	assert.WithinDuration(t, time.Now(), got.CreatedAt, time.Second)
 	assert.WithinDuration(t, time.Now(), got.UpdatedAt, time.Second)
 }

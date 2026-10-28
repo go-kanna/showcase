@@ -4,7 +4,7 @@ import (
 	"time"
 	"uuid"
 
-	"github.com/go-kanna/validated"
+	"github.com/go-kanna/value/rule"
 )
 
 var (
@@ -12,23 +12,19 @@ var (
 	validCompletedAtEnd   = time.Date(2100, 1, 1, 0, 0, 0, 0, time.UTC)
 )
 
-//kanna:fixture skip
-type CompletedAtRule struct{}
+//go:generate go tool kanna-value
 
-func (CompletedAtRule) Validate(v time.Time) error {
+//kanna:value
+type CompletedAt struct{ t time.Time }
+
+func (CompletedAt) validate(t time.Time) error {
 	switch {
-	case v.Before(validCompletedAtStart):
-		return validated.FailWith("greater_than_or_equal_to", map[string]any{"count": validCompletedAtStart})
-	case v.After(validCompletedAtEnd):
-		return validated.FailWith("less_than_or_equal_to", map[string]any{"count": validCompletedAtEnd})
+	case t.Before(validCompletedAtStart):
+		return rule.FailWith("greater_than_or_equal_to", map[string]any{"count": validCompletedAtStart})
+	case t.After(validCompletedAtEnd):
+		return rule.FailWith("less_than_or_equal_to", map[string]any{"count": validCompletedAtEnd})
 	}
 	return nil
-}
-
-type CompletedAt = validated.Value[time.Time, CompletedAtRule]
-
-func MustCompletedAt(v time.Time) CompletedAt {
-	return validated.Must[CompletedAtRule](v)
 }
 
 //go:generate go tool kanna-fixture
