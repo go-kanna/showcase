@@ -1,0 +1,26 @@
+[sqlfluff]
+dialect = postgres
+max_line_length = 120
+
+[sqlfluff:indentation]
+tab_space_size = 4
+indented_on_contents = False
+
+[sqlfluff:rules:capitalisation.keywords]
+capitalisation_policy = upper
+
+[sqlfluff:rules:capitalisation.identifiers]
+ignore_words = EXCLUDED
+
+[sqlfluff:rules:capitalisation.functions]
+extended_capitalisation_policy = upper
+
+[sqlfluff:rules:capitalisation.literals]
+capitalisation_policy = upper
+
+[sqlfluff:rules:capitalisation.types]
+extended_capitalisation_policy = upper
+
+[sqlfluff:layout:type:data_type]
+spacing_before = align
+align_within = create_table_statement

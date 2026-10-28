@@ -28,6 +28,13 @@ linters:
       os-mkdir-temp: true
       os-setenv: true
       os-chdir: true
+    wrapcheck:
+      ignore-package-globs:
+        - github.com/go-kanna/showcase/internal/errors/aerrors
+        - github.com/go-kanna/showcase/internal/feature/todo/usecase
+        - github.com/go-kanna/validated
+        - google.golang.org/grpc/status
+        - google.golang.org/grpc/internal/status
   enable:
     - gomodguard_v2
   disable:

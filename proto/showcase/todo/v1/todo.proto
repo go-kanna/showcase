@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package showcase.todo.v1;
+
+import "google/protobuf/timestamp.proto";
+
+service TodoService {
+  rpc ListTodo(ListTodoRequest) returns (ListTodoResponse);
+  rpc PutTodo(PutTodoRequest) returns (PutTodoResponse);
+  rpc SetTodoCompletion(SetTodoCompletionRequest) returns (SetTodoCompletionResponse);
+  rpc DeleteTodo(DeleteTodoRequest) returns (DeleteTodoResponse);
+}
+
+message Todo {
+  string id = 1;
+  string title = 2 [debug_redact = true];
+  optional google.protobuf.Timestamp completed_at = 3;
+  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Timestamp updated_at = 5;
+}
+
+message TodoInput {
+  string id = 1;
+  string title = 2 [
+    debug_redact = true
+  ];
+}
+
+message ListTodoRequest {}
+
+message ListTodoResponse {
+  repeated Todo todos = 1;
+}
+
+message PutTodoRequest {
+  TodoInput todo = 1;
+  optional google.protobuf.Timestamp completed_at = 2;
+}
+
+message PutTodoResponse {}
+
+message SetTodoCompletionRequest {
+  string id = 1;
+  bool completed = 2;
+}
+
+message SetTodoCompletionResponse {}
+
+message DeleteTodoRequest {
+  string id = 1;
+}
+
+message DeleteTodoResponse {}
