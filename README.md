@@ -9,14 +9,14 @@ Requires Go 1.27, Docker with Compose, and the [buf](https://buf.build/docs/cli/
 
 ## What each generator does here
 
-| Tool                                                   | Where                                         | What it writes                                                                                                          |
-|--------------------------------------------------------|-----------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
-| [kanna-di](https://github.com/go-kanna/di)             | `internal/di`, `usecase`, `handler`           | `NewInfra`, `NewPutTodo`, `NewHandler`, …: the constructor of each `//kanna:container` struct                           |
-| [kanna-validate](https://github.com/go-kanna/validate) | `config`, `usecase`                           | `Validate` methods from the `validate` tags on settings and use-case inputs                                             |
-| [kanna-mapper](https://github.com/go-kanna/mapper)     | `mapper`, `queries`                           | `TodoToProto` (model → protobuf) and `RowToTodo` (sqlc row → model), sharing the converters in `internal/lib/converter` |
-| [kanna-fixture](https://github.com/go-kanna/fixture)   | `model/fixture`                               | `fixture.Todo()`, every field filled, for tests                                                                         |
-| [kanna-i18n](https://github.com/go-kanna/i18n)         | `internal/messages`                           | `messages.TodoNotFound()` and the other messages in `locales/`, English and Japanese compiled in                        |
-| [validated](https://github.com/go-kanna/validated)     | `model`                                       | Nothing: a library. `model.CompletedAt` is a time held between 2000 and 2100                                            |
+| Tool                                                   | Where                               | What it writes                                                                                 |
+|--------------------------------------------------------|-------------------------------------|------------------------------------------------------------------------------------------------|
+| [kanna-di](https://github.com/go-kanna/di)             | `internal/di`, `usecase`, `handler` | `NewInfra`, `NewPutTodo`, `NewHandler`, …: the constructor of each `//kanna:container` struct  |
+| [kanna-validate](https://github.com/go-kanna/validate) | `config`, `usecase`                 | `Validate` methods from the `validate` tags, `rule=model.CompletedAtRule` among them           |
+| [kanna-mapper](https://github.com/go-kanna/mapper)     | `mapper`, `queries`                 | `TodoToProto` (model → protobuf) and `RowToTodo` (sqlc row → model), validated values included |
+| [kanna-fixture](https://github.com/go-kanna/fixture)   | `model/fixture`                     | `fixture.Todo()`, every field filled, for tests                                                |
+| [kanna-i18n](https://github.com/go-kanna/i18n)         | `internal/messages`                 | `messages.TodoNotFound()` and the texts of validation error codes, in English and Japanese     |
+| [validated](https://github.com/go-kanna/validated)     | `model`                             | Nothing: a library. `model.CompletedAt` is a time held between 2000 and 2100                   |
 
 The rest of the stack: [sqlc](https://sqlc.dev) for queries, [buf](https://buf.build) for protobuf and gRPC,
 [goose](https://github.com/pressly/goose) for migrations, and [pgtestdb](https://github.com/peterldowns/pgtestdb) for
@@ -71,6 +71,7 @@ buf curl --protocol grpc --http2-prior-knowledge --schema proto \
 | Command                        | What it does                                                      |
 |--------------------------------|-------------------------------------------------------------------|
 | `make gen`                     | run every generator: `go generate`, then buf, then sqlc           |
+| `make gen-check`               | fail if the kanna generators would change what is committed       |
 | `make test`                    | run the tests, each against its own database                      |
 | `make lint`                    | run golangci-lint                                                 |
 | `make sql-lint`                | run sqlfluff over the migrations                                  |

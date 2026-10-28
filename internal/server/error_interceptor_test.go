@@ -21,7 +21,8 @@ func TestToStatus(t *testing.T) {
 	t.Parallel()
 
 	var verrs validate.Errors
-	verrs.Add("Title", validate.Blank())
+	verrs.Add("id", validate.Blank())
+	verrs.Add("title", validate.TooLong(200))
 	notFound := aerrors.NotFound("todo").WithMessage(messages.TodoNotFound())
 
 	tests := []struct {
@@ -32,10 +33,17 @@ func TestToStatus(t *testing.T) {
 		wantMsg  string
 	}{
 		{
-			name:     "validation errors",
+			name:     "validation errors, in the default language",
 			err:      verrs.Err(),
 			wantCode: codes.InvalidArgument,
-			wantMsg:  verrs.Error(),
+			wantMsg:  "id can't be blank; title is too long (maximum is 200 characters)",
+		},
+		{
+			name:     "validation errors, in the requested language",
+			lang:     "ja",
+			err:      verrs.Err(),
+			wantCode: codes.InvalidArgument,
+			wantMsg:  "id を入力してください; title は200文字以内で入力してください", //nolint:gosmopolitan // Japanese is under test
 		},
 		{
 			name:     "wrapped app error without a message",
@@ -54,8 +62,7 @@ func TestToStatus(t *testing.T) {
 			lang:     "ja",
 			err:      notFound,
 			wantCode: codes.NotFound,
-			wantMsg:  "やることが見つかりませんでした。", //nolint:gosmopolitan // the Japanese translation is what is under test
-
+			wantMsg:  "やることが見つかりませんでした。", //nolint:gosmopolitan // Japanese is under test
 		},
 		{
 			name:     "canceled",

@@ -22,6 +22,10 @@ linters:
         - fmt.Fprint
         - fmt.Fprintf
         - fmt.Fprintln
+    tagliatelle:
+      case:
+        rules:
+          json: snake # Use-case inputs key their validation errors by the proto's field names.
     usetesting:
       context-background: true
       context-todo: true

@@ -1,8 +1,6 @@
 package queries
 
 import (
-	"time"
-
 	"github.com/go-kanna/showcase/internal/feature/todo/model"
 	"github.com/go-kanna/showcase/internal/lib/converter"
 )
@@ -11,18 +9,10 @@ import (
 
 //kanna:mapper
 type _ interface {
-	RowToTodo(m Todo) model.Todo
+	RowToTodo(m Todo) (model.Todo, error)
 }
 
 //kanna:converter
 var _ = []any{
 	converter.Defaults,
-	mapCompletedAt,
-}
-
-func mapCompletedAt(at *time.Time) *model.CompletedAt {
-	if at == nil {
-		return nil
-	}
-	return new(model.MustCompletedAt(*at))
 }

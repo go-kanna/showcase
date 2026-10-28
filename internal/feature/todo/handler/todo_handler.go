@@ -14,7 +14,7 @@ import (
 //go:generate go tool kanna-di
 //kanna:container
 type Handler struct {
-	todov1.UnimplementedTodoServiceServer `di:"-"`
+	todov1.UnimplementedTodoServiceServer
 
 	_ *di.Infra `di:"arg"`
 

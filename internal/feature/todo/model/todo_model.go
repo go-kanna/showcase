@@ -12,7 +12,7 @@ var (
 	validCompletedAtEnd   = time.Date(2100, 1, 1, 0, 0, 0, 0, time.UTC)
 )
 
-//kanna:ignore
+//kanna:fixture skip
 type CompletedAtRule struct{}
 
 func (CompletedAtRule) Validate(v time.Time) error {

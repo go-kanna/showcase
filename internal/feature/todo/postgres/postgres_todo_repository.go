@@ -16,7 +16,6 @@ import (
 	"github.com/go-kanna/showcase/internal/infra/storage/db"
 	"github.com/go-kanna/showcase/internal/infra/storage/tx"
 	"github.com/go-kanna/showcase/internal/lib/ptr"
-	"github.com/go-kanna/showcase/internal/lib/xslices"
 )
 
 type Todo struct {
@@ -41,7 +40,11 @@ func (r *Todo) Find(ctx context.Context, id uuid.UUID) (model.Todo, error) {
 	if err != nil {
 		return model.Todo{}, fmt.Errorf("get todo: %w", err)
 	}
-	return queries.RowToTodo(row), nil
+	m, err := queries.RowToTodo(row)
+	if err != nil {
+		return model.Todo{}, fmt.Errorf("get todo: %w", err)
+	}
+	return m, nil
 }
 
 func (r *Todo) List(ctx context.Context) ([]model.Todo, error) {
@@ -49,7 +52,14 @@ func (r *Todo) List(ctx context.Context) ([]model.Todo, error) {
 	if err != nil {
 		return nil, fmt.Errorf("list todos: %w", err)
 	}
-	return xslices.Map(rows, queries.RowToTodo), nil
+	todos := make([]model.Todo, len(rows))
+	for i, row := range rows {
+		todos[i], err = queries.RowToTodo(row)
+		if err != nil {
+			return nil, fmt.Errorf("list todos: %w", err)
+		}
+	}
+	return todos, nil
 }
 
 func (r *Todo) Upsert(ctx context.Context, m model.Todo) (bool, error) {

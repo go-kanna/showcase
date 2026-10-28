@@ -97,7 +97,7 @@ func TestPutTodo_InvalidCompletedAt(t *testing.T) {
 	var verrs validate.Errors
 	require.ErrorAs(t, err, &verrs)
 	require.Len(t, verrs, 1)
-	assert.Equal(t, "CompletedAt", verrs[0].Field)
+	assert.Equal(t, "completed_at", verrs[0].Field)
 	assert.Equal(t, "greater_than_or_equal_to", verrs[0].Code())
 	_, err = todos.Find(t.Context(), m.ID)
 	require.ErrorIs(t, err, aerrors.ErrNotFound)

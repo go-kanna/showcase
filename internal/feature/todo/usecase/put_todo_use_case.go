@@ -7,8 +7,6 @@ import (
 	"time"
 	"uuid"
 
-	"github.com/go-kanna/validate"
-
 	"github.com/go-kanna/showcase/internal/di"
 	"github.com/go-kanna/showcase/internal/errors/aerrors"
 	"github.com/go-kanna/showcase/internal/feature/todo/model"
@@ -20,15 +18,9 @@ import (
 
 //kanna:validate
 type PutTodoInput struct {
-	ID          string `validate:"required,uuid"`
-	Title       string `validate:"required,min=1,max=200"`
-	CompletedAt *time.Time
-}
-
-func (x PutTodoInput) validate(errs *validate.Errors) {
-	if x.CompletedAt != nil {
-		errs.Add("CompletedAt", model.CompletedAtRule{}.Validate(*x.CompletedAt))
-	}
+	ID          string     `json:"id"           validate:"required,uuid"`
+	Title       string     `json:"title"        validate:"required,min=1,max=200"`
+	CompletedAt *time.Time `json:"completed_at" validate:"rule=model.CompletedAtRule"`
 }
 
 type PutTodoOutput struct {

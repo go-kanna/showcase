@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"log/slog"
+	"strings"
 
+	"github.com/go-kanna/i18n"
 	"github.com/go-kanna/validate"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -42,7 +44,7 @@ func errorInterceptor(
 // toStatus tells the client what it can act on, and logs the rest.
 func toStatus(ctx context.Context, method string, err error) error {
 	if verrs, ok := errors.AsType[validate.Errors](err); ok {
-		return status.Error(codes.InvalidArgument, verrs.Error())
+		return status.Error(codes.InvalidArgument, validationMessage(ctx, verrs))
 	}
 	if aerr, ok := errors.AsType[aerrors.Error](err); ok {
 		return status.Error(kindCode(aerr), message(ctx, aerr))
@@ -68,5 +70,18 @@ func message(ctx context.Context, aerr aerrors.Error) string {
 	if !ok {
 		return aerr.Error()
 	}
-	return messages.Localizer(metadata.ValueFromIncomingContext(ctx, "accept-language")...).Localize(m)
+	return localizer(ctx).Localize(m)
+}
+
+func validationMessage(ctx context.Context, verrs validate.Errors) string {
+	loc := localizer(ctx)
+	msgs := make([]string, len(verrs))
+	for i, fe := range verrs {
+		msgs[i] = fe.Field + " " + loc.Localize(i18n.Coded("errors", fe.Code(), fe.Params()))
+	}
+	return strings.Join(msgs, "; ")
+}
+
+func localizer(ctx context.Context) i18n.Localizer {
+	return messages.Localizer(metadata.ValueFromIncomingContext(ctx, "accept-language")...)
 }

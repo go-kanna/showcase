@@ -13,7 +13,7 @@ import (
 
 //kanna:validate
 type DeleteTodoInput struct {
-	TodoID string `validate:"required,uuid"`
+	TodoID string `json:"id" validate:"required,uuid"`
 }
 
 type DeleteTodoOutput struct {

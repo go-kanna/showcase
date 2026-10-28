@@ -33,6 +33,10 @@ gen: gen-go gen-proto gen-sqlc
 gen-go:
 	go generate ./...
 
+.PHONY: gen-check
+gen-check:
+	KANNA_CHECK=1 go generate ./...
+
 .PHONY: gen-proto
 gen-proto:
 	cd proto && buf generate

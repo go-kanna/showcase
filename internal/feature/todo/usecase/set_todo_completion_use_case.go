@@ -17,7 +17,7 @@ import (
 
 //kanna:validate
 type SetTodoCompletionInput struct {
-	TodoID    string `validate:"required,uuid"`
+	TodoID    string `json:"id" validate:"required,uuid"`
 	Completed bool
 }
 
