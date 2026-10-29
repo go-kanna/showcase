@@ -1,8 +1,6 @@
 errors:
   attributes:
     id: ID
-    title: Title
-    completed_at: Completed at
 
 todo:
   not_found: To-do not found.
