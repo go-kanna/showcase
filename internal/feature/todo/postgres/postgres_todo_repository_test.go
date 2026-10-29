@@ -50,7 +50,7 @@ func TestTodo_InsertAndFind(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, m.ID, got.ID)
 	assert.Equal(t, m.Title, got.Title)
-	assert.WithinDuration(t, m.CompletedAt.Get(), got.CompletedAt.Get(), time.Millisecond)
+	assert.WithinDuration(t, m.CompletedAt.Time(), got.CompletedAt.Time(), time.Millisecond)
 	assert.WithinDuration(t, m.CreatedAt, got.CreatedAt, time.Millisecond)
 	assert.WithinDuration(t, m.UpdatedAt, got.UpdatedAt, time.Millisecond)
 }
@@ -80,7 +80,7 @@ func TestTodo_UpdateAndFind(t *testing.T) {
 	// assert
 	got, err := sut.Find(t.Context(), m.ID)
 	require.NoError(t, err)
-	assert.WithinDuration(t, now, got.CompletedAt.Get(), time.Millisecond)
+	assert.WithinDuration(t, now, got.CompletedAt.Time(), time.Millisecond)
 	assert.WithinDuration(t, now, got.UpdatedAt, time.Millisecond)
 }
 
@@ -107,7 +107,7 @@ func TestTodo_Complete(t *testing.T) {
 	// assert
 	got, err := sut.Find(t.Context(), m.ID)
 	require.NoError(t, err)
-	assert.WithinDuration(t, now, got.CompletedAt.Get(), time.Millisecond)
+	assert.WithinDuration(t, now, got.CompletedAt.Time(), time.Millisecond)
 }
 
 func TestTodo_Uncomplete(t *testing.T) {

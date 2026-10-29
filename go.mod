@@ -5,8 +5,8 @@ go 1.27.3
 require (
 	github.com/caarlos0/env/v11 v11.4.1
 	github.com/go-kanna/i18n v0.0.3
-	github.com/go-kanna/validate v0.0.3
-	github.com/go-kanna/validated v0.0.2
+	github.com/go-kanna/validate v0.0.4
+	github.com/go-kanna/value v0.0.2
 	github.com/jackc/pgx/v5 v5.11.0
 	github.com/peterldowns/pgtestdb v0.1.1
 	github.com/pressly/goose/v3 v3.29.0
@@ -46,9 +46,9 @@ require (
 	github.com/go-faster/city v1.0.1 // indirect
 	github.com/go-faster/errors v0.8.0 // indirect
 	github.com/go-kanna/di v0.0.3 // indirect
-	github.com/go-kanna/fixture v0.0.4 // indirect
+	github.com/go-kanna/fixture v0.0.5 // indirect
 	github.com/go-kanna/internal v0.0.5 // indirect
-	github.com/go-kanna/mapper v0.0.4 // indirect
+	github.com/go-kanna/mapper v0.0.5 // indirect
 	github.com/go-sql-driver/mysql v1.10.1 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/gohugoio/hashstructure v0.6.0 // indirect
@@ -143,7 +143,7 @@ tool (
 	github.com/go-kanna/i18n/cmd/kanna-i18n
 	github.com/go-kanna/mapper/cmd/kanna-mapper
 	github.com/go-kanna/validate/cmd/kanna-validate
-	github.com/go-kanna/validated
+	github.com/go-kanna/value/cmd/kanna-value
 	github.com/pressly/goose/v3/cmd/goose
 	github.com/sqlc-dev/sqlc/cmd/sqlc
 )

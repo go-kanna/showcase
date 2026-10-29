@@ -36,7 +36,7 @@ linters:
       ignore-package-globs:
         - github.com/go-kanna/showcase/internal/errors/aerrors
         - github.com/go-kanna/showcase/internal/feature/todo/usecase
-        - github.com/go-kanna/validated
+        - github.com/go-kanna/value/rule
         - google.golang.org/grpc/status
         - google.golang.org/grpc/internal/status
   enable:

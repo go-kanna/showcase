@@ -39,7 +39,7 @@ func TestSetTodoCompletion_Complete(t *testing.T) {
 	got, err := todos.Find(t.Context(), m.ID)
 	require.NoError(t, err)
 	require.NotNil(t, got.CompletedAt)
-	assert.WithinDuration(t, time.Now(), got.CompletedAt.Get(), time.Second)
+	assert.WithinDuration(t, time.Now(), got.CompletedAt.Time(), time.Second)
 }
 
 func TestSetTodoCompletion_Uncomplete(t *testing.T) {
