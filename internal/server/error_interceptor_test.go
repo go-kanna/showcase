@@ -36,14 +36,14 @@ func TestToStatus(t *testing.T) {
 			name:     "validation errors, in the default language",
 			err:      verrs.Err(),
 			wantCode: codes.InvalidArgument,
-			wantMsg:  "id can't be blank; title is too long (maximum is 200 characters)",
+			wantMsg:  "ID can't be blank; Title is too long (maximum is 200 characters)",
 		},
 		{
 			name:     "validation errors, in the requested language",
 			lang:     "ja",
 			err:      verrs.Err(),
 			wantCode: codes.InvalidArgument,
-			wantMsg:  "id を入力してください; title は200文字以内で入力してください", //nolint:gosmopolitan // Japanese is under test
+			wantMsg:  "IDを入力してください; タイトルは200文字以内で入力してください", //nolint:gosmopolitan // Japanese is under test
 		},
 		{
 			name:     "wrapped app error without a message",

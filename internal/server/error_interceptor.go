@@ -74,12 +74,7 @@ func message(ctx context.Context, aerr aerrors.Error) string {
 }
 
 func validationMessage(ctx context.Context, verrs validate.Errors) string {
-	loc := localizer(ctx)
-	msgs := make([]string, len(verrs))
-	for i, fe := range verrs {
-		msgs[i] = fe.Field + " " + loc.Localize(i18n.Coded("errors", fe.Code(), fe.Params()))
-	}
-	return strings.Join(msgs, "; ")
+	return strings.Join(i18n.FullMessages(localizer(ctx), verrs), "; ")
 }
 
 func localizer(ctx context.Context) i18n.Localizer {
