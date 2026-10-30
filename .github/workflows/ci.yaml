@@ -30,6 +30,9 @@ jobs:
       - name: Check generated code
         run: make gen-check
 
+      - name: Generate from scratch in one run
+        run: make gen-fresh-check
+
   test:
     runs-on: ubuntu-latest
     services:
