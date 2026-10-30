@@ -38,6 +38,7 @@ var bundle = i18n.NewBundle(
 	i18n.Catalog{Lang: "ja", Entries: map[string]i18n.Entry{
 		"errors.attributes.completed_at": {Single: i18n.Template{{Text: "完了日時"}}},
 		"errors.attributes.id":           {Single: i18n.Template{{Text: "ID"}}},
+		"errors.attributes.priority":     {Single: i18n.Template{{Text: "優先度"}}},
 		"errors.attributes.title":        {Single: i18n.Template{{Text: "タイトル"}}},
 		"todo.not_found":                 {Single: i18n.Template{{Text: "やることが見つかりませんでした。"}}},
 	}},

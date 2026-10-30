@@ -27,11 +27,24 @@ func (CompletedAt) validate(t time.Time) error {
 	return nil
 }
 
+// Priority is how soon a to-do is to be done. Only its constants come in from
+// a request or a row.
+//
+//kanna:enum
+type Priority string
+
+const (
+	PriorityLow    Priority = "low"
+	PriorityNormal Priority = "normal"
+	PriorityHigh   Priority = "high"
+)
+
 //go:generate go tool kanna-fixture
 
 type Todo struct {
 	ID          uuid.UUID
 	Title       string
+	Priority    Priority
 	CompletedAt *CompletedAt
 	CreatedAt   time.Time
 	UpdatedAt   time.Time

@@ -22,6 +22,58 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type Priority int32
+
+const (
+	Priority_PRIORITY_UNSPECIFIED Priority = 0
+	Priority_PRIORITY_LOW         Priority = 1
+	Priority_PRIORITY_NORMAL      Priority = 2
+	Priority_PRIORITY_HIGH        Priority = 3
+)
+
+// Enum value maps for Priority.
+var (
+	Priority_name = map[int32]string{
+		0: "PRIORITY_UNSPECIFIED",
+		1: "PRIORITY_LOW",
+		2: "PRIORITY_NORMAL",
+		3: "PRIORITY_HIGH",
+	}
+	Priority_value = map[string]int32{
+		"PRIORITY_UNSPECIFIED": 0,
+		"PRIORITY_LOW":         1,
+		"PRIORITY_NORMAL":      2,
+		"PRIORITY_HIGH":        3,
+	}
+)
+
+func (x Priority) Enum() *Priority {
+	p := new(Priority)
+	*p = x
+	return p
+}
+
+func (x Priority) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Priority) Descriptor() protoreflect.EnumDescriptor {
+	return file_showcase_todo_v1_todo_proto_enumTypes[0].Descriptor()
+}
+
+func (Priority) Type() protoreflect.EnumType {
+	return &file_showcase_todo_v1_todo_proto_enumTypes[0]
+}
+
+func (x Priority) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use Priority.Descriptor instead.
+func (Priority) EnumDescriptor() ([]byte, []int) {
+	return file_showcase_todo_v1_todo_proto_rawDescGZIP(), []int{0}
+}
+
 type Todo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -29,6 +81,7 @@ type Todo struct {
 	CompletedAt   *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=completed_at,json=completedAt,proto3,oneof" json:"completed_at,omitempty"`
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	Priority      Priority               `protobuf:"varint,6,opt,name=priority,proto3,enum=showcase.todo.v1.Priority" json:"priority,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -98,10 +151,18 @@ func (x *Todo) GetUpdatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *Todo) GetPriority() Priority {
+	if x != nil {
+		return x.Priority
+	}
+	return Priority_PRIORITY_UNSPECIFIED
+}
+
 type TodoInput struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	Priority      Priority               `protobuf:"varint,3,opt,name=priority,proto3,enum=showcase.todo.v1.Priority" json:"priority,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -148,6 +209,13 @@ func (x *TodoInput) GetTitle() string {
 		return x.Title
 	}
 	return ""
+}
+
+func (x *TodoInput) GetPriority() Priority {
+	if x != nil {
+		return x.Priority
+	}
+	return Priority_PRIORITY_UNSPECIFIED
 }
 
 type ListTodoRequest struct {
@@ -490,7 +558,7 @@ var File_showcase_todo_v1_todo_proto protoreflect.FileDescriptor
 
 const file_showcase_todo_v1_todo_proto_rawDesc = "" +
 	"\n" +
-	"\x1bshowcase/todo/v1/todo.proto\x12\x10showcase.todo.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xfc\x01\n" +
+	"\x1bshowcase/todo/v1/todo.proto\x12\x10showcase.todo.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xb4\x02\n" +
 	"\x04Todo\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
 	"\x05title\x18\x02 \x01(\tB\x03\x80\x01\x01R\x05title\x12B\n" +
@@ -498,11 +566,13 @@ const file_showcase_todo_v1_todo_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAtB\x0f\n" +
-	"\r_completed_at\"6\n" +
+	"updated_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x126\n" +
+	"\bpriority\x18\x06 \x01(\x0e2\x1a.showcase.todo.v1.PriorityR\bpriorityB\x0f\n" +
+	"\r_completed_at\"n\n" +
 	"\tTodoInput\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
-	"\x05title\x18\x02 \x01(\tB\x03\x80\x01\x01R\x05title\"\x11\n" +
+	"\x05title\x18\x02 \x01(\tB\x03\x80\x01\x01R\x05title\x126\n" +
+	"\bpriority\x18\x03 \x01(\x0e2\x1a.showcase.todo.v1.PriorityR\bpriority\"\x11\n" +
 	"\x0fListTodoRequest\"@\n" +
 	"\x10ListTodoResponse\x12,\n" +
 	"\x05todos\x18\x01 \x03(\v2\x16.showcase.todo.v1.TodoR\x05todos\"\x96\x01\n" +
@@ -517,7 +587,12 @@ const file_showcase_todo_v1_todo_proto_rawDesc = "" +
 	"\x19SetTodoCompletionResponse\"#\n" +
 	"\x11DeleteTodoRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"\x14\n" +
-	"\x12DeleteTodoResponse2\xf7\x02\n" +
+	"\x12DeleteTodoResponse*^\n" +
+	"\bPriority\x12\x18\n" +
+	"\x14PRIORITY_UNSPECIFIED\x10\x00\x12\x10\n" +
+	"\fPRIORITY_LOW\x10\x01\x12\x13\n" +
+	"\x0fPRIORITY_NORMAL\x10\x02\x12\x11\n" +
+	"\rPRIORITY_HIGH\x10\x032\xf7\x02\n" +
 	"\vTodoService\x12Q\n" +
 	"\bListTodo\x12!.showcase.todo.v1.ListTodoRequest\x1a\".showcase.todo.v1.ListTodoResponse\x12N\n" +
 	"\aPutTodo\x12 .showcase.todo.v1.PutTodoRequest\x1a!.showcase.todo.v1.PutTodoResponse\x12l\n" +
@@ -538,40 +613,44 @@ func file_showcase_todo_v1_todo_proto_rawDescGZIP() []byte {
 	return file_showcase_todo_v1_todo_proto_rawDescData
 }
 
+var file_showcase_todo_v1_todo_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_showcase_todo_v1_todo_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_showcase_todo_v1_todo_proto_goTypes = []any{
-	(*Todo)(nil),                      // 0: showcase.todo.v1.Todo
-	(*TodoInput)(nil),                 // 1: showcase.todo.v1.TodoInput
-	(*ListTodoRequest)(nil),           // 2: showcase.todo.v1.ListTodoRequest
-	(*ListTodoResponse)(nil),          // 3: showcase.todo.v1.ListTodoResponse
-	(*PutTodoRequest)(nil),            // 4: showcase.todo.v1.PutTodoRequest
-	(*PutTodoResponse)(nil),           // 5: showcase.todo.v1.PutTodoResponse
-	(*SetTodoCompletionRequest)(nil),  // 6: showcase.todo.v1.SetTodoCompletionRequest
-	(*SetTodoCompletionResponse)(nil), // 7: showcase.todo.v1.SetTodoCompletionResponse
-	(*DeleteTodoRequest)(nil),         // 8: showcase.todo.v1.DeleteTodoRequest
-	(*DeleteTodoResponse)(nil),        // 9: showcase.todo.v1.DeleteTodoResponse
-	(*timestamppb.Timestamp)(nil),     // 10: google.protobuf.Timestamp
+	(Priority)(0),                     // 0: showcase.todo.v1.Priority
+	(*Todo)(nil),                      // 1: showcase.todo.v1.Todo
+	(*TodoInput)(nil),                 // 2: showcase.todo.v1.TodoInput
+	(*ListTodoRequest)(nil),           // 3: showcase.todo.v1.ListTodoRequest
+	(*ListTodoResponse)(nil),          // 4: showcase.todo.v1.ListTodoResponse
+	(*PutTodoRequest)(nil),            // 5: showcase.todo.v1.PutTodoRequest
+	(*PutTodoResponse)(nil),           // 6: showcase.todo.v1.PutTodoResponse
+	(*SetTodoCompletionRequest)(nil),  // 7: showcase.todo.v1.SetTodoCompletionRequest
+	(*SetTodoCompletionResponse)(nil), // 8: showcase.todo.v1.SetTodoCompletionResponse
+	(*DeleteTodoRequest)(nil),         // 9: showcase.todo.v1.DeleteTodoRequest
+	(*DeleteTodoResponse)(nil),        // 10: showcase.todo.v1.DeleteTodoResponse
+	(*timestamppb.Timestamp)(nil),     // 11: google.protobuf.Timestamp
 }
 var file_showcase_todo_v1_todo_proto_depIdxs = []int32{
-	10, // 0: showcase.todo.v1.Todo.completed_at:type_name -> google.protobuf.Timestamp
-	10, // 1: showcase.todo.v1.Todo.created_at:type_name -> google.protobuf.Timestamp
-	10, // 2: showcase.todo.v1.Todo.updated_at:type_name -> google.protobuf.Timestamp
-	0,  // 3: showcase.todo.v1.ListTodoResponse.todos:type_name -> showcase.todo.v1.Todo
-	1,  // 4: showcase.todo.v1.PutTodoRequest.todo:type_name -> showcase.todo.v1.TodoInput
-	10, // 5: showcase.todo.v1.PutTodoRequest.completed_at:type_name -> google.protobuf.Timestamp
-	2,  // 6: showcase.todo.v1.TodoService.ListTodo:input_type -> showcase.todo.v1.ListTodoRequest
-	4,  // 7: showcase.todo.v1.TodoService.PutTodo:input_type -> showcase.todo.v1.PutTodoRequest
-	6,  // 8: showcase.todo.v1.TodoService.SetTodoCompletion:input_type -> showcase.todo.v1.SetTodoCompletionRequest
-	8,  // 9: showcase.todo.v1.TodoService.DeleteTodo:input_type -> showcase.todo.v1.DeleteTodoRequest
-	3,  // 10: showcase.todo.v1.TodoService.ListTodo:output_type -> showcase.todo.v1.ListTodoResponse
-	5,  // 11: showcase.todo.v1.TodoService.PutTodo:output_type -> showcase.todo.v1.PutTodoResponse
-	7,  // 12: showcase.todo.v1.TodoService.SetTodoCompletion:output_type -> showcase.todo.v1.SetTodoCompletionResponse
-	9,  // 13: showcase.todo.v1.TodoService.DeleteTodo:output_type -> showcase.todo.v1.DeleteTodoResponse
-	10, // [10:14] is the sub-list for method output_type
-	6,  // [6:10] is the sub-list for method input_type
-	6,  // [6:6] is the sub-list for extension type_name
-	6,  // [6:6] is the sub-list for extension extendee
-	0,  // [0:6] is the sub-list for field type_name
+	11, // 0: showcase.todo.v1.Todo.completed_at:type_name -> google.protobuf.Timestamp
+	11, // 1: showcase.todo.v1.Todo.created_at:type_name -> google.protobuf.Timestamp
+	11, // 2: showcase.todo.v1.Todo.updated_at:type_name -> google.protobuf.Timestamp
+	0,  // 3: showcase.todo.v1.Todo.priority:type_name -> showcase.todo.v1.Priority
+	0,  // 4: showcase.todo.v1.TodoInput.priority:type_name -> showcase.todo.v1.Priority
+	1,  // 5: showcase.todo.v1.ListTodoResponse.todos:type_name -> showcase.todo.v1.Todo
+	2,  // 6: showcase.todo.v1.PutTodoRequest.todo:type_name -> showcase.todo.v1.TodoInput
+	11, // 7: showcase.todo.v1.PutTodoRequest.completed_at:type_name -> google.protobuf.Timestamp
+	3,  // 8: showcase.todo.v1.TodoService.ListTodo:input_type -> showcase.todo.v1.ListTodoRequest
+	5,  // 9: showcase.todo.v1.TodoService.PutTodo:input_type -> showcase.todo.v1.PutTodoRequest
+	7,  // 10: showcase.todo.v1.TodoService.SetTodoCompletion:input_type -> showcase.todo.v1.SetTodoCompletionRequest
+	9,  // 11: showcase.todo.v1.TodoService.DeleteTodo:input_type -> showcase.todo.v1.DeleteTodoRequest
+	4,  // 12: showcase.todo.v1.TodoService.ListTodo:output_type -> showcase.todo.v1.ListTodoResponse
+	6,  // 13: showcase.todo.v1.TodoService.PutTodo:output_type -> showcase.todo.v1.PutTodoResponse
+	8,  // 14: showcase.todo.v1.TodoService.SetTodoCompletion:output_type -> showcase.todo.v1.SetTodoCompletionResponse
+	10, // 15: showcase.todo.v1.TodoService.DeleteTodo:output_type -> showcase.todo.v1.DeleteTodoResponse
+	12, // [12:16] is the sub-list for method output_type
+	8,  // [8:12] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_showcase_todo_v1_todo_proto_init() }
@@ -586,13 +665,14 @@ func file_showcase_todo_v1_todo_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_showcase_todo_v1_todo_proto_rawDesc), len(file_showcase_todo_v1_todo_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_showcase_todo_v1_todo_proto_goTypes,
 		DependencyIndexes: file_showcase_todo_v1_todo_proto_depIdxs,
+		EnumInfos:         file_showcase_todo_v1_todo_proto_enumTypes,
 		MessageInfos:      file_showcase_todo_v1_todo_proto_msgTypes,
 	}.Build()
 	File_showcase_todo_v1_todo_proto = out.File

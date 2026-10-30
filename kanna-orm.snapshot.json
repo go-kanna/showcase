@@ -18,7 +18,8 @@
         {"name": "title", "type": "text", "not_null": true},
         {"name": "completed_at", "type": "timestamptz"},
         {"name": "created_at", "type": "timestamptz", "not_null": true},
-        {"name": "updated_at", "type": "timestamptz", "not_null": true}
+        {"name": "updated_at", "type": "timestamptz", "not_null": true},
+        {"name": "priority", "type": "text", "not_null": true}
       ],
       "primary_key": ["id"],
       "unique_keys": [],

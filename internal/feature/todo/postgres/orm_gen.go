@@ -55,10 +55,10 @@ func (r Todo) List(ctx context.Context, s ...scopes.Todo) ([]model.Todo, error) 
 }
 
 func (r Todo) Upsert(ctx context.Context, m model.Todo) error {
-	const q = `INSERT INTO todos (id, title, completed_at, created_at, updated_at)
-VALUES ($1, $2, $3, $4, $5)
-ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, completed_at = EXCLUDED.completed_at, updated_at = EXCLUDED.updated_at`
-	if _, err := r.db.Exec(ctx, q, m.ID, m.Title, m.CompletedAt, m.CreatedAt, m.UpdatedAt); err != nil {
+	const q = `INSERT INTO todos (id, title, priority, completed_at, created_at, updated_at)
+VALUES ($1, $2, $3, $4, $5, $6)
+ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, priority = EXCLUDED.priority, completed_at = EXCLUDED.completed_at, updated_at = EXCLUDED.updated_at`
+	if _, err := r.db.Exec(ctx, q, m.ID, m.Title, m.Priority, m.CompletedAt, m.CreatedAt, m.UpdatedAt); err != nil {
 		return fmt.Errorf("upsert into todos: %w", err)
 	}
 	return nil
@@ -123,7 +123,7 @@ func selectTodos(ctx context.Context, db DBTX, q orm.Of[model.Todo]) ([]model.To
 	if err != nil {
 		return nil, err
 	}
-	rows, err := db.Query(ctx, `SELECT id, title, completed_at, created_at, updated_at FROM todos`+rd.Where()+rd.OrderBy()+rd.Limit(), rd.Args()...)
+	rows, err := db.Query(ctx, `SELECT id, title, priority, completed_at, created_at, updated_at FROM todos`+rd.Where()+rd.OrderBy()+rd.Limit(), rd.Args()...)
 	if err != nil {
 		return nil, fmt.Errorf("read todos: %w", err)
 	}
@@ -131,7 +131,7 @@ func selectTodos(ctx context.Context, db DBTX, q orm.Of[model.Todo]) ([]model.To
 	out := []model.Todo{}
 	for rows.Next() {
 		var row model.Todo
-		if err := rows.Scan(&row.ID, &row.Title, &row.CompletedAt, &row.CreatedAt, &row.UpdatedAt); err != nil {
+		if err := rows.Scan(&row.ID, &row.Title, &row.Priority, &row.CompletedAt, &row.CreatedAt, &row.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("read todos: %w", err)
 		}
 		out = append(out, row)

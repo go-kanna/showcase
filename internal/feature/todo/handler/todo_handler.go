@@ -2,9 +2,9 @@ package handler
 
 import (
 	"context"
-	"time"
 
 	"github.com/go-kanna/showcase/internal/di"
+	"github.com/go-kanna/showcase/internal/errors/aerrors"
 	"github.com/go-kanna/showcase/internal/feature/todo/mapper"
 	"github.com/go-kanna/showcase/internal/feature/todo/usecase"
 	todov1 "github.com/go-kanna/showcase/internal/gen/showcase/todo/v1"
@@ -45,16 +45,15 @@ func (h Handler) ListTodo(ctx context.Context, request *todov1.ListTodoRequest) 
 }
 
 func (h Handler) PutTodo(ctx context.Context, request *todov1.PutTodoRequest) (*todov1.PutTodoResponse, error) {
-	var completedAt *time.Time
-	if ts := request.GetCompletedAt(); ts != nil {
-		completedAt = new(ts.AsTime())
-	}
-	_, err := h.put.Do(ctx, usecase.PutTodoInput{
-		ID:          request.GetTodo().GetId(),
-		Title:       request.GetTodo().GetTitle(),
-		CompletedAt: completedAt,
-	})
+	in, err := mapper.TodoInputFromProto(request.GetTodo())
 	if err != nil {
+		// A priority of a number the service does not know.
+		return nil, aerrors.InvalidArgument(err.Error())
+	}
+	if ts := request.GetCompletedAt(); ts != nil {
+		in.CompletedAt = new(ts.AsTime())
+	}
+	if _, err := h.put.Do(ctx, in); err != nil {
 		return nil, err
 	}
 	return &todov1.PutTodoResponse{}, nil

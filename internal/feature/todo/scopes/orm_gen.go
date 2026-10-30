@@ -130,6 +130,84 @@ func (s Todo) TitleDesc() Todo {
 	return Todo{s.q.OrderBy(`title`, true)}
 }
 
+// PriorityEq narrows to the rows whose priority is v.
+func (s Todo) PriorityEq(v model.Priority) Todo {
+	return Todo{s.q.Where(`priority = `, v)}
+}
+
+// PriorityNe narrows to the rows whose priority is not v.
+func (s Todo) PriorityNe(v model.Priority) Todo {
+	return Todo{s.q.Where(`priority <> `, v)}
+}
+
+// PriorityIn narrows to the rows whose priority is one of vs.
+func (s Todo) PriorityIn(vs ...model.Priority) Todo {
+	return Todo{s.q.Where(`priority = ANY(`, vs, `)`)}
+}
+
+// PriorityNotIn narrows to the rows whose priority is none of vs.
+func (s Todo) PriorityNotIn(vs ...model.Priority) Todo {
+	if len(vs) == 0 {
+		return s
+	}
+	return Todo{s.q.Where(`priority <> ALL(`, vs, `)`)}
+}
+
+// PriorityLt narrows to the rows whose priority is less than v.
+func (s Todo) PriorityLt(v model.Priority) Todo {
+	return Todo{s.q.Where(`priority < `, v)}
+}
+
+// PriorityLte narrows to the rows whose priority is at most v.
+func (s Todo) PriorityLte(v model.Priority) Todo {
+	return Todo{s.q.Where(`priority <= `, v)}
+}
+
+// PriorityGt narrows to the rows whose priority is greater than v.
+func (s Todo) PriorityGt(v model.Priority) Todo {
+	return Todo{s.q.Where(`priority > `, v)}
+}
+
+// PriorityGte narrows to the rows whose priority is at least v.
+func (s Todo) PriorityGte(v model.Priority) Todo {
+	return Todo{s.q.Where(`priority >= `, v)}
+}
+
+// PriorityBetween narrows to the rows whose priority is between lo and hi, both included.
+func (s Todo) PriorityBetween(lo, hi model.Priority) Todo {
+	return Todo{s.q.Where(`priority BETWEEN `, lo, ` AND `, hi)}
+}
+
+// PriorityLike narrows to the rows whose priority matches pattern, as LIKE does.
+func (s Todo) PriorityLike(pattern string) Todo {
+	return Todo{s.q.Where(`priority LIKE `, pattern)}
+}
+
+// PriorityILike narrows to the rows whose priority matches pattern, as ILIKE does, ignoring case.
+func (s Todo) PriorityILike(pattern string) Todo {
+	return Todo{s.q.Where(`priority ILIKE `, pattern)}
+}
+
+// PriorityHasPrefix narrows to the rows whose priority starts with prefix.
+func (s Todo) PriorityHasPrefix(prefix string) Todo {
+	return Todo{s.q.Where(`priority LIKE `, orm.EscapeLike(prefix)+"%", ` ESCAPE '!'`)}
+}
+
+// PriorityContains narrows to the rows whose priority contains substr.
+func (s Todo) PriorityContains(substr string) Todo {
+	return Todo{s.q.Where(`priority LIKE `, "%"+orm.EscapeLike(substr)+"%", ` ESCAPE '!'`)}
+}
+
+// PriorityAsc orders the rows by priority, in ascending order.
+func (s Todo) PriorityAsc() Todo {
+	return Todo{s.q.OrderBy(`priority`, false)}
+}
+
+// PriorityDesc orders the rows by priority, in descending order.
+func (s Todo) PriorityDesc() Todo {
+	return Todo{s.q.OrderBy(`priority`, true)}
+}
+
 // CompletedAtEq narrows to the rows whose completed_at is v.
 func (s Todo) CompletedAtEq(v model.CompletedAt) Todo {
 	return Todo{s.q.Where(`completed_at = `, v)}
@@ -344,6 +422,7 @@ func (Todo) values(row model.Todo) map[string]any {
 	return map[string]any{
 		`id`:           row.ID,
 		`title`:        row.Title,
+		`priority`:     row.Priority,
 		`completed_at`: orm.MayBeNull,
 		`created_at`:   row.CreatedAt,
 		`updated_at`:   row.UpdatedAt,
@@ -374,6 +453,7 @@ func (s Todo) AfterCursor(cursor string) (Todo, error) {
 	if err := s.q.DecodeCursor(cursor, []string{`id`}, map[string]any{
 		`id`:         &row.ID,
 		`title`:      &row.Title,
+		`priority`:   &row.Priority,
 		`created_at`: &row.CreatedAt,
 		`updated_at`: &row.UpdatedAt,
 	}); err != nil {
