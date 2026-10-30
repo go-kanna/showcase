@@ -13,7 +13,7 @@ Requires Go 1.27, Docker with Compose, and the [buf](https://buf.build/docs/cli/
 |--------------------------------------------------------|-------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|
 | [kanna-di](https://github.com/go-kanna/di)             | `internal/di`, `usecase`, `handler` | `NewInfra`, `NewPutTodo`, `NewHandler`, …: the constructor of each `//kanna:container` struct                                             |
 | [kanna-validate](https://github.com/go-kanna/validate) | `config`, `usecase`                 | `Validate` methods from the `validate` tags, `rule=model.CompletedAt` among them                                                          |
-| [kanna-mapper](https://github.com/go-kanna/mapper)     | `mapper`                            | `TodoToProto` and `TodoInputFromProto`, between model and protobuf, value types and enums included                                        |
+| [kanna-mapper](https://github.com/go-kanna/mapper)     | `mapper`                            | `TodoToProto`, `TodoInputFromProto`, and `ListTodoInputFromProto`, value types, enums, and a oneof's sum type included                    |
 | [kanna-fixture](https://github.com/go-kanna/fixture)   | `model/fixture`                     | `fixture.Todo()`, every field filled, for tests                                                                                           |
 | [kanna-i18n](https://github.com/go-kanna/i18n)         | `internal/messages`                 | `messages.TodoNotFound()` and the texts of validation error codes, in English and Japanese                                                |
 | [kanna-value](https://github.com/go-kanna/value)       | `model`                             | `NewCompletedAt` and the JSON and SQL methods of `model.CompletedAt`, a time held between 2000 and 2100, and of `model.Priority`, an enum |
@@ -63,6 +63,10 @@ buf curl --protocol grpc --http2-prior-knowledge --schema proto \
   http://localhost:8080/showcase.todo.v1.TodoService/PutTodo
 
 buf curl --protocol grpc --http2-prior-knowledge --schema proto \
+  http://localhost:8080/showcase.todo.v1.TodoService/ListTodo
+
+buf curl --protocol grpc --http2-prior-knowledge --schema proto \
+  --data '{"priority": {"priority": "PRIORITY_HIGH"}}' \
   http://localhost:8080/showcase.todo.v1.TodoService/ListTodo
 ```
 

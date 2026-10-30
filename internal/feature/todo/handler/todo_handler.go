@@ -37,7 +37,12 @@ func (h Handler) DeleteTodo(
 }
 
 func (h Handler) ListTodo(ctx context.Context, request *todov1.ListTodoRequest) (*todov1.ListTodoResponse, error) {
-	out, err := h.list.Do(ctx, usecase.ListTodoInput{})
+	in, err := mapper.ListTodoInputFromProto(request)
+	if err != nil {
+		// A priority of a number the service does not know.
+		return nil, aerrors.InvalidArgument(err.Error())
+	}
+	out, err := h.list.Do(ctx, in)
 	if err != nil {
 		return nil, err
 	}

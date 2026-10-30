@@ -24,6 +24,30 @@ func (x DeleteTodoInput) Validate() error {
 	return errs.Err()
 }
 
+// Validate checks x against the validate tags of ListTodoInput. It returns the
+// validate.Errors of every rule x breaks, or nil.
+func (x ListTodoInput) Validate() error {
+	var errs validate.Errors
+
+	if x.Filter != nil {
+		errs.Nest("filter", x.Filter.Validate())
+	}
+
+	return errs.Err()
+}
+
+// Validate checks x against the validate tags of PriorityFilter. It returns the
+// validate.Errors of every rule x breaks, or nil.
+func (x PriorityFilter) Validate() error {
+	var errs validate.Errors
+
+	if x.Priority == "" {
+		errs.Add("priority", validate.Blank())
+	}
+
+	return errs.Err()
+}
+
 // Validate checks x against the validate tags of PutTodoInput. It returns the
 // validate.Errors of every rule x breaks, or nil.
 func (x PutTodoInput) Validate() error {
