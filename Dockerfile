@@ -7,8 +7,10 @@ ENV BIN_NAME=$BIN_NAME
 
 WORKDIR /src
 
-COPY . .
-
+# The modules first, so that a change to the source alone keeps the layer they are downloaded in.
+COPY go.mod go.sum ./
 RUN go mod download
+
+COPY . .
 
 CMD ["sh", "-c", "go tool air -c .air.${BIN_NAME}.toml"]
