@@ -2,25 +2,25 @@
 
 A to-do gRPC service in Go, written to show the [kanna](https://github.com/go-kanna/kanna) code generators at work in
 one application. Each generator takes over a piece of code you would otherwise write by hand: constructors, validation,
-mappings between layers, test fixtures, and typed messages. Everything it writes is committed, so you can read it next
-to what it was generated from.
+mappings between layers, test fixtures, typed messages, value types, and the database code behind a repository.
+Everything it writes is committed, so you can read it next to what it was generated from.
 
 Requires Go 1.27, Docker with Compose, and the [buf](https://buf.build/docs/cli/installation/) CLI.
 
 ## What each generator does here
 
-| Tool                                                   | Where                               | What it writes                                                                                 |
-|--------------------------------------------------------|-------------------------------------|------------------------------------------------------------------------------------------------|
-| [kanna-di](https://github.com/go-kanna/di)             | `internal/di`, `usecase`, `handler` | `NewInfra`, `NewPutTodo`, `NewHandler`, …: the constructor of each `//kanna:container` struct  |
-| [kanna-validate](https://github.com/go-kanna/validate) | `config`, `usecase`                 | `Validate` methods from the `validate` tags, `rule=model.CompletedAtRule` among them           |
-| [kanna-mapper](https://github.com/go-kanna/mapper)     | `mapper`, `queries`                 | `TodoToProto` (model → protobuf) and `RowToTodo` (sqlc row → model), validated values included |
-| [kanna-fixture](https://github.com/go-kanna/fixture)   | `model/fixture`                     | `fixture.Todo()`, every field filled, for tests                                                |
-| [kanna-i18n](https://github.com/go-kanna/i18n)         | `internal/messages`                 | `messages.TodoNotFound()` and the texts of validation error codes, in English and Japanese     |
-| [validated](https://github.com/go-kanna/validated)     | `model`                             | Nothing: a library. `model.CompletedAt` is a time held between 2000 and 2100                   |
+| Tool                                                   | Where                               | What it writes                                                                                                           |
+|--------------------------------------------------------|-------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| [kanna-di](https://github.com/go-kanna/di)             | `internal/di`, `usecase`, `handler` | `NewInfra`, `NewPutTodo`, `NewHandler`, …: the constructor of each `//kanna:container` struct                            |
+| [kanna-validate](https://github.com/go-kanna/validate) | `config`, `usecase`                 | `Validate` methods from the `validate` tags, `rule=model.CompletedAt` among them                                         |
+| [kanna-mapper](https://github.com/go-kanna/mapper)     | `mapper`                            | `TodoToProto` (model → protobuf), validated values included                                                              |
+| [kanna-fixture](https://github.com/go-kanna/fixture)   | `model/fixture`                     | `fixture.Todo()`, every field filled, for tests                                                                          |
+| [kanna-i18n](https://github.com/go-kanna/i18n)         | `internal/messages`                 | `messages.TodoNotFound()` and the texts of validation error codes, in English and Japanese                               |
+| [kanna-value](https://github.com/go-kanna/value)       | `model`                             | `NewCompletedAt` and the JSON and SQL methods of `model.CompletedAt`, a time held between 2000 and 2100                  |
+| [kanna-orm](https://github.com/go-kanna/orm)           | `scopes`, `postgres`                | `postgres.Todo`, which implements `repository.Todo`, and the scopes it reads through, as `scopes.Todos().CreatedAtAsc()` |
 
-The rest of the stack: [sqlc](https://sqlc.dev) for queries, [buf](https://buf.build) for protobuf and gRPC,
-[goose](https://github.com/pressly/goose) for migrations, and [pgtestdb](https://github.com/peterldowns/pgtestdb) for
-a fresh database per test.
+The rest of the stack: [buf](https://buf.build) for protobuf and gRPC, [goose](https://github.com/pressly/goose) for
+migrations, and [pgtestdb](https://github.com/peterldowns/pgtestdb) for a fresh database per test.
 
 ## Layout
 
@@ -32,9 +32,9 @@ internal/
   di                      the containers the server is built from: Config and Infra
   feature/todo/
     model                 the domain type, and the fixtures generated for it
-    repository            the interface the use cases depend on
-    postgres              its implementation on sqlc
-    queries               SQL, the code sqlc writes, and the row → model mapping
+    scopes                the scope types the repository reads through
+    repository            the interface the use cases depend on, and the SQL it takes written by hand
+    postgres              its implementation, which kanna-orm writes
     usecase               one struct per operation: List, Put, SetCompletion, Delete
     mapper                the model → protobuf mapping
     handler               the gRPC handler
@@ -68,15 +68,20 @@ buf curl --protocol grpc --http2-prior-knowledge --schema proto \
 
 ## Develop
 
-| Command                        | What it does                                                      |
-|--------------------------------|-------------------------------------------------------------------|
-| `make gen`                     | run every generator: `go generate`, then buf, then sqlc           |
-| `make gen-check`               | fail if the kanna generators would change what is committed       |
-| `make test`                    | run the tests, each against its own database                      |
-| `make lint`                    | run golangci-lint                                                 |
-| `make sql-lint`                | run sqlfluff over the migrations                                  |
-| `make db-reset`                | drop the database, create it again, and apply the migrations      |
-| `make new-migration name=...`  | add a migration file                                              |
+| Command                       | What it does                                                            |
+|-------------------------------|-------------------------------------------------------------------------|
+| `make gen`                    | run every generator: `go generate`, then buf                            |
+| `make gen-check`              | fail if the kanna generators would change what is committed             |
+| `make test`                   | run the tests, each against its own database                            |
+| `make lint`                   | run golangci-lint                                                       |
+| `make sql-lint`               | run sqlfluff over the migrations                                        |
+| `make db-reset`               | drop the database, create it again, and apply the migrations            |
+| `make db-describe`            | record the schema of the migrated database in `kanna-orm.snapshot.json` |
+| `make new-migration name=...` | add a migration file                                                    |
+
+kanna-orm generates from `kanna-orm.snapshot.json`, not from a database, so `make gen` needs none. After a migration,
+apply it with `make db-migrate`, record it with `make db-describe`, and commit the snapshot along with the migration;
+CI fails when the two disagree.
 
 The tests need the database running, migrated once with `make db-migrate` (that creates the roles they connect as), and
 its URLs in the environment:
