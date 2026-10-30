@@ -2,6 +2,7 @@ errors:
   attributes:
     id: ID
     title: タイトル
+    priority: 優先度
     completed_at: 完了日時
 
 todo:

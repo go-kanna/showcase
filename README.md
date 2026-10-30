@@ -9,15 +9,15 @@ Requires Go 1.27, Docker with Compose, and the [buf](https://buf.build/docs/cli/
 
 ## What each generator does here
 
-| Tool                                                   | Where                               | What it writes                                                                                                           |
-|--------------------------------------------------------|-------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
-| [kanna-di](https://github.com/go-kanna/di)             | `internal/di`, `usecase`, `handler` | `NewInfra`, `NewPutTodo`, `NewHandler`, …: the constructor of each `//kanna:container` struct                            |
-| [kanna-validate](https://github.com/go-kanna/validate) | `config`, `usecase`                 | `Validate` methods from the `validate` tags, `rule=model.CompletedAt` among them                                         |
-| [kanna-mapper](https://github.com/go-kanna/mapper)     | `mapper`                            | `TodoToProto` (model → protobuf), validated values included                                                              |
-| [kanna-fixture](https://github.com/go-kanna/fixture)   | `model/fixture`                     | `fixture.Todo()`, every field filled, for tests                                                                          |
-| [kanna-i18n](https://github.com/go-kanna/i18n)         | `internal/messages`                 | `messages.TodoNotFound()` and the texts of validation error codes, in English and Japanese                               |
-| [kanna-value](https://github.com/go-kanna/value)       | `model`                             | `NewCompletedAt` and the JSON and SQL methods of `model.CompletedAt`, a time held between 2000 and 2100                  |
-| [kanna-orm](https://github.com/go-kanna/orm)           | `scopes`, `postgres`                | `postgres.Todo`, which implements `repository.Todo`, and the scopes it reads through, as `scopes.Todos().CreatedAtAsc()` |
+| Tool                                                   | Where                               | What it writes                                                                                                                            |
+|--------------------------------------------------------|-------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|
+| [kanna-di](https://github.com/go-kanna/di)             | `internal/di`, `usecase`, `handler` | `NewInfra`, `NewPutTodo`, `NewHandler`, …: the constructor of each `//kanna:container` struct                                             |
+| [kanna-validate](https://github.com/go-kanna/validate) | `config`, `usecase`                 | `Validate` methods from the `validate` tags, `rule=model.CompletedAt` among them                                                          |
+| [kanna-mapper](https://github.com/go-kanna/mapper)     | `mapper`                            | `TodoToProto` and `TodoInputFromProto`, between model and protobuf, value types and enums included                                        |
+| [kanna-fixture](https://github.com/go-kanna/fixture)   | `model/fixture`                     | `fixture.Todo()`, every field filled, for tests                                                                                           |
+| [kanna-i18n](https://github.com/go-kanna/i18n)         | `internal/messages`                 | `messages.TodoNotFound()` and the texts of validation error codes, in English and Japanese                                                |
+| [kanna-value](https://github.com/go-kanna/value)       | `model`                             | `NewCompletedAt` and the JSON and SQL methods of `model.CompletedAt`, a time held between 2000 and 2100, and of `model.Priority`, an enum |
+| [kanna-orm](https://github.com/go-kanna/orm)           | `scopes`, `postgres`                | `postgres.Todo`, which implements `repository.Todo`, and the scopes it reads through, as `scopes.Todos().CreatedAtAsc()`                  |
 
 The rest of the stack: [buf](https://buf.build) for protobuf and gRPC, [goose](https://github.com/pressly/goose) for
 migrations, and [pgtestdb](https://github.com/peterldowns/pgtestdb) for a fresh database per test.
@@ -59,7 +59,7 @@ The server listens on `localhost:8080`. It has no reflection service, so give th
 
 ```sh
 buf curl --protocol grpc --http2-prior-knowledge --schema proto \
-  --data '{"todo": {"id": "01890a5d-ac96-774b-bcce-b302099a8057", "title": "Buy milk"}}' \
+  --data '{"todo": {"id": "01890a5d-ac96-774b-bcce-b302099a8057", "title": "Buy milk", "priority": "PRIORITY_HIGH"}}' \
   http://localhost:8080/showcase.todo.v1.TodoService/PutTodo
 
 buf curl --protocol grpc --http2-prior-knowledge --schema proto \

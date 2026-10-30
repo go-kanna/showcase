@@ -1,10 +1,12 @@
 package postgres_test
 
 import (
+	"errors"
 	"testing"
 	"time"
 
 	"github.com/go-kanna/orm"
+	"github.com/go-kanna/value/rule"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -50,9 +52,35 @@ func TestTodo_InsertAndGet(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, m.ID, got.ID)
 	assert.Equal(t, m.Title, got.Title)
+	assert.Equal(t, m.Priority, got.Priority)
 	assert.WithinDuration(t, m.CompletedAt.Time(), got.CompletedAt.Time(), time.Millisecond)
 	assert.WithinDuration(t, m.CreatedAt, got.CreatedAt, time.Millisecond)
 	assert.WithinDuration(t, m.UpdatedAt, got.UpdatedAt, time.Millisecond)
+}
+
+// A row holding a priority the model has no constant for, as one written by a
+// newer release and read after a rollback, is an error rather than a to-do
+// holding it.
+func TestTodo_GetUnknownPriority(t *testing.T) {
+	t.Parallel()
+
+	// arrange
+	ifr := infra.New(t)
+	sut := postgres.NewTodo(ifr.Reader)
+	m := fixture.Todo()
+	ifr.InTx(t, func(tx tx.Tx) {
+		require.NoError(t, sut.Bind(tx).Upsert(t.Context(), m))
+		_, err := tx.DBTX().Exec(t.Context(), "UPDATE todos SET priority = 'urgent' WHERE id = $1", m.ID)
+		require.NoError(t, err)
+	})
+
+	// act
+	_, err := sut.Get(t.Context(), m.ID)
+
+	// assert
+	rerr, ok := errors.AsType[*rule.Error](err)
+	require.True(t, ok, "err = %v, want a *rule.Error", err)
+	assert.Equal(t, "inclusion", rerr.Code())
 }
 
 func TestTodo_UpdateAndGet(t *testing.T) {

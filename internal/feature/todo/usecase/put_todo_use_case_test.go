@@ -30,6 +30,7 @@ func TestPutTodo_Insert(t *testing.T) {
 	_, err := usecase.NewPutTodo(ifr.Infra).Do(t.Context(), usecase.PutTodoInput{
 		ID:          m.ID.String(),
 		Title:       m.Title,
+		Priority:    model.PriorityHigh,
 		CompletedAt: &completedAt,
 	})
 
@@ -39,6 +40,7 @@ func TestPutTodo_Insert(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, m.ID, got.ID)
 	assert.Equal(t, m.Title, got.Title)
+	assert.Equal(t, model.PriorityHigh, got.Priority)
 	require.NotNil(t, got.CompletedAt)
 	assert.WithinDuration(t, completedAt, got.CompletedAt.Time(), time.Millisecond)
 	assert.WithinDuration(t, time.Now(), got.CreatedAt, time.Second)
@@ -62,8 +64,9 @@ func TestPutTodo_Update(t *testing.T) {
 
 	// act
 	_, err := usecase.NewPutTodo(ifr.Infra).Do(t.Context(), usecase.PutTodoInput{
-		ID:    m.ID.String(),
-		Title: title,
+		ID:       m.ID.String(),
+		Title:    title,
+		Priority: m.Priority,
 	})
 
 	// assert
@@ -90,6 +93,7 @@ func TestPutTodo_InvalidCompletedAt(t *testing.T) {
 	_, err := usecase.NewPutTodo(ifr.Infra).Do(t.Context(), usecase.PutTodoInput{
 		ID:          m.ID.String(),
 		Title:       m.Title,
+		Priority:    m.Priority,
 		CompletedAt: &completedAt,
 	})
 
@@ -99,6 +103,32 @@ func TestPutTodo_InvalidCompletedAt(t *testing.T) {
 	require.Len(t, verrs, 1)
 	assert.Equal(t, "completed_at", verrs[0].Field)
 	assert.Equal(t, "greater_than_or_equal_to", verrs[0].Code())
+	_, err = todos.Get(t.Context(), m.ID)
+	require.ErrorIs(t, err, orm.ErrNotFound)
+}
+
+// A request without a priority comes in as PRIORITY_UNSPECIFIED, which the
+// mapper reads as the zero value, the one that stands for none.
+func TestPutTodo_NoPriority(t *testing.T) {
+	t.Parallel()
+
+	// arrange
+	ifr := infra.New(t)
+	todos := postgres.NewTodo(ifr.Reader)
+	m := fixture.Todo()
+
+	// act
+	_, err := usecase.NewPutTodo(ifr.Infra).Do(t.Context(), usecase.PutTodoInput{
+		ID:    m.ID.String(),
+		Title: m.Title,
+	})
+
+	// assert
+	var verrs validate.Errors
+	require.ErrorAs(t, err, &verrs)
+	require.Len(t, verrs, 1)
+	assert.Equal(t, "priority", verrs[0].Field)
+	assert.Equal(t, "blank", verrs[0].Code())
 	_, err = todos.Get(t.Context(), m.ID)
 	require.ErrorIs(t, err, orm.ErrNotFound)
 }

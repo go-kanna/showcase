@@ -20,6 +20,7 @@ func Todo(setters ...func(*model.Todo)) model.Todo {
 	x := model.Todo{
 		ID:        uuid.MustParse(fmt.Sprintf("00000000-0000-4000-8000-%012x", n)),
 		Title:     fmt.Sprintf("title-%d", n),
+		Priority:  model.PriorityLow,
 		CreatedAt: time.Date(2000, time.January, 1, 0, 0, int(n), 0, time.UTC),
 		UpdatedAt: time.Date(2000, time.January, 1, 0, 0, int(n), 0, time.UTC),
 	}

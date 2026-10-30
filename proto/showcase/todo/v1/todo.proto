@@ -11,12 +11,20 @@ service TodoService {
   rpc DeleteTodo(DeleteTodoRequest) returns (DeleteTodoResponse);
 }
 
+enum Priority {
+  PRIORITY_UNSPECIFIED = 0;
+  PRIORITY_LOW = 1;
+  PRIORITY_NORMAL = 2;
+  PRIORITY_HIGH = 3;
+}
+
 message Todo {
   string id = 1;
   string title = 2 [debug_redact = true];
   optional google.protobuf.Timestamp completed_at = 3;
   google.protobuf.Timestamp created_at = 4;
   google.protobuf.Timestamp updated_at = 5;
+  Priority priority = 6;
 }
 
 message TodoInput {
@@ -24,6 +32,7 @@ message TodoInput {
   string title = 2 [
     debug_redact = true
   ];
+  Priority priority = 3;
 }
 
 message ListTodoRequest {}

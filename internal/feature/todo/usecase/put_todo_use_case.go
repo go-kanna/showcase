@@ -19,9 +19,10 @@ import (
 
 //kanna:validate
 type PutTodoInput struct {
-	ID          string     `json:"id"           validate:"required,uuid"`
-	Title       string     `json:"title"        validate:"required,min=1,max=200"`
-	CompletedAt *time.Time `json:"completed_at" validate:"rule=model.CompletedAt"`
+	ID          string         `json:"id"           validate:"required,uuid"`
+	Title       string         `json:"title"        validate:"required,min=1,max=200"`
+	Priority    model.Priority `json:"priority"     validate:"required"`
+	CompletedAt *time.Time     `json:"completed_at" validate:"rule=model.CompletedAt"`
 }
 
 type PutTodoOutput struct {
@@ -51,6 +52,7 @@ func (uc PutTodo) Do(ctx context.Context, in PutTodoInput) (PutTodoOutput, error
 		m := model.Todo{
 			ID:          id,
 			Title:       in.Title,
+			Priority:    in.Priority,
 			CompletedAt: ptr.Map(in.CompletedAt, model.MustCompletedAt),
 			CreatedAt:   now,
 			UpdatedAt:   now,
