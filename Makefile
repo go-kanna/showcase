@@ -49,8 +49,10 @@ gen:
 gen-go:
 	go generate $(GEN_PACKAGES) ./...
 
+# Both the protobuf code and the kanna output, each checked against what is committed.
 .PHONY: gen-check
 gen-check:
+	$(MAKE) gen-proto-check
 	KANNA_CHECK=1 go generate $(GEN_PACKAGES) ./...
 
 # Delete what the kanna generators wrote and generate it again in one run, as after a clone that lost it, to check that
@@ -65,6 +67,13 @@ gen-fresh-check:
 .PHONY: gen-proto
 gen-proto:
 	cd proto && buf generate
+
+# buf has no mode that only checks, so regenerate and fail on any difference from what is committed, a file added or
+# left over included. A message nothing in Go uses yet compiles either way, so only this tells it was not generated.
+.PHONY: gen-proto-check
+gen-proto-check: gen-proto
+	git diff --exit-code -- internal/gen
+	test -z "$$(git status --porcelain -- internal/gen)"
 
 .PHONY: db-create
 db-create:
