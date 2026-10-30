@@ -51,6 +51,11 @@ func (h Handler) PutTodo(ctx context.Context, request *todov1.PutTodoRequest) (*
 		return nil, aerrors.InvalidArgument(err.Error())
 	}
 	if ts := request.GetCompletedAt(); ts != nil {
+		// AsTime would turn a timestamp protobuf does not allow, such as one of negative nanos, into a time like any
+		// other, which the rule of CompletedAt could not tell from one sent as it is.
+		if err := ts.CheckValid(); err != nil {
+			return nil, aerrors.InvalidArgument(err.Error())
+		}
 		in.CompletedAt = new(ts.AsTime())
 	}
 	if _, err := h.put.Do(ctx, in); err != nil {
