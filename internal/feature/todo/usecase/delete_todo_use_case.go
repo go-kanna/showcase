@@ -8,7 +8,6 @@ import (
 
 	"github.com/go-kanna/orm"
 
-	"github.com/go-kanna/showcase/internal/di"
 	"github.com/go-kanna/showcase/internal/feature/todo/repository"
 	"github.com/go-kanna/showcase/internal/infra/storage/tx"
 	"github.com/go-kanna/showcase/internal/lib/either"
@@ -24,9 +23,8 @@ type DeleteTodoOutput struct {
 
 //kanna:container
 type DeleteTodo struct {
-	_          *di.Infra `di:"arg"`
-	transactor tx.Transactor
-	todos      repository.Todo `di:"with=postgres.NewTodo"`
+	transactor tx.Transactor   `di:"arg"`
+	todos      repository.Todo `di:"arg"`
 }
 
 func (uc DeleteTodo) Do(ctx context.Context, in DeleteTodoInput) (DeleteTodoOutput, error) {

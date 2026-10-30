@@ -4,7 +4,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-kanna/orm"
 	"github.com/go-kanna/validate"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -27,7 +26,7 @@ func TestPutTodo_Insert(t *testing.T) {
 	completedAt := time.Now()
 
 	// act
-	_, err := usecase.NewPutTodo(ifr.Infra).Do(t.Context(), usecase.PutTodoInput{
+	_, err := usecase.NewPutTodo(ifr.Transactor, todos).Do(t.Context(), usecase.PutTodoInput{
 		ID:          m.ID.String(),
 		Title:       m.Title,
 		Priority:    model.PriorityHigh,
@@ -63,7 +62,7 @@ func TestPutTodo_Update(t *testing.T) {
 	title := m.Title + " (updated)"
 
 	// act
-	_, err := usecase.NewPutTodo(ifr.Infra).Do(t.Context(), usecase.PutTodoInput{
+	_, err := usecase.NewPutTodo(ifr.Transactor, todos).Do(t.Context(), usecase.PutTodoInput{
 		ID:       m.ID.String(),
 		Title:    title,
 		Priority: m.Priority,
@@ -80,17 +79,44 @@ func TestPutTodo_Update(t *testing.T) {
 	assert.WithinDuration(t, time.Now(), got.UpdatedAt, time.Second)
 }
 
+// The rest need no database: the input is checked before any repository is
+// called, and what reaches one is told by a fake.
+
+func TestPutTodo_Upserts(t *testing.T) {
+	t.Parallel()
+
+	// arrange
+	todos := &fakeTodos{}
+	m := fixture.Todo()
+
+	// act
+	_, err := usecase.NewPutTodo(fakeTransactor{}, todos).Do(t.Context(), usecase.PutTodoInput{
+		ID:       m.ID.String(),
+		Title:    m.Title,
+		Priority: model.PriorityHigh,
+	})
+
+	// assert
+	require.NoError(t, err)
+	require.Len(t, todos.upserted, 1)
+	got := todos.upserted[0]
+	assert.Equal(t, m.ID, got.ID)
+	assert.Equal(t, m.Title, got.Title)
+	assert.Equal(t, model.PriorityHigh, got.Priority)
+	assert.Nil(t, got.CompletedAt)
+	assert.Equal(t, got.CreatedAt, got.UpdatedAt)
+}
+
 func TestPutTodo_InvalidCompletedAt(t *testing.T) {
 	t.Parallel()
 
 	// arrange
-	ifr := infra.New(t)
-	todos := postgres.NewTodo(ifr.Reader)
+	todos := &fakeTodos{}
 	m := fixture.Todo()
 	completedAt := time.Date(1999, time.December, 31, 0, 0, 0, 0, time.UTC)
 
 	// act
-	_, err := usecase.NewPutTodo(ifr.Infra).Do(t.Context(), usecase.PutTodoInput{
+	_, err := usecase.NewPutTodo(fakeTransactor{}, todos).Do(t.Context(), usecase.PutTodoInput{
 		ID:          m.ID.String(),
 		Title:       m.Title,
 		Priority:    m.Priority,
@@ -103,8 +129,7 @@ func TestPutTodo_InvalidCompletedAt(t *testing.T) {
 	require.Len(t, verrs, 1)
 	assert.Equal(t, "completed_at", verrs[0].Field)
 	assert.Equal(t, "greater_than_or_equal_to", verrs[0].Code())
-	_, err = todos.Get(t.Context(), m.ID)
-	require.ErrorIs(t, err, orm.ErrNotFound)
+	assert.Empty(t, todos.upserted)
 }
 
 // A request without a priority comes in as PRIORITY_UNSPECIFIED, which the
@@ -113,12 +138,11 @@ func TestPutTodo_NoPriority(t *testing.T) {
 	t.Parallel()
 
 	// arrange
-	ifr := infra.New(t)
-	todos := postgres.NewTodo(ifr.Reader)
+	todos := &fakeTodos{}
 	m := fixture.Todo()
 
 	// act
-	_, err := usecase.NewPutTodo(ifr.Infra).Do(t.Context(), usecase.PutTodoInput{
+	_, err := usecase.NewPutTodo(fakeTransactor{}, todos).Do(t.Context(), usecase.PutTodoInput{
 		ID:    m.ID.String(),
 		Title: m.Title,
 	})
@@ -129,6 +153,5 @@ func TestPutTodo_NoPriority(t *testing.T) {
 	require.Len(t, verrs, 1)
 	assert.Equal(t, "priority", verrs[0].Field)
 	assert.Equal(t, "blank", verrs[0].Code())
-	_, err = todos.Get(t.Context(), m.ID)
-	require.ErrorIs(t, err, orm.ErrNotFound)
+	assert.Empty(t, todos.upserted)
 }

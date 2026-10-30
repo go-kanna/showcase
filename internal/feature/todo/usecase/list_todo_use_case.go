@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/go-kanna/showcase/internal/di"
 	"github.com/go-kanna/showcase/internal/errors/aerrors"
 	"github.com/go-kanna/showcase/internal/feature/todo/model"
 	"github.com/go-kanna/showcase/internal/feature/todo/repository"
@@ -22,9 +21,8 @@ type ListTodoOutput struct {
 
 //kanna:container
 type ListTodo struct {
-	_          *di.Infra `di:"arg"`
-	transactor tx.ReadTransactor
-	todos      repository.Todo `di:"with=postgres.NewTodo"`
+	transactor tx.ReadTransactor `di:"arg"`
+	todos      repository.Todo   `di:"arg"`
 }
 
 func (uc ListTodo) Do(ctx context.Context, in ListTodoInput) (ListTodoOutput, error) {

@@ -6,6 +6,7 @@ import (
 	"github.com/go-kanna/showcase/internal/di"
 	"github.com/go-kanna/showcase/internal/errors/aerrors"
 	"github.com/go-kanna/showcase/internal/feature/todo/mapper"
+	"github.com/go-kanna/showcase/internal/feature/todo/repository"
 	"github.com/go-kanna/showcase/internal/feature/todo/usecase"
 	todov1 "github.com/go-kanna/showcase/internal/gen/showcase/todo/v1"
 	"github.com/go-kanna/showcase/internal/lib/xslices"
@@ -16,7 +17,8 @@ import (
 type Handler struct {
 	todov1.UnimplementedTodoServiceServer
 
-	_ *di.Infra `di:"arg"`
+	_ *di.Infra       `di:"arg"`
+	_ repository.Todo `di:"with=postgres.NewTodo"`
 
 	delete        *usecase.DeleteTodo
 	list          *usecase.ListTodo

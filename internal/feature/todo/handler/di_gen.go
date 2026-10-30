@@ -4,15 +4,21 @@ package handler
 
 import (
 	"github.com/go-kanna/showcase/internal/di"
+	"github.com/go-kanna/showcase/internal/feature/todo/postgres"
 	"github.com/go-kanna/showcase/internal/feature/todo/usecase"
 )
 
 // NewHandler initializes dependencies and constructs Handler.
 func NewHandler(infra *di.Infra) *Handler {
-	delete2 := usecase.NewDeleteTodo(infra)
-	list := usecase.NewListTodo(infra)
-	put := usecase.NewPutTodo(infra)
-	setCompletion := usecase.NewSetTodoCompletion(infra)
+	transactor := infra.Transactor
+	reader := infra.Reader
+	db := postgres.NewDBTX(reader)
+	todo := postgres.NewTodo(db)
+	delete2 := usecase.NewDeleteTodo(transactor, todo)
+	readTransactor := infra.ReadTransactor
+	list := usecase.NewListTodo(readTransactor, todo)
+	put := usecase.NewPutTodo(transactor, todo)
+	setCompletion := usecase.NewSetTodoCompletion(transactor, todo)
 
 	return &Handler{
 		delete:        delete2,

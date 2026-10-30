@@ -34,7 +34,8 @@ func TestListTodo(t *testing.T) {
 	}
 
 	// act
-	got, err := usecase.NewListTodo(ifr.Infra).Do(t.Context(), usecase.ListTodoInput{})
+	sut := usecase.NewListTodo(ifr.ReadTransactor, postgres.NewTodo(ifr.Reader))
+	got, err := sut.Do(t.Context(), usecase.ListTodoInput{})
 
 	// assert
 	require.NoError(t, err)
