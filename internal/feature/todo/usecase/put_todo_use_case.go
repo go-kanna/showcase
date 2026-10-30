@@ -7,8 +7,9 @@ import (
 	"time"
 	"uuid"
 
+	"github.com/go-kanna/orm"
+
 	"github.com/go-kanna/showcase/internal/di"
-	"github.com/go-kanna/showcase/internal/errors/aerrors"
 	"github.com/go-kanna/showcase/internal/feature/todo/model"
 	"github.com/go-kanna/showcase/internal/feature/todo/repository"
 	"github.com/go-kanna/showcase/internal/infra/storage/tx"
@@ -41,8 +42,8 @@ func (uc PutTodo) Do(ctx context.Context, in PutTodoInput) (PutTodoOutput, error
 	id := either.Must(uuid.Parse(in.ID))
 	if err := uc.transactor.WithTx(ctx, func(tx tx.Tx) error {
 		todos := uc.todos.Bind(tx)
-		_, err := todos.Find(ctx, id)
-		if err != nil && !errors.Is(err, aerrors.ErrNotFound) {
+		_, err := todos.Get(ctx, id)
+		if err != nil && !errors.Is(err, orm.ErrNotFound) {
 			return fmt.Errorf("find todo: %w", err)
 		}
 
@@ -54,7 +55,7 @@ func (uc PutTodo) Do(ctx context.Context, in PutTodoInput) (PutTodoOutput, error
 			CreatedAt:   now,
 			UpdatedAt:   now,
 		}
-		_, err = todos.Upsert(ctx, m)
+		err = todos.Upsert(ctx, m)
 		if err != nil {
 			return fmt.Errorf("upsert todo: %w", err)
 		}

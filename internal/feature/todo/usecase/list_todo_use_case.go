@@ -9,6 +9,7 @@ import (
 	"github.com/go-kanna/showcase/internal/errors/aerrors"
 	"github.com/go-kanna/showcase/internal/feature/todo/model"
 	"github.com/go-kanna/showcase/internal/feature/todo/repository"
+	"github.com/go-kanna/showcase/internal/feature/todo/scopes"
 	"github.com/go-kanna/showcase/internal/infra/storage/tx"
 )
 
@@ -31,7 +32,7 @@ func (uc ListTodo) Do(ctx context.Context, in ListTodoInput) (ListTodoOutput, er
 	if err := uc.transactor.WithReadTx(ctx, func(tx tx.Tx) error {
 		todos := uc.todos.Bind(tx)
 		var err error
-		ms, err = todos.List(ctx)
+		ms, err = todos.List(ctx, scopes.Todos().CreatedAtAsc())
 		if err != nil && !errors.Is(err, aerrors.ErrNotFound) {
 			return fmt.Errorf("find todo: %w", err)
 		}

@@ -4,11 +4,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-kanna/orm"
 	"github.com/go-kanna/validate"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/go-kanna/showcase/internal/errors/aerrors"
 	"github.com/go-kanna/showcase/internal/feature/todo/model"
 	"github.com/go-kanna/showcase/internal/feature/todo/model/fixture"
 	"github.com/go-kanna/showcase/internal/feature/todo/postgres"
@@ -35,7 +35,7 @@ func TestPutTodo_Insert(t *testing.T) {
 
 	// assert
 	require.NoError(t, err)
-	got, err := todos.Find(t.Context(), m.ID)
+	got, err := todos.Get(t.Context(), m.ID)
 	require.NoError(t, err)
 	assert.Equal(t, m.ID, got.ID)
 	assert.Equal(t, m.Title, got.Title)
@@ -55,7 +55,7 @@ func TestPutTodo_Update(t *testing.T) {
 		m.CompletedAt = new(model.MustCompletedAt(time.Now()))
 	})
 	ifr.InTx(t, func(tx tx.Tx) {
-		_, err := todos.Bind(tx).Upsert(t.Context(), m)
+		err := todos.Bind(tx).Upsert(t.Context(), m)
 		require.NoError(t, err)
 	})
 	title := m.Title + " (updated)"
@@ -68,7 +68,7 @@ func TestPutTodo_Update(t *testing.T) {
 
 	// assert
 	require.NoError(t, err)
-	got, err := todos.Find(t.Context(), m.ID)
+	got, err := todos.Get(t.Context(), m.ID)
 	require.NoError(t, err)
 	assert.Equal(t, m.ID, got.ID)
 	assert.Equal(t, title, got.Title)
@@ -99,6 +99,6 @@ func TestPutTodo_InvalidCompletedAt(t *testing.T) {
 	require.Len(t, verrs, 1)
 	assert.Equal(t, "completed_at", verrs[0].Field)
 	assert.Equal(t, "greater_than_or_equal_to", verrs[0].Code())
-	_, err = todos.Find(t.Context(), m.ID)
-	require.ErrorIs(t, err, aerrors.ErrNotFound)
+	_, err = todos.Get(t.Context(), m.ID)
+	require.ErrorIs(t, err, orm.ErrNotFound)
 }

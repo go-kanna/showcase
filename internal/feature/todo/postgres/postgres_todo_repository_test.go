@@ -4,18 +4,19 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-kanna/orm"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/go-kanna/showcase/internal/errors/aerrors"
 	"github.com/go-kanna/showcase/internal/feature/todo/model"
 	"github.com/go-kanna/showcase/internal/feature/todo/model/fixture"
 	"github.com/go-kanna/showcase/internal/feature/todo/postgres"
+	"github.com/go-kanna/showcase/internal/feature/todo/scopes"
 	"github.com/go-kanna/showcase/internal/infra/storage/tx"
 	"github.com/go-kanna/showcase/test/infra"
 )
 
-func TestTodo_FindNotFound(t *testing.T) {
+func TestTodo_GetNotFound(t *testing.T) {
 	t.Parallel()
 
 	// arrange
@@ -23,13 +24,13 @@ func TestTodo_FindNotFound(t *testing.T) {
 	sut := postgres.NewTodo(ifr.Reader)
 
 	// act
-	_, err := sut.Find(t.Context(), fixture.Todo().ID)
+	_, err := sut.Get(t.Context(), fixture.Todo().ID)
 
 	// assert
-	require.ErrorIs(t, err, aerrors.ErrNotFound)
+	require.ErrorIs(t, err, orm.ErrNotFound)
 }
 
-func TestTodo_InsertAndFind(t *testing.T) {
+func TestTodo_InsertAndGet(t *testing.T) {
 	t.Parallel()
 
 	// arrange
@@ -39,12 +40,11 @@ func TestTodo_InsertAndFind(t *testing.T) {
 		m.CompletedAt = new(model.MustCompletedAt(time.Now()))
 	})
 	ifr.InTx(t, func(tx tx.Tx) {
-		_, err := sut.Bind(tx).Upsert(t.Context(), m)
-		require.NoError(t, err)
+		require.NoError(t, sut.Bind(tx).Upsert(t.Context(), m))
 	})
 
 	// act
-	got, err := sut.Find(t.Context(), m.ID)
+	got, err := sut.Get(t.Context(), m.ID)
 
 	// assert
 	require.NoError(t, err)
@@ -55,7 +55,7 @@ func TestTodo_InsertAndFind(t *testing.T) {
 	assert.WithinDuration(t, m.UpdatedAt, got.UpdatedAt, time.Millisecond)
 }
 
-func TestTodo_UpdateAndFind(t *testing.T) {
+func TestTodo_UpdateAndGet(t *testing.T) {
 	t.Parallel()
 
 	// arrange
@@ -63,24 +63,24 @@ func TestTodo_UpdateAndFind(t *testing.T) {
 	sut := postgres.NewTodo(ifr.Reader)
 	m := fixture.Todo()
 	ifr.InTx(t, func(tx tx.Tx) {
-		_, err := sut.Bind(tx).Upsert(t.Context(), m)
-		require.NoError(t, err)
+		require.NoError(t, sut.Bind(tx).Upsert(t.Context(), m))
 	})
+	createdAt := m.CreatedAt
 	now := time.Now()
 	m.CompletedAt = new(model.MustCompletedAt(now))
+	m.CreatedAt = now
 	m.UpdatedAt = now
 
 	// act
 	ifr.InTx(t, func(tx tx.Tx) {
-		updated, err := sut.Bind(tx).Upsert(t.Context(), m)
-		require.NoError(t, err)
-		assert.True(t, updated)
+		require.NoError(t, sut.Bind(tx).Upsert(t.Context(), m))
 	})
 
 	// assert
-	got, err := sut.Find(t.Context(), m.ID)
+	got, err := sut.Get(t.Context(), m.ID)
 	require.NoError(t, err)
 	assert.WithinDuration(t, now, got.CompletedAt.Time(), time.Millisecond)
+	assert.WithinDuration(t, createdAt, got.CreatedAt, time.Millisecond, "keep=created_at leaves it as it was")
 	assert.WithinDuration(t, now, got.UpdatedAt, time.Millisecond)
 }
 
@@ -92,20 +92,19 @@ func TestTodo_Complete(t *testing.T) {
 	sut := postgres.NewTodo(ifr.Reader)
 	m := fixture.Todo()
 	ifr.InTx(t, func(tx tx.Tx) {
-		_, err := sut.Bind(tx).Upsert(t.Context(), m)
-		require.NoError(t, err)
+		require.NoError(t, sut.Bind(tx).Upsert(t.Context(), m))
 	})
 	now := time.Now()
 
 	// act
 	ifr.InTx(t, func(tx tx.Tx) {
-		updated, err := sut.Bind(tx).Complete(t.Context(), m.ID, now)
+		n, err := sut.Bind(tx).Complete(t.Context(), m.ID, now)
 		require.NoError(t, err)
-		assert.True(t, updated)
+		assert.EqualValues(t, 1, n)
 	})
 
 	// assert
-	got, err := sut.Find(t.Context(), m.ID)
+	got, err := sut.Get(t.Context(), m.ID)
 	require.NoError(t, err)
 	assert.WithinDuration(t, now, got.CompletedAt.Time(), time.Millisecond)
 }
@@ -120,19 +119,18 @@ func TestTodo_Uncomplete(t *testing.T) {
 		m.CompletedAt = new(model.MustCompletedAt(time.Now()))
 	})
 	ifr.InTx(t, func(tx tx.Tx) {
-		_, err := sut.Bind(tx).Upsert(t.Context(), m)
-		require.NoError(t, err)
+		require.NoError(t, sut.Bind(tx).Upsert(t.Context(), m))
 	})
 
 	// act
 	ifr.InTx(t, func(tx tx.Tx) {
-		updated, err := sut.Bind(tx).Uncomplete(t.Context(), m.ID)
+		n, err := sut.Bind(tx).Uncomplete(t.Context(), m.ID)
 		require.NoError(t, err)
-		assert.True(t, updated)
+		assert.EqualValues(t, 1, n)
 	})
 
 	// assert
-	got, err := sut.Find(t.Context(), m.ID)
+	got, err := sut.Get(t.Context(), m.ID)
 	require.NoError(t, err)
 	assert.Nil(t, got.CompletedAt)
 }
@@ -145,17 +143,18 @@ func TestTodo_Delete(t *testing.T) {
 	sut := postgres.NewTodo(ifr.Reader)
 	m := fixture.Todo()
 	ifr.InTx(t, func(tx tx.Tx) {
-		_, err := sut.Bind(tx).Upsert(t.Context(), m)
-		require.NoError(t, err)
+		require.NoError(t, sut.Bind(tx).Upsert(t.Context(), m))
 	})
 
 	// act
 	ifr.InTx(t, func(tx tx.Tx) {
-		require.NoError(t, sut.Bind(tx).Delete(t.Context(), m.ID))
+		n, err := sut.Bind(tx).Delete(t.Context(), scopes.Todos().IDEq(m.ID))
+		require.NoError(t, err)
+		assert.EqualValues(t, 1, n)
 	})
 
 	// assert
-	got, err := sut.Find(t.Context(), m.ID)
-	require.ErrorIs(t, err, aerrors.ErrNotFound)
+	got, err := sut.Get(t.Context(), m.ID)
+	require.ErrorIs(t, err, orm.ErrNotFound)
 	assert.Zero(t, got)
 }

@@ -23,7 +23,7 @@ func TestSetTodoCompletion_Complete(t *testing.T) {
 	m := fixture.Todo()
 	todos := postgres.NewTodo(ifr.Reader)
 	ifr.InTx(t, func(tx tx.Tx) {
-		_, err := todos.Bind(tx).Upsert(t.Context(), m)
+		err := todos.Bind(tx).Upsert(t.Context(), m)
 		require.NoError(t, err)
 	})
 
@@ -36,7 +36,7 @@ func TestSetTodoCompletion_Complete(t *testing.T) {
 
 	// assert
 	require.NoError(t, err)
-	got, err := todos.Find(t.Context(), m.ID)
+	got, err := todos.Get(t.Context(), m.ID)
 	require.NoError(t, err)
 	require.NotNil(t, got.CompletedAt)
 	assert.WithinDuration(t, time.Now(), got.CompletedAt.Time(), time.Second)
@@ -52,7 +52,7 @@ func TestSetTodoCompletion_Uncomplete(t *testing.T) {
 	})
 	todos := postgres.NewTodo(ifr.Reader)
 	ifr.InTx(t, func(tx tx.Tx) {
-		_, err := todos.Bind(tx).Upsert(t.Context(), m)
+		err := todos.Bind(tx).Upsert(t.Context(), m)
 		require.NoError(t, err)
 	})
 
@@ -65,7 +65,7 @@ func TestSetTodoCompletion_Uncomplete(t *testing.T) {
 
 	// assert
 	require.NoError(t, err)
-	got, err := todos.Find(t.Context(), m.ID)
+	got, err := todos.Get(t.Context(), m.ID)
 	require.NoError(t, err)
 	assert.Nil(t, got.CompletedAt)
 }

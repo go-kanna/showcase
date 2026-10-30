@@ -1,0 +1,45 @@
+{
+  "dialect": "postgresql",
+  "tables": {
+    "goose_db_version": {
+      "columns": [
+        {"name": "id", "type": "int4", "not_null": true, "assigned": true},
+        {"name": "version_id", "type": "int8", "not_null": true},
+        {"name": "is_applied", "type": "bool", "not_null": true},
+        {"name": "tstamp", "type": "timestamp", "not_null": true, "default": true}
+      ],
+      "primary_key": ["id"],
+      "unique_keys": [],
+      "foreign_keys": []
+    },
+    "todos": {
+      "columns": [
+        {"name": "id", "type": "uuid", "not_null": true, "default": true},
+        {"name": "title", "type": "text", "not_null": true},
+        {"name": "completed_at", "type": "timestamptz"},
+        {"name": "created_at", "type": "timestamptz", "not_null": true},
+        {"name": "updated_at", "type": "timestamptz", "not_null": true}
+      ],
+      "primary_key": ["id"],
+      "unique_keys": [],
+      "foreign_keys": []
+    }
+  },
+  "statements": {
+    "github.com/go-kanna/showcase/internal/feature/todo/repository.Complete": {
+      "digest": "dd0c40391d950b14",
+      "params": [
+        {"name": "completedAt", "type": "timestamptz"},
+        {"name": "id", "type": "uuid"}
+      ],
+      "columns": []
+    },
+    "github.com/go-kanna/showcase/internal/feature/todo/repository.Uncomplete": {
+      "digest": "32ed75f220430b53",
+      "params": [
+        {"name": "id", "type": "uuid"}
+      ],
+      "columns": []
+    }
+  }
+}
