@@ -33,8 +33,8 @@ internal/
   feature/todo/
     model                 the domain type, and the fixtures generated for it
     scopes                the scope types the repository reads through
-    repository            the interface the use cases depend on, and the SQL it takes written by hand
-    postgres              its implementation, which kanna-orm writes
+    repository            the interface the use cases depend on
+    postgres              its implementation, which kanna-orm writes, and the SQL written by hand for it
     usecase               one struct per operation: List, Put, SetCompletion, Delete
     mapper                the model → protobuf mapping
     handler               the gRPC handler

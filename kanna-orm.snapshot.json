@@ -27,7 +27,7 @@
     }
   },
   "statements": {
-    "github.com/go-kanna/showcase/internal/feature/todo/repository.Complete": {
+    "github.com/go-kanna/showcase/internal/feature/todo/postgres.Complete": {
       "digest": "dd0c40391d950b14",
       "params": [
         {"name": "completedAt", "type": "timestamptz"},
@@ -35,7 +35,7 @@
       ],
       "columns": []
     },
-    "github.com/go-kanna/showcase/internal/feature/todo/repository.Uncomplete": {
+    "github.com/go-kanna/showcase/internal/feature/todo/postgres.Uncomplete": {
       "digest": "32ed75f220430b53",
       "params": [
         {"name": "id", "type": "uuid"}

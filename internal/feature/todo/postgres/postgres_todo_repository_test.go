@@ -13,7 +13,6 @@ import (
 	"github.com/go-kanna/showcase/internal/feature/todo/model"
 	"github.com/go-kanna/showcase/internal/feature/todo/model/fixture"
 	"github.com/go-kanna/showcase/internal/feature/todo/postgres"
-	"github.com/go-kanna/showcase/internal/feature/todo/scopes"
 	"github.com/go-kanna/showcase/internal/infra/storage/tx"
 	"github.com/go-kanna/showcase/test/infra"
 )
@@ -176,13 +175,28 @@ func TestTodo_Delete(t *testing.T) {
 
 	// act
 	ifr.InTx(t, func(tx tx.Tx) {
-		n, err := sut.Bind(tx).Delete(t.Context(), scopes.Todos().IDEq(m.ID))
-		require.NoError(t, err)
-		assert.EqualValues(t, 1, n)
+		require.NoError(t, sut.Bind(tx).Delete(t.Context(), m.ID))
 	})
 
 	// assert
 	got, err := sut.Get(t.Context(), m.ID)
 	require.ErrorIs(t, err, orm.ErrNotFound)
 	assert.Zero(t, got)
+}
+
+func TestTodo_DeleteNotFound(t *testing.T) {
+	t.Parallel()
+
+	// arrange
+	ifr := infra.New(t)
+	sut := postgres.NewTodo(ifr.Reader)
+
+	// act
+	var err error
+	ifr.InTx(t, func(tx tx.Tx) {
+		err = sut.Bind(tx).Delete(t.Context(), fixture.Todo().ID)
+	})
+
+	// assert
+	require.ErrorIs(t, err, orm.ErrNotFound)
 }

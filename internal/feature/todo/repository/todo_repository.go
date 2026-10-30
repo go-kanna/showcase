@@ -12,7 +12,7 @@ import (
 
 //go:generate go tool kanna-orm -destination ../postgres
 
-//kanna:repository
+//kanna:repository table=todos
 type Todo interface {
 	Get(ctx context.Context, id uuid.UUID) (model.Todo, error)
 	List(ctx context.Context, s ...scopes.Todo) ([]model.Todo, error)
@@ -20,6 +20,6 @@ type Todo interface {
 	Upsert(ctx context.Context, m model.Todo) error
 	Complete(ctx context.Context, id uuid.UUID, completedAt time.Time) (int64, error)
 	Uncomplete(ctx context.Context, id uuid.UUID) (int64, error)
-	Delete(ctx context.Context, s ...scopes.Todo) (int64, error)
+	Delete(ctx context.Context, id uuid.UUID) error
 	Bind(tx tx.Tx) Todo
 }
