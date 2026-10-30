@@ -35,9 +35,9 @@ internal/
     scopes                the scope types the repository reads through
     repository            the interface the use cases depend on
     postgres              its implementation, which kanna-orm writes, and the SQL written by hand for it
-    usecase               one struct per operation: List, Put, SetCompletion, Delete
+    usecase               one struct per operation, given the repository and transactor it works through
     mapper                the model → protobuf mapping
-    handler               the gRPC handler
+    handler               the gRPC handler, which puts the feature together and chooses the repository
   gen                     the code buf writes from proto/
   messages                the messages compiled from locales/
   infra/storage           pgx pools, transactions, and migrations
@@ -89,8 +89,10 @@ kanna-orm generates from `kanna-orm.snapshot.json`, not from a database, so `mak
 apply it with `make db-migrate`, record it with `make db-describe`, and commit the snapshot along with the migration;
 CI fails when the two disagree.
 
-The tests need the database running, migrated once with `make db-migrate` (that creates the roles they connect as), and
-its URLs in the environment:
+A use case takes its repository and transactor as arguments, so a test that checks what it does with its input gives
+it fakes and needs no database, as `put_todo_use_case_test.go` does; what the SQL does is tested against PostgreSQL.
+Those tests need the database running, migrated once with `make db-migrate` (that creates the roles they connect as),
+and its URLs in the environment:
 
 ```sh
 make db-migrate

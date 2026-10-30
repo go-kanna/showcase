@@ -3,58 +3,38 @@
 package usecase
 
 import (
-	"github.com/go-kanna/showcase/internal/di"
-	"github.com/go-kanna/showcase/internal/feature/todo/postgres"
+	"github.com/go-kanna/showcase/internal/feature/todo/repository"
+	"github.com/go-kanna/showcase/internal/infra/storage/tx"
 )
 
 // NewDeleteTodo initializes dependencies and constructs DeleteTodo.
-func NewDeleteTodo(infra *di.Infra) *DeleteTodo {
-	transactor := infra.Transactor
-	reader := infra.Reader
-	db := postgres.NewDBTX(reader)
-	todos := postgres.NewTodo(db)
-
+func NewDeleteTodo(transactor tx.Transactor, todo repository.Todo) *DeleteTodo {
 	return &DeleteTodo{
 		transactor: transactor,
-		todos:      todos,
+		todos:      todo,
 	}
 }
 
 // NewListTodo initializes dependencies and constructs ListTodo.
-func NewListTodo(infra *di.Infra) *ListTodo {
-	readTransactor := infra.ReadTransactor
-	reader := infra.Reader
-	db := postgres.NewDBTX(reader)
-	todos := postgres.NewTodo(db)
-
+func NewListTodo(readTransactor tx.ReadTransactor, todo repository.Todo) *ListTodo {
 	return &ListTodo{
 		transactor: readTransactor,
-		todos:      todos,
+		todos:      todo,
 	}
 }
 
 // NewPutTodo initializes dependencies and constructs PutTodo.
-func NewPutTodo(infra *di.Infra) *PutTodo {
-	transactor := infra.Transactor
-	reader := infra.Reader
-	db := postgres.NewDBTX(reader)
-	todos := postgres.NewTodo(db)
-
+func NewPutTodo(transactor tx.Transactor, todo repository.Todo) *PutTodo {
 	return &PutTodo{
 		transactor: transactor,
-		todos:      todos,
+		todos:      todo,
 	}
 }
 
 // NewSetTodoCompletion initializes dependencies and constructs SetTodoCompletion.
-func NewSetTodoCompletion(infra *di.Infra) *SetTodoCompletion {
-	transactor := infra.Transactor
-	reader := infra.Reader
-	db := postgres.NewDBTX(reader)
-	todos := postgres.NewTodo(db)
-
+func NewSetTodoCompletion(transactor tx.Transactor, todo repository.Todo) *SetTodoCompletion {
 	return &SetTodoCompletion{
 		transactor: transactor,
-		todos:      todos,
+		todos:      todo,
 	}
 }

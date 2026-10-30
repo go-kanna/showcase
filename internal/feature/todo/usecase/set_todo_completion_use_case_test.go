@@ -28,7 +28,7 @@ func TestSetTodoCompletion_Complete(t *testing.T) {
 	})
 
 	// act
-	sut := usecase.NewSetTodoCompletion(ifr.Infra)
+	sut := usecase.NewSetTodoCompletion(ifr.Transactor, todos)
 	_, err := sut.Do(t.Context(), usecase.SetTodoCompletionInput{
 		TodoID:    m.ID.String(),
 		Completed: true,
@@ -57,7 +57,7 @@ func TestSetTodoCompletion_Uncomplete(t *testing.T) {
 	})
 
 	// act
-	sut := usecase.NewSetTodoCompletion(ifr.Infra)
+	sut := usecase.NewSetTodoCompletion(ifr.Transactor, todos)
 	_, err := sut.Do(t.Context(), usecase.SetTodoCompletionInput{
 		TodoID:    m.ID.String(),
 		Completed: false,

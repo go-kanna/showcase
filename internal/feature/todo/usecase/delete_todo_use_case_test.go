@@ -25,7 +25,7 @@ func TestDeleteTodo(t *testing.T) {
 		err := todos.Bind(tx).Upsert(t.Context(), m)
 		require.NoError(t, err)
 	})
-	sut := usecase.NewDeleteTodo(ifr.Infra)
+	sut := usecase.NewDeleteTodo(ifr.Transactor, todos)
 
 	// act
 	_, err := sut.Do(t.Context(), usecase.DeleteTodoInput{TodoID: m.ID.String()})

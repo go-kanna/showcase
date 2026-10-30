@@ -6,7 +6,6 @@ import (
 	"time"
 	"uuid"
 
-	"github.com/go-kanna/showcase/internal/di"
 	"github.com/go-kanna/showcase/internal/feature/todo/model"
 	"github.com/go-kanna/showcase/internal/feature/todo/repository"
 	"github.com/go-kanna/showcase/internal/infra/storage/tx"
@@ -27,9 +26,8 @@ type PutTodoOutput struct {
 
 //kanna:container
 type PutTodo struct {
-	_          *di.Infra `di:"arg"`
-	transactor tx.Transactor
-	todos      repository.Todo `di:"with=postgres.NewTodo"`
+	transactor tx.Transactor   `di:"arg"`
+	todos      repository.Todo `di:"arg"`
 }
 
 func (uc PutTodo) Do(ctx context.Context, in PutTodoInput) (PutTodoOutput, error) {
