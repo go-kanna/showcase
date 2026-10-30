@@ -2,12 +2,9 @@ package usecase
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 	"uuid"
-
-	"github.com/go-kanna/orm"
 
 	"github.com/go-kanna/showcase/internal/di"
 	"github.com/go-kanna/showcase/internal/feature/todo/model"
@@ -42,12 +39,7 @@ func (uc PutTodo) Do(ctx context.Context, in PutTodoInput) (PutTodoOutput, error
 
 	id := either.Must(uuid.Parse(in.ID))
 	if err := uc.transactor.WithTx(ctx, func(tx tx.Tx) error {
-		todos := uc.todos.Bind(tx)
-		_, err := todos.Get(ctx, id)
-		if err != nil && !errors.Is(err, orm.ErrNotFound) {
-			return fmt.Errorf("find todo: %w", err)
-		}
-
+		// Upsert keeps the created_at of a to-do there is, as its //kanna:conflict says, so nothing needs reading first.
 		now := time.Now()
 		m := model.Todo{
 			ID:          id,
@@ -57,8 +49,7 @@ func (uc PutTodo) Do(ctx context.Context, in PutTodoInput) (PutTodoOutput, error
 			CreatedAt:   now,
 			UpdatedAt:   now,
 		}
-		err = todos.Upsert(ctx, m)
-		if err != nil {
+		if err := uc.todos.Bind(tx).Upsert(ctx, m); err != nil {
 			return fmt.Errorf("upsert todo: %w", err)
 		}
 		return nil
