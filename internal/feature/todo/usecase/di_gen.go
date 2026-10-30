@@ -11,7 +11,8 @@ import (
 func NewDeleteTodo(infra *di.Infra) *DeleteTodo {
 	transactor := infra.Transactor
 	reader := infra.Reader
-	todos := postgres.NewTodo(reader)
+	db := postgres.NewDBTX(reader)
+	todos := postgres.NewTodo(db)
 
 	return &DeleteTodo{
 		transactor: transactor,
@@ -23,7 +24,8 @@ func NewDeleteTodo(infra *di.Infra) *DeleteTodo {
 func NewListTodo(infra *di.Infra) *ListTodo {
 	readTransactor := infra.ReadTransactor
 	reader := infra.Reader
-	todos := postgres.NewTodo(reader)
+	db := postgres.NewDBTX(reader)
+	todos := postgres.NewTodo(db)
 
 	return &ListTodo{
 		transactor: readTransactor,
@@ -35,7 +37,8 @@ func NewListTodo(infra *di.Infra) *ListTodo {
 func NewPutTodo(infra *di.Infra) *PutTodo {
 	transactor := infra.Transactor
 	reader := infra.Reader
-	todos := postgres.NewTodo(reader)
+	db := postgres.NewDBTX(reader)
+	todos := postgres.NewTodo(db)
 
 	return &PutTodo{
 		transactor: transactor,
@@ -47,7 +50,8 @@ func NewPutTodo(infra *di.Infra) *PutTodo {
 func NewSetTodoCompletion(infra *di.Infra) *SetTodoCompletion {
 	transactor := infra.Transactor
 	reader := infra.Reader
-	todos := postgres.NewTodo(reader)
+	db := postgres.NewDBTX(reader)
+	todos := postgres.NewTodo(db)
 
 	return &SetTodoCompletion{
 		transactor: transactor,

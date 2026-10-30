@@ -60,5 +60,8 @@ jobs:
       - name: Migrate database
         run: make db-migrate
 
+      - name: Check the snapshot of the schema
+        run: make db-describe-check
+
       - name: Run tests
         run: make test

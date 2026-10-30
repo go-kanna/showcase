@@ -28,7 +28,7 @@ func TestListTodo(t *testing.T) {
 	})
 	for _, m := range []model.Todo{m1, m2} {
 		ifr.InTx(t, func(tx tx.Tx) {
-			_, err := postgres.NewTodo(ifr.Reader).Bind(tx).Upsert(t.Context(), m)
+			err := postgres.NewTodo(ifr.Reader).Bind(tx).Upsert(t.Context(), m)
 			require.NoError(t, err)
 		})
 	}

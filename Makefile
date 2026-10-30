@@ -24,10 +24,9 @@ sql-lint:
 .PHONY: sql-fix
 sql-fix:
 	sqlfluff fix --disable-progress-bar $(SQL_PATHS)
-	$(MAKE) gen-sqlc
 
 .PHONY: gen
-gen: gen-go gen-proto gen-sqlc
+gen: gen-go gen-proto
 
 .PHONY: gen-go
 gen-go:
@@ -41,10 +40,6 @@ gen-check:
 gen-proto:
 	cd proto && buf generate
 
-.PHONY: gen-sqlc
-gen-sqlc:
-	go tool sqlc generate
-
 .PHONY: db-create
 db-create:
 	docker compose exec -T db psql -U $(DB_USER) -d postgres -tAc \
@@ -54,6 +49,14 @@ db-create:
 .PHONY: db-migrate
 db-migrate:
 	GOOSE_MIGRATION_DIR=$(GOOSE_MIGRATION_DIR) go tool goose postgres $(DB_URL) up
+
+.PHONY: db-describe
+db-describe:
+	go tool kanna-orm describe -database-url $(DB_URL) ./...
+
+.PHONY: db-describe-check
+db-describe-check:
+	go tool kanna-orm describe -check -database-url $(DB_URL) ./...
 
 .PHONY: db-drop
 db-drop:
