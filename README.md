@@ -71,7 +71,7 @@ buf curl --protocol grpc --http2-prior-knowledge --schema proto \
 | Command                       | What it does                                                                    |
 |-------------------------------|---------------------------------------------------------------------------------|
 | `make gen`                    | run every generator: buf, then `go generate` in the order outputs are used      |
-| `make gen-check`              | fail if the kanna generators would change what is committed                     |
+| `make gen-check`              | fail if buf or the kanna generators would change what is committed              |
 | `make gen-fresh-check`        | delete what the kanna generators wrote, and fail unless one run writes it again |
 | `make test`                   | run the tests, each against its own database                                    |
 | `make lint`                   | run golangci-lint                                                               |
