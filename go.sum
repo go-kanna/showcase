@@ -139,8 +139,8 @@ github.com/go-kanna/internal v0.0.13 h1:ZeUjIlmsX9XOm2eMVApYgtpY64UyaxmYrTv2JVdS
 github.com/go-kanna/internal v0.0.13/go.mod h1:Df477EkeFmw5w4hFNoBGUZfZJfgKJnaemuReERxK7to=
 github.com/go-kanna/mapper v0.0.8 h1:68ZverTlsLD6w3GY/oKvMEELbISy7yOwKHnvI8jkvXc=
 github.com/go-kanna/mapper v0.0.8/go.mod h1:z4zQsAIO4yzt5jHxt9giKqebxAbiUNR2oLKAqNyBh34=
-github.com/go-kanna/orm v0.0.2 h1:TqQWxYr+/Kn33IJy+aBlz0ZGeZ38LWvLTE08IsN3VTQ=
-github.com/go-kanna/orm v0.0.2/go.mod h1:RhygmcNkownUHAfx3YN2hLERnOyrBpRRgwHRL6RY2+c=
+github.com/go-kanna/orm v0.0.3 h1:xnABJOjdEG2FSBIi+l0eWgbmA4hAK40AMd0N1TR1RHY=
+github.com/go-kanna/orm v0.0.3/go.mod h1:RhygmcNkownUHAfx3YN2hLERnOyrBpRRgwHRL6RY2+c=
 github.com/go-kanna/validate v0.0.8 h1:vTq+XhFb9/lKID9YJx9budOAx78pqb8qUpLEHSAvsQs=
 github.com/go-kanna/validate v0.0.8/go.mod h1:K+HuK1IXbw/73RbpcUnIxzeuwrC6h1nOVbZGvq9QRMc=
 github.com/go-kanna/value v0.0.5 h1:8UZNH4xV437XdXV+rot7MbsOanzizNb+EsmGOrHGXLg=
