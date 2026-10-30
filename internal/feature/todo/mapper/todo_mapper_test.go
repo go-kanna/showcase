@@ -9,6 +9,7 @@ import (
 	"github.com/go-kanna/showcase/internal/feature/todo/mapper"
 	"github.com/go-kanna/showcase/internal/feature/todo/model"
 	"github.com/go-kanna/showcase/internal/feature/todo/model/fixture"
+	"github.com/go-kanna/showcase/internal/feature/todo/usecase"
 	todov1 "github.com/go-kanna/showcase/internal/gen/showcase/todo/v1"
 )
 
@@ -58,6 +59,60 @@ func TestTodoInputFromProto_Priority(t *testing.T) {
 			}
 			require.NoError(t, err)
 			assert.Equal(t, tt.want, got.Priority)
+		})
+	}
+}
+
+// The request's oneof becomes the variant of usecase.ListFilter its arm is
+// named after, and no arm set none.
+func TestListTodoInputFromProto(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name    string
+		req     *todov1.ListTodoRequest
+		want    usecase.ListFilter
+		wantErr string
+	}{
+		{name: "none", req: &todov1.ListTodoRequest{}},
+		{
+			name: "completion",
+			req: &todov1.ListTodoRequest{Filter: &todov1.ListTodoRequest_Completion{
+				Completion: &todov1.CompletionFilter{Completed: true},
+			}},
+			want: usecase.CompletionFilter{Completed: true},
+		},
+		{
+			name: "priority",
+			req: &todov1.ListTodoRequest{Filter: &todov1.ListTodoRequest_Priority{
+				Priority: &todov1.PriorityFilter{Priority: todov1.Priority_PRIORITY_HIGH},
+			}},
+			want: usecase.PriorityFilter{Priority: model.PriorityHigh},
+		},
+		{
+			name: "a priority nobody declared",
+			req: &todov1.ListTodoRequest{Filter: &todov1.ListTodoRequest_Priority{
+				Priority: &todov1.PriorityFilter{Priority: todov1.Priority(9)},
+			}},
+			wantErr: "map usecase.ListTodoInput.Filter: map usecase.PriorityFilter.Priority: " +
+				"model.Priority has no value for 9",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			// act
+			got, err := mapper.ListTodoInputFromProto(tt.req)
+
+			// assert
+			if tt.wantErr != "" {
+				require.EqualError(t, err, tt.wantErr)
+				return
+			}
+			require.NoError(t, err)
+			assert.Equal(t, tt.want, got.Filter)
 		})
 	}
 }

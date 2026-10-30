@@ -218,15 +218,112 @@ func (x *TodoInput) GetPriority() Priority {
 	return Priority_PRIORITY_UNSPECIFIED
 }
 
-type ListTodoRequest struct {
+// CompletionFilter lists the to-dos completed, or those not.
+type CompletionFilter struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	Completed     bool                   `protobuf:"varint,1,opt,name=completed,proto3" json:"completed,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CompletionFilter) Reset() {
+	*x = CompletionFilter{}
+	mi := &file_showcase_todo_v1_todo_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CompletionFilter) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CompletionFilter) ProtoMessage() {}
+
+func (x *CompletionFilter) ProtoReflect() protoreflect.Message {
+	mi := &file_showcase_todo_v1_todo_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CompletionFilter.ProtoReflect.Descriptor instead.
+func (*CompletionFilter) Descriptor() ([]byte, []int) {
+	return file_showcase_todo_v1_todo_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *CompletionFilter) GetCompleted() bool {
+	if x != nil {
+		return x.Completed
+	}
+	return false
+}
+
+// PriorityFilter lists the to-dos of one priority.
+type PriorityFilter struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Priority      Priority               `protobuf:"varint,1,opt,name=priority,proto3,enum=showcase.todo.v1.Priority" json:"priority,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PriorityFilter) Reset() {
+	*x = PriorityFilter{}
+	mi := &file_showcase_todo_v1_todo_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PriorityFilter) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PriorityFilter) ProtoMessage() {}
+
+func (x *PriorityFilter) ProtoReflect() protoreflect.Message {
+	mi := &file_showcase_todo_v1_todo_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PriorityFilter.ProtoReflect.Descriptor instead.
+func (*PriorityFilter) Descriptor() ([]byte, []int) {
+	return file_showcase_todo_v1_todo_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *PriorityFilter) GetPriority() Priority {
+	if x != nil {
+		return x.Priority
+	}
+	return Priority_PRIORITY_UNSPECIFIED
+}
+
+type ListTodoRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// filter narrows the list to one condition, or none when left unset.
+	//
+	// Types that are valid to be assigned to Filter:
+	//
+	//	*ListTodoRequest_Completion
+	//	*ListTodoRequest_Priority
+	Filter        isListTodoRequest_Filter `protobuf_oneof:"filter"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ListTodoRequest) Reset() {
 	*x = ListTodoRequest{}
-	mi := &file_showcase_todo_v1_todo_proto_msgTypes[2]
+	mi := &file_showcase_todo_v1_todo_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -238,7 +335,7 @@ func (x *ListTodoRequest) String() string {
 func (*ListTodoRequest) ProtoMessage() {}
 
 func (x *ListTodoRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_showcase_todo_v1_todo_proto_msgTypes[2]
+	mi := &file_showcase_todo_v1_todo_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -251,8 +348,49 @@ func (x *ListTodoRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListTodoRequest.ProtoReflect.Descriptor instead.
 func (*ListTodoRequest) Descriptor() ([]byte, []int) {
-	return file_showcase_todo_v1_todo_proto_rawDescGZIP(), []int{2}
+	return file_showcase_todo_v1_todo_proto_rawDescGZIP(), []int{4}
 }
+
+func (x *ListTodoRequest) GetFilter() isListTodoRequest_Filter {
+	if x != nil {
+		return x.Filter
+	}
+	return nil
+}
+
+func (x *ListTodoRequest) GetCompletion() *CompletionFilter {
+	if x != nil {
+		if x, ok := x.Filter.(*ListTodoRequest_Completion); ok {
+			return x.Completion
+		}
+	}
+	return nil
+}
+
+func (x *ListTodoRequest) GetPriority() *PriorityFilter {
+	if x != nil {
+		if x, ok := x.Filter.(*ListTodoRequest_Priority); ok {
+			return x.Priority
+		}
+	}
+	return nil
+}
+
+type isListTodoRequest_Filter interface {
+	isListTodoRequest_Filter()
+}
+
+type ListTodoRequest_Completion struct {
+	Completion *CompletionFilter `protobuf:"bytes,1,opt,name=completion,proto3,oneof"`
+}
+
+type ListTodoRequest_Priority struct {
+	Priority *PriorityFilter `protobuf:"bytes,2,opt,name=priority,proto3,oneof"`
+}
+
+func (*ListTodoRequest_Completion) isListTodoRequest_Filter() {}
+
+func (*ListTodoRequest_Priority) isListTodoRequest_Filter() {}
 
 type ListTodoResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -263,7 +401,7 @@ type ListTodoResponse struct {
 
 func (x *ListTodoResponse) Reset() {
 	*x = ListTodoResponse{}
-	mi := &file_showcase_todo_v1_todo_proto_msgTypes[3]
+	mi := &file_showcase_todo_v1_todo_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -275,7 +413,7 @@ func (x *ListTodoResponse) String() string {
 func (*ListTodoResponse) ProtoMessage() {}
 
 func (x *ListTodoResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_showcase_todo_v1_todo_proto_msgTypes[3]
+	mi := &file_showcase_todo_v1_todo_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -288,7 +426,7 @@ func (x *ListTodoResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListTodoResponse.ProtoReflect.Descriptor instead.
 func (*ListTodoResponse) Descriptor() ([]byte, []int) {
-	return file_showcase_todo_v1_todo_proto_rawDescGZIP(), []int{3}
+	return file_showcase_todo_v1_todo_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ListTodoResponse) GetTodos() []*Todo {
@@ -308,7 +446,7 @@ type PutTodoRequest struct {
 
 func (x *PutTodoRequest) Reset() {
 	*x = PutTodoRequest{}
-	mi := &file_showcase_todo_v1_todo_proto_msgTypes[4]
+	mi := &file_showcase_todo_v1_todo_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -320,7 +458,7 @@ func (x *PutTodoRequest) String() string {
 func (*PutTodoRequest) ProtoMessage() {}
 
 func (x *PutTodoRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_showcase_todo_v1_todo_proto_msgTypes[4]
+	mi := &file_showcase_todo_v1_todo_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -333,7 +471,7 @@ func (x *PutTodoRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PutTodoRequest.ProtoReflect.Descriptor instead.
 func (*PutTodoRequest) Descriptor() ([]byte, []int) {
-	return file_showcase_todo_v1_todo_proto_rawDescGZIP(), []int{4}
+	return file_showcase_todo_v1_todo_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *PutTodoRequest) GetTodo() *TodoInput {
@@ -358,7 +496,7 @@ type PutTodoResponse struct {
 
 func (x *PutTodoResponse) Reset() {
 	*x = PutTodoResponse{}
-	mi := &file_showcase_todo_v1_todo_proto_msgTypes[5]
+	mi := &file_showcase_todo_v1_todo_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -370,7 +508,7 @@ func (x *PutTodoResponse) String() string {
 func (*PutTodoResponse) ProtoMessage() {}
 
 func (x *PutTodoResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_showcase_todo_v1_todo_proto_msgTypes[5]
+	mi := &file_showcase_todo_v1_todo_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -383,7 +521,7 @@ func (x *PutTodoResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PutTodoResponse.ProtoReflect.Descriptor instead.
 func (*PutTodoResponse) Descriptor() ([]byte, []int) {
-	return file_showcase_todo_v1_todo_proto_rawDescGZIP(), []int{5}
+	return file_showcase_todo_v1_todo_proto_rawDescGZIP(), []int{7}
 }
 
 type SetTodoCompletionRequest struct {
@@ -396,7 +534,7 @@ type SetTodoCompletionRequest struct {
 
 func (x *SetTodoCompletionRequest) Reset() {
 	*x = SetTodoCompletionRequest{}
-	mi := &file_showcase_todo_v1_todo_proto_msgTypes[6]
+	mi := &file_showcase_todo_v1_todo_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -408,7 +546,7 @@ func (x *SetTodoCompletionRequest) String() string {
 func (*SetTodoCompletionRequest) ProtoMessage() {}
 
 func (x *SetTodoCompletionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_showcase_todo_v1_todo_proto_msgTypes[6]
+	mi := &file_showcase_todo_v1_todo_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -421,7 +559,7 @@ func (x *SetTodoCompletionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetTodoCompletionRequest.ProtoReflect.Descriptor instead.
 func (*SetTodoCompletionRequest) Descriptor() ([]byte, []int) {
-	return file_showcase_todo_v1_todo_proto_rawDescGZIP(), []int{6}
+	return file_showcase_todo_v1_todo_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *SetTodoCompletionRequest) GetId() string {
@@ -446,7 +584,7 @@ type SetTodoCompletionResponse struct {
 
 func (x *SetTodoCompletionResponse) Reset() {
 	*x = SetTodoCompletionResponse{}
-	mi := &file_showcase_todo_v1_todo_proto_msgTypes[7]
+	mi := &file_showcase_todo_v1_todo_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -458,7 +596,7 @@ func (x *SetTodoCompletionResponse) String() string {
 func (*SetTodoCompletionResponse) ProtoMessage() {}
 
 func (x *SetTodoCompletionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_showcase_todo_v1_todo_proto_msgTypes[7]
+	mi := &file_showcase_todo_v1_todo_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -471,7 +609,7 @@ func (x *SetTodoCompletionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetTodoCompletionResponse.ProtoReflect.Descriptor instead.
 func (*SetTodoCompletionResponse) Descriptor() ([]byte, []int) {
-	return file_showcase_todo_v1_todo_proto_rawDescGZIP(), []int{7}
+	return file_showcase_todo_v1_todo_proto_rawDescGZIP(), []int{9}
 }
 
 type DeleteTodoRequest struct {
@@ -483,7 +621,7 @@ type DeleteTodoRequest struct {
 
 func (x *DeleteTodoRequest) Reset() {
 	*x = DeleteTodoRequest{}
-	mi := &file_showcase_todo_v1_todo_proto_msgTypes[8]
+	mi := &file_showcase_todo_v1_todo_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -495,7 +633,7 @@ func (x *DeleteTodoRequest) String() string {
 func (*DeleteTodoRequest) ProtoMessage() {}
 
 func (x *DeleteTodoRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_showcase_todo_v1_todo_proto_msgTypes[8]
+	mi := &file_showcase_todo_v1_todo_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -508,7 +646,7 @@ func (x *DeleteTodoRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteTodoRequest.ProtoReflect.Descriptor instead.
 func (*DeleteTodoRequest) Descriptor() ([]byte, []int) {
-	return file_showcase_todo_v1_todo_proto_rawDescGZIP(), []int{8}
+	return file_showcase_todo_v1_todo_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *DeleteTodoRequest) GetId() string {
@@ -526,7 +664,7 @@ type DeleteTodoResponse struct {
 
 func (x *DeleteTodoResponse) Reset() {
 	*x = DeleteTodoResponse{}
-	mi := &file_showcase_todo_v1_todo_proto_msgTypes[9]
+	mi := &file_showcase_todo_v1_todo_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -538,7 +676,7 @@ func (x *DeleteTodoResponse) String() string {
 func (*DeleteTodoResponse) ProtoMessage() {}
 
 func (x *DeleteTodoResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_showcase_todo_v1_todo_proto_msgTypes[9]
+	mi := &file_showcase_todo_v1_todo_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -551,7 +689,7 @@ func (x *DeleteTodoResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteTodoResponse.ProtoReflect.Descriptor instead.
 func (*DeleteTodoResponse) Descriptor() ([]byte, []int) {
-	return file_showcase_todo_v1_todo_proto_rawDescGZIP(), []int{9}
+	return file_showcase_todo_v1_todo_proto_rawDescGZIP(), []int{11}
 }
 
 var File_showcase_todo_v1_todo_proto protoreflect.FileDescriptor
@@ -572,8 +710,17 @@ const file_showcase_todo_v1_todo_proto_rawDesc = "" +
 	"\tTodoInput\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
 	"\x05title\x18\x02 \x01(\tB\x03\x80\x01\x01R\x05title\x126\n" +
-	"\bpriority\x18\x03 \x01(\x0e2\x1a.showcase.todo.v1.PriorityR\bpriority\"\x11\n" +
-	"\x0fListTodoRequest\"@\n" +
+	"\bpriority\x18\x03 \x01(\x0e2\x1a.showcase.todo.v1.PriorityR\bpriority\"0\n" +
+	"\x10CompletionFilter\x12\x1c\n" +
+	"\tcompleted\x18\x01 \x01(\bR\tcompleted\"H\n" +
+	"\x0ePriorityFilter\x126\n" +
+	"\bpriority\x18\x01 \x01(\x0e2\x1a.showcase.todo.v1.PriorityR\bpriority\"\xa1\x01\n" +
+	"\x0fListTodoRequest\x12D\n" +
+	"\n" +
+	"completion\x18\x01 \x01(\v2\".showcase.todo.v1.CompletionFilterH\x00R\n" +
+	"completion\x12>\n" +
+	"\bpriority\x18\x02 \x01(\v2 .showcase.todo.v1.PriorityFilterH\x00R\bpriorityB\b\n" +
+	"\x06filter\"@\n" +
 	"\x10ListTodoResponse\x12,\n" +
 	"\x05todos\x18\x01 \x03(\v2\x16.showcase.todo.v1.TodoR\x05todos\"\x96\x01\n" +
 	"\x0ePutTodoRequest\x12/\n" +
@@ -614,43 +761,48 @@ func file_showcase_todo_v1_todo_proto_rawDescGZIP() []byte {
 }
 
 var file_showcase_todo_v1_todo_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_showcase_todo_v1_todo_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_showcase_todo_v1_todo_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_showcase_todo_v1_todo_proto_goTypes = []any{
 	(Priority)(0),                     // 0: showcase.todo.v1.Priority
 	(*Todo)(nil),                      // 1: showcase.todo.v1.Todo
 	(*TodoInput)(nil),                 // 2: showcase.todo.v1.TodoInput
-	(*ListTodoRequest)(nil),           // 3: showcase.todo.v1.ListTodoRequest
-	(*ListTodoResponse)(nil),          // 4: showcase.todo.v1.ListTodoResponse
-	(*PutTodoRequest)(nil),            // 5: showcase.todo.v1.PutTodoRequest
-	(*PutTodoResponse)(nil),           // 6: showcase.todo.v1.PutTodoResponse
-	(*SetTodoCompletionRequest)(nil),  // 7: showcase.todo.v1.SetTodoCompletionRequest
-	(*SetTodoCompletionResponse)(nil), // 8: showcase.todo.v1.SetTodoCompletionResponse
-	(*DeleteTodoRequest)(nil),         // 9: showcase.todo.v1.DeleteTodoRequest
-	(*DeleteTodoResponse)(nil),        // 10: showcase.todo.v1.DeleteTodoResponse
-	(*timestamppb.Timestamp)(nil),     // 11: google.protobuf.Timestamp
+	(*CompletionFilter)(nil),          // 3: showcase.todo.v1.CompletionFilter
+	(*PriorityFilter)(nil),            // 4: showcase.todo.v1.PriorityFilter
+	(*ListTodoRequest)(nil),           // 5: showcase.todo.v1.ListTodoRequest
+	(*ListTodoResponse)(nil),          // 6: showcase.todo.v1.ListTodoResponse
+	(*PutTodoRequest)(nil),            // 7: showcase.todo.v1.PutTodoRequest
+	(*PutTodoResponse)(nil),           // 8: showcase.todo.v1.PutTodoResponse
+	(*SetTodoCompletionRequest)(nil),  // 9: showcase.todo.v1.SetTodoCompletionRequest
+	(*SetTodoCompletionResponse)(nil), // 10: showcase.todo.v1.SetTodoCompletionResponse
+	(*DeleteTodoRequest)(nil),         // 11: showcase.todo.v1.DeleteTodoRequest
+	(*DeleteTodoResponse)(nil),        // 12: showcase.todo.v1.DeleteTodoResponse
+	(*timestamppb.Timestamp)(nil),     // 13: google.protobuf.Timestamp
 }
 var file_showcase_todo_v1_todo_proto_depIdxs = []int32{
-	11, // 0: showcase.todo.v1.Todo.completed_at:type_name -> google.protobuf.Timestamp
-	11, // 1: showcase.todo.v1.Todo.created_at:type_name -> google.protobuf.Timestamp
-	11, // 2: showcase.todo.v1.Todo.updated_at:type_name -> google.protobuf.Timestamp
+	13, // 0: showcase.todo.v1.Todo.completed_at:type_name -> google.protobuf.Timestamp
+	13, // 1: showcase.todo.v1.Todo.created_at:type_name -> google.protobuf.Timestamp
+	13, // 2: showcase.todo.v1.Todo.updated_at:type_name -> google.protobuf.Timestamp
 	0,  // 3: showcase.todo.v1.Todo.priority:type_name -> showcase.todo.v1.Priority
 	0,  // 4: showcase.todo.v1.TodoInput.priority:type_name -> showcase.todo.v1.Priority
-	1,  // 5: showcase.todo.v1.ListTodoResponse.todos:type_name -> showcase.todo.v1.Todo
-	2,  // 6: showcase.todo.v1.PutTodoRequest.todo:type_name -> showcase.todo.v1.TodoInput
-	11, // 7: showcase.todo.v1.PutTodoRequest.completed_at:type_name -> google.protobuf.Timestamp
-	3,  // 8: showcase.todo.v1.TodoService.ListTodo:input_type -> showcase.todo.v1.ListTodoRequest
-	5,  // 9: showcase.todo.v1.TodoService.PutTodo:input_type -> showcase.todo.v1.PutTodoRequest
-	7,  // 10: showcase.todo.v1.TodoService.SetTodoCompletion:input_type -> showcase.todo.v1.SetTodoCompletionRequest
-	9,  // 11: showcase.todo.v1.TodoService.DeleteTodo:input_type -> showcase.todo.v1.DeleteTodoRequest
-	4,  // 12: showcase.todo.v1.TodoService.ListTodo:output_type -> showcase.todo.v1.ListTodoResponse
-	6,  // 13: showcase.todo.v1.TodoService.PutTodo:output_type -> showcase.todo.v1.PutTodoResponse
-	8,  // 14: showcase.todo.v1.TodoService.SetTodoCompletion:output_type -> showcase.todo.v1.SetTodoCompletionResponse
-	10, // 15: showcase.todo.v1.TodoService.DeleteTodo:output_type -> showcase.todo.v1.DeleteTodoResponse
-	12, // [12:16] is the sub-list for method output_type
-	8,  // [8:12] is the sub-list for method input_type
-	8,  // [8:8] is the sub-list for extension type_name
-	8,  // [8:8] is the sub-list for extension extendee
-	0,  // [0:8] is the sub-list for field type_name
+	0,  // 5: showcase.todo.v1.PriorityFilter.priority:type_name -> showcase.todo.v1.Priority
+	3,  // 6: showcase.todo.v1.ListTodoRequest.completion:type_name -> showcase.todo.v1.CompletionFilter
+	4,  // 7: showcase.todo.v1.ListTodoRequest.priority:type_name -> showcase.todo.v1.PriorityFilter
+	1,  // 8: showcase.todo.v1.ListTodoResponse.todos:type_name -> showcase.todo.v1.Todo
+	2,  // 9: showcase.todo.v1.PutTodoRequest.todo:type_name -> showcase.todo.v1.TodoInput
+	13, // 10: showcase.todo.v1.PutTodoRequest.completed_at:type_name -> google.protobuf.Timestamp
+	5,  // 11: showcase.todo.v1.TodoService.ListTodo:input_type -> showcase.todo.v1.ListTodoRequest
+	7,  // 12: showcase.todo.v1.TodoService.PutTodo:input_type -> showcase.todo.v1.PutTodoRequest
+	9,  // 13: showcase.todo.v1.TodoService.SetTodoCompletion:input_type -> showcase.todo.v1.SetTodoCompletionRequest
+	11, // 14: showcase.todo.v1.TodoService.DeleteTodo:input_type -> showcase.todo.v1.DeleteTodoRequest
+	6,  // 15: showcase.todo.v1.TodoService.ListTodo:output_type -> showcase.todo.v1.ListTodoResponse
+	8,  // 16: showcase.todo.v1.TodoService.PutTodo:output_type -> showcase.todo.v1.PutTodoResponse
+	10, // 17: showcase.todo.v1.TodoService.SetTodoCompletion:output_type -> showcase.todo.v1.SetTodoCompletionResponse
+	12, // 18: showcase.todo.v1.TodoService.DeleteTodo:output_type -> showcase.todo.v1.DeleteTodoResponse
+	15, // [15:19] is the sub-list for method output_type
+	11, // [11:15] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_showcase_todo_v1_todo_proto_init() }
@@ -659,14 +811,18 @@ func file_showcase_todo_v1_todo_proto_init() {
 		return
 	}
 	file_showcase_todo_v1_todo_proto_msgTypes[0].OneofWrappers = []any{}
-	file_showcase_todo_v1_todo_proto_msgTypes[4].OneofWrappers = []any{}
+	file_showcase_todo_v1_todo_proto_msgTypes[4].OneofWrappers = []any{
+		(*ListTodoRequest_Completion)(nil),
+		(*ListTodoRequest_Priority)(nil),
+	}
+	file_showcase_todo_v1_todo_proto_msgTypes[6].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_showcase_todo_v1_todo_proto_rawDesc), len(file_showcase_todo_v1_todo_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   10,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

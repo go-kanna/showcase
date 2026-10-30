@@ -35,7 +35,23 @@ message TodoInput {
   Priority priority = 3;
 }
 
-message ListTodoRequest {}
+// CompletionFilter lists the to-dos completed, or those not.
+message CompletionFilter {
+  bool completed = 1;
+}
+
+// PriorityFilter lists the to-dos of one priority.
+message PriorityFilter {
+  Priority priority = 1;
+}
+
+message ListTodoRequest {
+  // filter narrows the list to one condition, or none when left unset.
+  oneof filter {
+    CompletionFilter completion = 1;
+    PriorityFilter priority = 2;
+  }
+}
 
 message ListTodoResponse {
   repeated Todo todos = 1;

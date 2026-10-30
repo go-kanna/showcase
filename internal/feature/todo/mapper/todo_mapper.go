@@ -18,6 +18,10 @@ type _ interface {
 	//
 	//kanna:map CompletedAt=-
 	TodoInputFromProto(in *todov1.TodoInput) (usecase.PutTodoInput, error)
+
+	// ListTodoInputFromProto reads the filter of a ListTodo request, its oneof
+	// becoming the variant of usecase.ListFilter that its arm is named after.
+	ListTodoInputFromProto(req *todov1.ListTodoRequest) (usecase.ListTodoInput, error)
 }
 
 //kanna:converter
