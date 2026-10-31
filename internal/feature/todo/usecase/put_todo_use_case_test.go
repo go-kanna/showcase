@@ -155,3 +155,23 @@ func TestPutTodo_NoPriority(t *testing.T) {
 	assert.Equal(t, "blank", verrs[0].Code())
 	assert.Empty(t, todos.upserted)
 }
+
+func TestPutTodo_UnknownPriority(t *testing.T) {
+	t.Parallel()
+
+	todos := &fakeTodos{}
+	m := fixture.Todo()
+
+	_, err := usecase.NewPutTodo(fakeTransactor{}, todos).Do(t.Context(), usecase.PutTodoInput{
+		ID:       m.ID.String(),
+		Title:    m.Title,
+		Priority: model.Priority("urgent"),
+	})
+
+	var verrs validate.Errors
+	require.ErrorAs(t, err, &verrs)
+	require.Len(t, verrs, 1)
+	assert.Equal(t, "priority", verrs[0].Field)
+	assert.Equal(t, "inclusion", verrs[0].Code())
+	assert.Empty(t, todos.upserted)
+}

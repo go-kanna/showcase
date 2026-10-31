@@ -43,6 +43,8 @@ func (x PriorityFilter) Validate() error {
 
 	if x.Priority == "" {
 		errs.Add("priority", validate.Blank())
+	} else {
+		errs.Nest("priority", x.Priority.Validate())
 	}
 
 	return errs.Err()
@@ -72,6 +74,8 @@ func (x PutTodoInput) Validate() error {
 
 	if x.Priority == "" {
 		errs.Add("priority", validate.Blank())
+	} else {
+		errs.Nest("priority", x.Priority.Validate())
 	}
 
 	if x.CompletedAt != nil {
