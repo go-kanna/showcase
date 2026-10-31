@@ -53,7 +53,7 @@ func (uc SetTodoCompletion) Do(ctx context.Context, in SetTodoCompletionInput) (
 			}
 			return nil
 		}
-		_, err = todos.Uncomplete(ctx, id)
+		_, err = todos.Uncomplete(ctx, id, time.Now())
 		if err != nil {
 			return fmt.Errorf("uncomplete: %w", err)
 		}

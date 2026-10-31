@@ -21,7 +21,9 @@ func TestSetTodoCompletion_Complete(t *testing.T) {
 
 	// arrange
 	ifr := infra.New(t)
-	m := fixture.Todo()
+	m := fixture.Todo(func(m *model.Todo) {
+		m.UpdatedAt = time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
+	})
 	todos := postgres.NewTodo(ifr.Reader)
 	ifr.InTx(t, func(tx tx.Tx) {
 		err := todos.Bind(tx).Upsert(t.Context(), m)
@@ -41,6 +43,7 @@ func TestSetTodoCompletion_Complete(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, got.CompletedAt)
 	assert.WithinDuration(t, time.Now(), got.CompletedAt.Time(), time.Second)
+	assert.WithinDuration(t, time.Now(), got.UpdatedAt, time.Second)
 }
 
 func TestSetTodoCompletion_Uncomplete(t *testing.T) {
@@ -50,6 +53,7 @@ func TestSetTodoCompletion_Uncomplete(t *testing.T) {
 	ifr := infra.New(t)
 	m := fixture.Todo(func(m *model.Todo) {
 		m.CompletedAt = new(model.MustCompletedAt(time.Now()))
+		m.UpdatedAt = time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
 	})
 	todos := postgres.NewTodo(ifr.Reader)
 	ifr.InTx(t, func(tx tx.Tx) {
@@ -69,6 +73,7 @@ func TestSetTodoCompletion_Uncomplete(t *testing.T) {
 	got, err := todos.Get(t.Context(), m.ID)
 	require.NoError(t, err)
 	assert.Nil(t, got.CompletedAt)
+	assert.WithinDuration(t, time.Now(), got.UpdatedAt, time.Second)
 }
 
 func TestSetTodoCompletion_NotFound(t *testing.T) {
@@ -99,6 +104,7 @@ func TestSetTodoCompletion_AlreadyInState(t *testing.T) {
 
 			ifr := infra.New(t)
 			m := fixture.Todo(func(m *model.Todo) {
+				m.UpdatedAt = time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
 				if tt.completed {
 					m.CompletedAt = new(model.MustCompletedAt(time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)))
 				}
@@ -116,6 +122,7 @@ func TestSetTodoCompletion_AlreadyInState(t *testing.T) {
 			require.NoError(t, err)
 			got, err := todos.Get(t.Context(), m.ID)
 			require.NoError(t, err)
+			assert.WithinDuration(t, m.UpdatedAt, got.UpdatedAt, 0)
 			if tt.completed {
 				require.NotNil(t, got.CompletedAt)
 				assert.WithinDuration(t, m.CompletedAt.Time(), got.CompletedAt.Time(), 0)

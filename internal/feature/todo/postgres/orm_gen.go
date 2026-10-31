@@ -87,7 +87,8 @@ ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, priority = EXCLUDED.prior
 func (r Todo) Complete(ctx context.Context, id uuid.UUID, completedAt time.Time) (int64, error) {
 	const q = `UPDATE todos
 SET
-    completed_at = $1
+    completed_at = $1,
+    updated_at = $1
 WHERE
     id = $2
     AND completed_at IS NULL`
@@ -99,14 +100,15 @@ WHERE
 }
 
 // Uncomplete runs the query of its name in todo_queries.sql.
-func (r Todo) Uncomplete(ctx context.Context, id uuid.UUID) (int64, error) {
+func (r Todo) Uncomplete(ctx context.Context, id uuid.UUID, updatedAt time.Time) (int64, error) {
 	const q = `UPDATE todos
 SET
-    completed_at = NULL
+    completed_at = NULL,
+    updated_at = $1
 WHERE
-    id = $1
+    id = $2
     AND completed_at IS NOT NULL`
-	tag, err := r.db.Exec(ctx, q, id)
+	tag, err := r.db.Exec(ctx, q, updatedAt, id)
 	if err != nil {
 		return 0, fmt.Errorf("query Uncomplete: %w", err)
 	}

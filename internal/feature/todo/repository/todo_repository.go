@@ -20,7 +20,7 @@ type Todo interface {
 	//kanna:conflict id keep=created_at
 	Upsert(ctx context.Context, m model.Todo) error
 	Complete(ctx context.Context, id uuid.UUID, completedAt time.Time) (int64, error)
-	Uncomplete(ctx context.Context, id uuid.UUID) (int64, error)
+	Uncomplete(ctx context.Context, id uuid.UUID, updatedAt time.Time) (int64, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 	Bind(tx tx.Tx) Todo
 }
