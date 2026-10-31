@@ -54,12 +54,11 @@ type ListTodo struct {
 }
 
 func (uc ListTodo) Do(ctx context.Context, in ListTodoInput) (ListTodoOutput, error) {
-	if err := in.Validate(); err != nil {
-		return ListTodoOutput{}, err
-	}
-
+	// Before Validate, which a nil pointer to a variant would panic in: a pointer
+	// implements ListFilter as well, and would otherwise list every to-do.
 	s := scopes.Todos().CreatedAtAsc()
 	switch f := in.Filter.(type) {
+	case nil:
 	case CompletionFilter:
 		if f.Completed {
 			s = s.CompletedAtIsNotNull()
@@ -68,6 +67,12 @@ func (uc ListTodo) Do(ctx context.Context, in ListTodoInput) (ListTodoOutput, er
 		}
 	case PriorityFilter:
 		s = s.PriorityEq(f.Priority)
+	default:
+		return ListTodoOutput{}, fmt.Errorf("unsupported filter %T", f)
+	}
+
+	if err := in.Validate(); err != nil {
+		return ListTodoOutput{}, err
 	}
 
 	var ms []model.Todo
