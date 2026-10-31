@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-kanna/orm"
 	"github.com/go-kanna/value/rule"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -29,6 +30,37 @@ func TestTodo_GetNotFound(t *testing.T) {
 
 	// assert
 	require.ErrorIs(t, err, orm.ErrNotFound)
+}
+
+func TestTodo_GetForUpdateLocksRow(t *testing.T) {
+	t.Parallel()
+
+	ifr := infra.New(t)
+	sut := postgres.NewTodo(ifr.Reader)
+	m := fixture.Todo()
+	ifr.InTx(t, func(tx tx.Tx) {
+		require.NoError(t, sut.Bind(tx).Upsert(t.Context(), m))
+	})
+
+	ifr.InTx(t, func(tx tx.Tx) {
+		got, err := sut.Bind(tx).GetForUpdate(t.Context(), m.ID)
+		require.NoError(t, err)
+		assert.Equal(t, m.ID, got.ID)
+
+		competing, err := ifr.Writer.Begin(t.Context())
+		require.NoError(t, err)
+		defer func() { _ = competing.Rollback(t.Context()) }()
+		_, err = competing.Exec(t.Context(), "SET LOCAL lock_timeout = '100ms'")
+		require.NoError(t, err)
+
+		_, err = competing.Exec(t.Context(), "DELETE FROM todos WHERE id = $1", m.ID)
+		pgerr, ok := errors.AsType[*pgconn.PgError](err)
+		require.True(t, ok, "err = %v, want a PostgreSQL lock timeout", err)
+		assert.Equal(t, "55P03", pgerr.Code)
+	})
+
+	_, err := sut.Get(t.Context(), m.ID)
+	require.NoError(t, err)
 }
 
 func TestTodo_InsertAndGet(t *testing.T) {

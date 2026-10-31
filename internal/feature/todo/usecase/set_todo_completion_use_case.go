@@ -39,7 +39,7 @@ func (uc SetTodoCompletion) Do(ctx context.Context, in SetTodoCompletionInput) (
 	id := either.Must(uuid.Parse(in.TodoID))
 	if err := uc.transactor.WithTx(ctx, func(tx tx.Tx) error {
 		todos := uc.todos.Bind(tx)
-		_, err := todos.Get(ctx, id)
+		_, err := todos.GetForUpdate(ctx, id)
 		if errors.Is(err, orm.ErrNotFound) {
 			return aerrors.NotFound("todo").WithMessage(messages.TodoNotFound())
 		}

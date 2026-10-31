@@ -35,6 +35,20 @@
       ],
       "columns": []
     },
+    "github.com/go-kanna/showcase/internal/feature/todo/postgres.GetForUpdate": {
+      "digest": "770fd9dde22aca24",
+      "params": [
+        {"name": "id", "type": "uuid"}
+      ],
+      "columns": [
+        {"name": "id", "type": "uuid", "not_null": true},
+        {"name": "title", "type": "text", "not_null": true},
+        {"name": "priority", "type": "text", "not_null": true},
+        {"name": "completed_at", "type": "timestamptz", "nullable": true},
+        {"name": "created_at", "type": "timestamptz", "not_null": true},
+        {"name": "updated_at", "type": "timestamptz", "not_null": true}
+      ]
+    },
     "github.com/go-kanna/showcase/internal/feature/todo/postgres.Uncomplete": {
       "digest": "32ed75f220430b53",
       "params": [
