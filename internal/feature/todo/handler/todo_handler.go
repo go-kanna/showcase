@@ -6,9 +6,11 @@ import (
 	"github.com/go-kanna/showcase/internal/di"
 	"github.com/go-kanna/showcase/internal/errors/aerrors"
 	"github.com/go-kanna/showcase/internal/feature/todo/mapper"
+	"github.com/go-kanna/showcase/internal/feature/todo/postgres"
 	"github.com/go-kanna/showcase/internal/feature/todo/repository"
 	"github.com/go-kanna/showcase/internal/feature/todo/usecase"
 	todov1 "github.com/go-kanna/showcase/internal/gen/showcase/todo/v1"
+	"github.com/go-kanna/showcase/internal/infra/storage/db"
 	"github.com/go-kanna/showcase/internal/lib/xslices"
 )
 
@@ -24,6 +26,10 @@ type Handler struct {
 	list          *usecase.ListTodo
 	put           *usecase.PutTodo
 	setCompletion *usecase.SetTodoCompletion
+}
+
+func provideDBTX(reader db.Reader) postgres.DBTX {
+	return reader
 }
 
 func (h Handler) DeleteTodo(
