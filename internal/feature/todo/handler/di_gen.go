@@ -12,7 +12,7 @@ import (
 func NewHandler(infra *di.Infra) *Handler {
 	transactor := infra.Transactor
 	reader := infra.Reader
-	db := postgres.NewDBTX(reader)
+	db := provideDBTX(reader)
 	todo := postgres.NewTodo(db)
 	delete2 := usecase.NewDeleteTodo(transactor, todo)
 	readTransactor := infra.ReadTransactor
