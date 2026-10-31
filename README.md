@@ -76,9 +76,8 @@ buf curl --protocol grpc --http2-prior-knowledge --schema proto \
 
 | Command                       | What it does                                                                    |
 |-------------------------------|---------------------------------------------------------------------------------|
-| `make gen`                    | run every generator: buf, then `go generate` in the order outputs are used      |
+| `make gen`                    | run every generator: buf, then the kanna generators with `go tool kanna gen`    |
 | `make gen-check`              | fail if buf or the kanna generators would change what is committed              |
-| `make gen-fresh-check`        | delete what the kanna generators wrote, and fail unless one run writes it again |
 | `make test`                   | run the tests, each against its own database                                    |
 | `make lint`                   | run golangci-lint                                                               |
 | `make sql-lint`               | run sqlfluff over the migrations                                                |
@@ -86,10 +85,9 @@ buf curl --protocol grpc --http2-prior-knowledge --schema proto \
 | `make db-describe`            | record the schema of the migrated database in `kanna-orm.snapshot.json`         |
 | `make new-migration name=...` | add a migration file                                                            |
 
-`make gen` runs the generators package by package, in the order of `GEN_PACKAGES` in the Makefile: each loads the
-packages its own imports, whose generated code has to be there by then. A package that gains a `//go:generate` line
-goes into that list, after the packages whose output it uses; `make gen-fresh-check`, which CI runs, fails when the
-order needs a second run.
+`make gen` runs the kanna generators with `go tool kanna gen`, which works out their order from what each reads and
+writes, so a package that gains a `//go:generate` line needs nothing else. `go tool kanna gen --plan` shows the order and
+why.
 
 kanna-orm generates from `kanna-orm.snapshot.json`, not from a database, so `make gen` needs none. After a migration,
 apply it with `make db-migrate`, record it with `make db-describe`, and commit the snapshot along with the migration;
