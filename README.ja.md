@@ -71,9 +71,8 @@ buf curl --protocol grpc --http2-prior-knowledge --schema proto \
 
 | コマンド | 内容 |
 |---|---|
-| `make gen` | すべてのジェネレータを実行する: buf を実行してから、出力が使われる順に `go generate` を実行する |
+| `make gen` | すべてのジェネレータを実行する: buf を実行してから、`go tool kanna gen` で kanna のジェネレータを実行する |
 | `make gen-check` | buf または kanna のジェネレータがコミット済みの内容を変更する場合に失敗する |
-| `make gen-fresh-check` | kanna のジェネレータが生成したものを削除し、1 回の実行で再生成できなければ失敗する |
 | `make test` | テストを、それぞれ専用のデータベースに対して実行する |
 | `make lint` | golangci-lint を実行する |
 | `make sql-lint` | マイグレーションに sqlfluff を実行する |
@@ -81,7 +80,7 @@ buf curl --protocol grpc --http2-prior-knowledge --schema proto \
 | `make db-describe` | マイグレーション済みのデータベースのスキーマを `kanna-orm.snapshot.json` に記録する |
 | `make new-migration name=...` | マイグレーションファイルを追加する |
 
-`make gen` は Makefile の `GEN_PACKAGES` の順に、パッケージごとにジェネレータを実行します。各ジェネレータは自身のインポート先のパッケージを読み込むので、その時点でそれらの生成コードが存在している必要があります。`//go:generate` の行を追加したパッケージは、出力を使うパッケージの後ろに並ぶようこのリストに加えてください。CI が実行する `make gen-fresh-check` は、順序のせいで 2 回の実行が必要になると失敗します。
+`make gen` は `go tool kanna gen` で kanna のジェネレータを実行します。順序は各ジェネレータが読むものと書くものから求められるので、`//go:generate` の行を追加したパッケージに、ほかの作業は要りません。順序とその理由は `go tool kanna gen --plan` で確認できます。
 
 kanna-orm はデータベースではなく `kanna-orm.snapshot.json` から生成するので、`make gen` にデータベースは不要です。マイグレーションの後は、`make db-migrate` で適用し、`make db-describe` で記録して、スナップショットをマイグレーションと一緒にコミットしてください。両者が一致しないと CI が失敗します。
 
