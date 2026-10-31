@@ -2,7 +2,7 @@
 
 [![日本語](https://img.shields.io/badge/lang-%E6%97%A5%E6%9C%AC%E8%AA%9E-blue.svg)](README.ja.md)
 
-A to-do gRPC service in Go, written to show the [kanna](https://github.com/go-kanna/kanna) code generators at work in
+A to-do gRPC service in Go, written to show the [kanna](https://go-kanna.github.io/) code generators at work in
 one application. Each generator takes over a piece of code you would otherwise write by hand: constructors, validation,
 mappings between layers, test fixtures, typed messages, value types, and the database code behind a repository.
 Everything it writes is committed, so you can read it next to what it was generated from.
