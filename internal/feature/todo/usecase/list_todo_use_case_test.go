@@ -107,6 +107,20 @@ func TestListTodo_FilterWithoutPriority(t *testing.T) {
 	assert.Equal(t, "blank", verrs[0].Code())
 }
 
+func TestListTodo_FilterWithUnknownPriority(t *testing.T) {
+	t.Parallel()
+
+	_, err := usecase.NewListTodo(nil, nil).Do(t.Context(), usecase.ListTodoInput{
+		Filter: usecase.PriorityFilter{Priority: model.Priority("urgent")},
+	})
+
+	var verrs validate.Errors
+	require.ErrorAs(t, err, &verrs)
+	require.Len(t, verrs, 1)
+	assert.Equal(t, "filter.priority", verrs[0].Field)
+	assert.Equal(t, "inclusion", verrs[0].Code())
+}
+
 // A pointer to a variant implements ListFilter too, but Do narrows by the
 // variants alone, so it is refused before any repository is called, rather than
 // listing every to-do.
