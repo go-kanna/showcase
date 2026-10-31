@@ -76,7 +76,10 @@ db-drop:
 	docker compose exec -T db dropdb -U $(DB_USER) --force --if-exists $(DB_NAME)
 
 .PHONY: db-reset
-db-reset: db-drop db-create db-migrate
+db-reset:
+	$(MAKE) db-drop
+	$(MAKE) db-create
+	$(MAKE) db-migrate
 
 .POHNY: new-migration
 new-migration:
