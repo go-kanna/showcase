@@ -39,11 +39,6 @@ const (
 	PriorityHigh   Priority = "high"
 )
 
-func (p Priority) Validate() error {
-	_, err := NewPriority(string(p))
-	return err
-}
-
 //go:generate go tool kanna-fixture
 
 type Todo struct {
