@@ -4,6 +4,7 @@ package postgres
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"slices"
 	"time"
@@ -43,6 +44,24 @@ func (r Todo) Get(ctx context.Context, id uuid.UUID) (model.Todo, error) {
 		return model.Todo{}, fmt.Errorf("todos with id %v: %w", id, orm.ErrNotFound)
 	}
 	return rows[0], nil
+}
+
+// GetForUpdate runs the query of its name in todo_queries.sql.
+func (r Todo) GetForUpdate(ctx context.Context, id uuid.UUID) (model.Todo, error) {
+	const q = `SELECT id, title, priority, completed_at, created_at, updated_at
+FROM todos
+WHERE id = $1
+FOR UPDATE`
+	var row model.Todo
+	err := r.db.QueryRow(ctx, q, id).
+		Scan(&row.ID, &row.Title, &row.Priority, &row.CompletedAt, &row.CreatedAt, &row.UpdatedAt)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return model.Todo{}, fmt.Errorf("query GetForUpdate: %w", orm.ErrNotFound)
+	}
+	if err != nil {
+		return model.Todo{}, fmt.Errorf("query GetForUpdate: %w", err)
+	}
+	return row, nil
 }
 
 func (r Todo) List(ctx context.Context, s ...scopes.Todo) ([]model.Todo, error) {
