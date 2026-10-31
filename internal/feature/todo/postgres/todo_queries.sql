@@ -1,9 +1,3 @@
--- query: GetForUpdate
-SELECT id, title, priority, completed_at, created_at, updated_at
-FROM todos
-WHERE id = :id
-FOR UPDATE;
-
 -- query: Complete
 UPDATE todos
 SET

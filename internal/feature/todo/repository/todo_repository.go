@@ -15,6 +15,7 @@ import (
 //kanna:repository table=todos
 type Todo interface {
 	Get(ctx context.Context, id uuid.UUID) (model.Todo, error)
+	//kanna:lock update
 	GetForUpdate(ctx context.Context, id uuid.UUID) (model.Todo, error)
 	List(ctx context.Context, s ...scopes.Todo) ([]model.Todo, error)
 	//kanna:conflict id keep=created_at
