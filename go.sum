@@ -143,10 +143,10 @@ github.com/go-kanna/mapper v0.0.13 h1:7t9KPmKYCUywhWNLDqtdJX1tHtF1YeLUxboJh+O6MX
 github.com/go-kanna/mapper v0.0.13/go.mod h1:j/6uBRUgpVCLV00PvUnn8jKBgpE6kfisQSkEB5NF9FU=
 github.com/go-kanna/orm v0.0.8 h1:+HgcIlSYjBsWRrfejUDXvIxqP33iMLRzsNzJkiEowN0=
 github.com/go-kanna/orm v0.0.8/go.mod h1:vIza3IpOv+Jr/lxmucS06mj2Yx9mpLSI7+pOkPSnTAs=
-github.com/go-kanna/validate v0.0.11 h1:JzYGv2L5eCTsYgB2F+y7KOvt+O1uuWNGDeWt92usTNY=
-github.com/go-kanna/validate v0.0.11/go.mod h1:S0HrvWXjYuIMbs+dd7v7ShPM1vrtbx8723MFvGH3UxI=
-github.com/go-kanna/value v0.0.8 h1:falZvJnk6qXz9oky5413/56SX3OkTxAa3KNgKKs3+rQ=
-github.com/go-kanna/value v0.0.8/go.mod h1:XgM7Ncc9PQsZDeM6RMT8jKvcneO/QGyk7dSkQ7xAOgU=
+github.com/go-kanna/validate v0.0.12 h1:8ZjWzUA1dyI3EGmDyI1U909OOFet/MEsAny/BLzs5BU=
+github.com/go-kanna/validate v0.0.12/go.mod h1:S0HrvWXjYuIMbs+dd7v7ShPM1vrtbx8723MFvGH3UxI=
+github.com/go-kanna/value v0.0.9 h1:h5zDO5TnI9FbfjuvM2XQTJcSLZyfUYF3nhi5vKip1SY=
+github.com/go-kanna/value v0.0.9/go.mod h1:XgM7Ncc9PQsZDeM6RMT8jKvcneO/QGyk7dSkQ7xAOgU=
 github.com/go-openapi/jsonpointer v0.22.5 h1:8on/0Yp4uTb9f4XvTrM2+1CPrV05QPZXu+rvu2o9jcA=
 github.com/go-openapi/jsonpointer v0.22.5/go.mod h1:gyUR3sCvGSWchA2sUBJGluYMbe1zazrYWIkWPjjMUY0=
 github.com/go-openapi/swag/jsonname v0.25.5 h1:8p150i44rv/Drip4vWI3kGi9+4W9TdI3US3uUYSFhSo=
