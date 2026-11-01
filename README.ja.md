@@ -4,6 +4,8 @@
 
 [kanna](https://go-kanna.github.io/ja/) コードジェネレータが 1 つのアプリケーションの中で働く様子を見せるために書かれた、Go の ToDo gRPC サービスです。各ジェネレータは、本来手で書くコードの一部を引き受けます。コンストラクタ、バリデーション、レイヤ間のマッピング、テストフィクスチャ、型付きのメッセージ、値オブジェクト、リポジトリの裏側のデータベースコードです。生成されたものはすべてコミットされているので、生成元と並べて読めます。
 
+orm、validate、mapper、di、fixture でブログの JSON API を段階的に作る場合は、[チュートリアル](tutorial/README.ja.md) を参照してください。VHS の台本で同じ手順を録画でき、手作業の画面収録は不要です。
+
 Go 1.27 以上、Docker と Compose、[buf](https://buf.build/docs/cli/installation/) CLI が必要です。
 
 ## 各ジェネレータの役割

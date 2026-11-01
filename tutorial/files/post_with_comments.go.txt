@@ -1,0 +1,14 @@
+package model
+
+import "time"
+
+//go:generate go tool kanna-fixture
+
+type Post struct {
+	ID        int64
+	Title     string `validate:"required,max=200"`
+	Body      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Comments  []Comment
+}

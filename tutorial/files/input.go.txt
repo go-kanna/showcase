@@ -1,0 +1,9 @@
+package main
+
+//go:generate go tool kanna-validate
+
+//kanna:validate
+type SavePost struct {
+	Title string `json:"title" validate:"required,max=200"`
+	Body  string `json:"body"`
+}
