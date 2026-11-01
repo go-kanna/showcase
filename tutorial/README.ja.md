@@ -133,7 +133,7 @@ VHS は profile と rc ファイルを読まない Bash を使います。Apple 
 
 録画し直す場合は、DB を停止し、`tmp/tutorial` を別の場所に移動してから、もう一度準備してください。専用 PostgreSQL のコンテナを停止するとデータは破棄されます。ソースと生成されたアプリは `tmp/tutorial` に残ります。HTTP の日時、モデルに設定する日時、実行時間は録画ごとに変わります。
 
-## 英語キャプション
+## キャプション
 
 録画後、Go、ImageMagick（`magick`）、ffmpeg を使ってキャプションを追加します。
 
@@ -142,3 +142,11 @@ go run tutorial/caption.go
 ```
 
 元動画を残し、`tmp/blog-tutorial-captioned.mp4` と、同名の `.srt`・`.vtt` 字幕ファイルを出力します。コードが隠れないよう、ターミナルの下に字幕用の帯を追加します。文面と表示時刻は [captions.json](captions.json) で変更できます。現在の時刻は 14 分 48 秒の録画に合わせているため、録り直した場合は対応する場面を確認してください。既定のフォントは macOS の Helvetica です。他の環境では `-font DejaVu-Sans` のように、ImageMagick で使えるフォントを指定してください。
+
+日本語版は [captions.ja.json](captions.ja.json) と日本語フォントを指定します。macOS では以下を実行します。
+
+```sh
+go run tutorial/caption.go -cues tutorial/captions.ja.json -output tmp/blog-tutorial-ja.mp4 -work tmp/blog-captions-ja/generated -font '/System/Library/Fonts/ヒラギノ角ゴシック W3.ttc'
+```
+
+英語版を残したまま、日本語版の動画と同名の `.srt`・`.vtt` 字幕ファイルを出力します。

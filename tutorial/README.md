@@ -142,3 +142,11 @@ go run tutorial/caption.go
 ```
 
 This preserves the original video and writes `tmp/blog-tutorial-captioned.mp4`, plus matching `.srt` and `.vtt` subtitle files. Captions appear in an added strip below the terminal, leaving the code visible. Edit [captions.json](captions.json) to change the text or timing. The current cues match the 14:48 recording; check their alignment after recording again. The default font is macOS Helvetica; on other systems, pass an installed ImageMagick font with `-font`, such as `-font DejaVu-Sans`.
+
+For Japanese captions, use [captions.ja.json](captions.ja.json) and a Japanese font. On macOS:
+
+```sh
+go run tutorial/caption.go -cues tutorial/captions.ja.json -output tmp/blog-tutorial-ja.mp4 -work tmp/blog-captions-ja/generated -font '/System/Library/Fonts/ヒラギノ角ゴシック W3.ttc'
+```
+
+This writes the Japanese video and matching `.srt` and `.vtt` files without replacing the English outputs.
