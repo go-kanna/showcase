@@ -1,0 +1,91 @@
+package main
+
+import (
+	"net/http"
+	"time"
+
+	"github.com/jackc/pgx/v5/pgxpool"
+
+	"example.com/blog/mapper"
+	"example.com/blog/model"
+	"example.com/blog/postgres"
+	"example.com/blog/repository"
+	"example.com/blog/scopes"
+)
+
+//go:generate go tool kanna-di
+
+//kanna:container
+type API struct {
+	_     *pgxpool.Pool   `di:"arg"`
+	posts repository.Post `di:"with=postgres.NewPost"`
+}
+
+func provideDBTX(pool *pgxpool.Pool) postgres.DBTX { return pool }
+
+func (a API) routes() http.Handler {
+	mux := http.NewServeMux()
+	mux.HandleFunc("POST /posts", a.createPost)
+	mux.HandleFunc("GET /posts", a.listPosts)
+	mux.HandleFunc("GET /posts/{id}", a.showPost)
+	mux.HandleFunc("PUT /posts/{id}", a.updatePost)
+	mux.HandleFunc("DELETE /posts/{id}", a.deletePost)
+	return mux
+}
+
+func (a API) createPost(w http.ResponseWriter, r *http.Request) {
+	var in SavePost
+	if !readJSON(w, r, &in) {
+		return
+	}
+	now := time.Now()
+	post, err := a.posts.Insert(r.Context(), model.Post{
+		Title: in.Title, Body: in.Body, CreatedAt: now, UpdatedAt: now,
+	})
+	respond(w, http.StatusCreated, mapper.PostToResponse(post), err)
+}
+
+func (a API) listPosts(w http.ResponseWriter, r *http.Request) {
+	posts, err := a.posts.List(r.Context(), scopes.Posts().CreatedAtDesc())
+	responses := make([]mapper.PostResponse, 0, len(posts))
+	for _, post := range posts {
+		responses = append(responses, mapper.PostToResponse(post))
+	}
+	respond(w, http.StatusOK, responses, err)
+}
+
+func (a API) showPost(w http.ResponseWriter, r *http.Request) {
+	id, ok := pathID(w, r)
+	if !ok {
+		return
+	}
+	post, err := a.posts.Get(r.Context(), id)
+	respond(w, http.StatusOK, mapper.PostToResponse(post), err)
+}
+
+func (a API) updatePost(w http.ResponseWriter, r *http.Request) {
+	id, ok := pathID(w, r)
+	if !ok {
+		return
+	}
+	var in SavePost
+	if !readJSON(w, r, &in) {
+		return
+	}
+	post, err := a.posts.Get(r.Context(), id)
+	if err != nil {
+		respond(w, 0, nil, err)
+		return
+	}
+	post.Title, post.Body, post.UpdatedAt = in.Title, in.Body, time.Now()
+	err = a.posts.Update(r.Context(), post)
+	respond(w, http.StatusOK, mapper.PostToResponse(post), err)
+}
+
+func (a API) deletePost(w http.ResponseWriter, r *http.Request) {
+	id, ok := pathID(w, r)
+	if !ok {
+		return
+	}
+	respond(w, http.StatusNoContent, nil, a.posts.Delete(r.Context(), id))
+}

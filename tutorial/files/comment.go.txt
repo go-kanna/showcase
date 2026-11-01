@@ -1,0 +1,11 @@
+package model
+
+import "time"
+
+type Comment struct {
+	ID        int64
+	PostID    int64
+	Content   string `validate:"required"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}

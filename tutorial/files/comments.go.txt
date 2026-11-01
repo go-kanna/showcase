@@ -1,0 +1,34 @@
+package main
+
+import (
+	"net/http"
+	"time"
+
+	"example.com/blog/mapper"
+	"example.com/blog/model"
+	"example.com/blog/scopes"
+)
+
+func (a API) createComment(w http.ResponseWriter, r *http.Request) {
+	id, ok := pathID(w, r)
+	if !ok {
+		return
+	}
+	var in CreateComment
+	if !readJSON(w, r, &in) {
+		return
+	}
+	if _, err := a.posts.Get(r.Context(), id); err != nil {
+		respond(w, 0, nil, err)
+		return
+	}
+	now := time.Now()
+	if _, err := a.comments.Insert(r.Context(), model.Comment{
+		PostID: id, Content: in.Content, CreatedAt: now, UpdatedAt: now,
+	}); err != nil {
+		respond(w, 0, nil, err)
+		return
+	}
+	post, err := a.posts.Get(r.Context(), id, scopes.Posts().WithComments())
+	respond(w, http.StatusCreated, mapper.PostToResponse(post), err)
+}

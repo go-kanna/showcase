@@ -1,0 +1,89 @@
+package repository_test
+
+import (
+	"context"
+	"errors"
+	"os"
+	"testing"
+
+	"github.com/go-kanna/orm"
+	"github.com/jackc/pgx/v5"
+
+	"example.com/blog/mapper"
+	"example.com/blog/model"
+	"example.com/blog/model/fixture"
+	"example.com/blog/postgres"
+	"example.com/blog/scopes"
+)
+
+func TestPostAndComments(t *testing.T) {
+	conn, err := pgx.Connect(t.Context(), os.Getenv("DATABASE_URL"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close(context.Background())
+	tx, err := conn.Begin(t.Context())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tx.Rollback(context.Background())
+	posts := postgres.NewPost(tx)
+	comments := postgres.NewComment(tx)
+
+	post, err := posts.Insert(t.Context(), fixture.Post())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if post.ID <= 0 {
+		t.Fatalf("database did not assign a post ID: %d", post.ID)
+	}
+	post.Title = "A blog with kanna"
+	if err := posts.Update(t.Context(), post); err != nil {
+		t.Fatal(err)
+	}
+	rows, err := posts.List(t.Context(), scopes.Posts().IDEq(post.ID))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(rows) != 1 || rows[0].Title != post.Title {
+		t.Fatalf("unexpected posts: %v", rows)
+	}
+
+	comment, err := comments.Insert(t.Context(), fixture.Comment(func(c *model.Comment) {
+		c.PostID = post.ID
+	}))
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := posts.Get(t.Context(), post.ID, scopes.Posts().WithComments())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got.Title != post.Title || len(got.Comments) != 1 {
+		t.Fatalf("unexpected post with comments: %+v", got)
+	}
+	if got.Comments[0].ID != comment.ID || got.Comments[0].Content != comment.Content {
+		t.Fatalf("unexpected comment: %+v", got.Comments[0])
+	}
+	response := mapper.PostToResponse(got)
+	if response.ID != post.ID || response.Title != post.Title || response.Body != post.Body {
+		t.Fatalf("unexpected post response: %+v", response)
+	}
+	if len(response.Comments) != 1 || response.Comments[0].Content != comment.Content {
+		t.Fatalf("unexpected comment response: %+v", response.Comments)
+	}
+
+	if err := posts.Delete(t.Context(), post.ID); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := posts.Get(t.Context(), post.ID); !errors.Is(err, orm.ErrNotFound) {
+		t.Fatalf("deleted post: error = %v, want ErrNotFound", err)
+	}
+	remaining, err := comments.List(t.Context(), scopes.Comments().PostIDEq(post.ID))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(remaining) != 0 {
+		t.Fatalf("comments remain after deleting their post: %v", remaining)
+	}
+}

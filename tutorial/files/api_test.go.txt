@@ -1,0 +1,32 @@
+package main
+
+import (
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"testing"
+)
+
+func TestInvalidRequests(t *testing.T) {
+	tests := []struct {
+		method, path, body string
+		status             int
+	}{
+		{"POST", "/posts", `{"title":""}`, http.StatusUnprocessableEntity},
+		{"POST", "/posts", `{"title":"` + strings.Repeat("x", 201) + `"}`, http.StatusUnprocessableEntity},
+		{"PUT", "/posts/1", `{"title":""}`, http.StatusUnprocessableEntity},
+		{"POST", "/posts/1/comments", `{"content":""}`, http.StatusUnprocessableEntity},
+		{"POST", "/posts", `{"title":`, http.StatusBadRequest},
+		{"GET", "/posts/nope", "", http.StatusBadRequest},
+	}
+	for _, tt := range tests {
+		t.Run(tt.method+" "+tt.path+" "+tt.body, func(t *testing.T) {
+			rec := httptest.NewRecorder()
+			req := httptest.NewRequestWithContext(t.Context(), tt.method, tt.path, strings.NewReader(tt.body))
+			API{}.routes().ServeHTTP(rec, req)
+			if rec.Code != tt.status {
+				t.Fatalf("status = %d, want %d: %s", rec.Code, tt.status, rec.Body)
+			}
+		})
+	}
+}

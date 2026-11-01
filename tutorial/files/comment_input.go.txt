@@ -1,0 +1,6 @@
+package main
+
+//kanna:validate
+type CreateComment struct {
+	Content string `json:"content" validate:"required"`
+}

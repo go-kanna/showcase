@@ -1,0 +1,22 @@
+package mapper
+
+import (
+	"time"
+
+	"example.com/blog/model"
+)
+
+//go:generate go tool kanna-mapper
+
+type PostResponse struct {
+	ID        int64     `json:"id"`
+	Title     string    `json:"title"`
+	Body      string    `json:"body"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
+//kanna:mapper
+type _ interface {
+	PostToResponse(model.Post) PostResponse
+}
