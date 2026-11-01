@@ -22,6 +22,12 @@ type _ interface {
 	// ListTodoInputFromProto reads the filter of a ListTodo request, its oneof
 	// becoming the variant of usecase.ListFilter that its arm is named after.
 	ListTodoInputFromProto(req *todov1.ListTodoRequest) (usecase.ListTodoInput, error)
+
+	// priorityToModel leaves a priority the request did not set to the required
+	// rule of the use case, to report with the other rules of the request.
+	//
+	//kanna:allow unspecified
+	priorityToModel(p todov1.Priority) (model.Priority, error)
 }
 
 //kanna:converter
