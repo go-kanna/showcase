@@ -12,6 +12,7 @@ import (
 //kanna:mapper
 type _ interface {
 	TodoToProto(m model.Todo) *todov1.Todo
+	CommentToProto(c model.Comment) *todov1.Comment
 
 	// TodoInputFromProto reads the to-do a PutTodo request carries. The
 	// request carries its completion apart from it.

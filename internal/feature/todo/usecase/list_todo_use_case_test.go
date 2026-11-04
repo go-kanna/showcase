@@ -3,6 +3,7 @@ package usecase_test
 import (
 	"testing"
 	"time"
+	"uuid"
 
 	"github.com/go-kanna/validate"
 	"github.com/stretchr/testify/assert"
@@ -14,6 +15,7 @@ import (
 	"github.com/go-kanna/showcase/internal/feature/todo/postgres"
 	"github.com/go-kanna/showcase/internal/feature/todo/usecase"
 	"github.com/go-kanna/showcase/internal/infra/storage/tx"
+	"github.com/go-kanna/showcase/internal/lib/xslices"
 	"github.com/go-kanna/showcase/internal/messages"
 	"github.com/go-kanna/showcase/test/infra"
 )
@@ -221,4 +223,41 @@ func TestListTodo_PageSizeOutOfRange(t *testing.T) {
 			assert.Equal(t, tt.code, verrs[0].Code())
 		})
 	}
+}
+
+// Each to-do comes with its own latest comments, newest first: the limit keeps
+// a page of the comments of each to-do, not of the list.
+func TestListTodo_LatestComments(t *testing.T) {
+	t.Parallel()
+
+	// arrange
+	ifr := infra.New(t)
+	busy, quiet, silent := fixture.Todo(), fixture.Todo(), fixture.Todo()
+	var comments []model.Comment // as inserted, with the IDs the database gave
+	ifr.InTx(t, func(tx tx.Tx) {
+		for _, m := range []model.Todo{busy, quiet, silent} {
+			require.NoError(t, postgres.NewTodo(ifr.Reader).Bind(tx).Upsert(t.Context(), m))
+		}
+		for _, todoID := range []uuid.UUID{busy.ID, busy.ID, busy.ID, busy.ID, quiet.ID} {
+			c, err := postgres.NewComment(ifr.Reader).Bind(tx).
+				Insert(t.Context(), fixture.Comment(func(c *model.Comment) { c.TodoID = todoID }))
+			require.NoError(t, err)
+			comments = append(comments, c)
+		}
+	})
+	sut := usecase.NewListTodo(ifr.ReadTransactor, postgres.NewTodo(ifr.Reader))
+
+	// act
+	got, err := sut.Do(t.Context(), usecase.ListTodoInput{})
+
+	// assert
+	require.NoError(t, err)
+	require.Len(t, got.Todos, 3)
+	ids := func(cs []model.Comment) []uuid.UUID {
+		return xslices.Map(cs, func(c model.Comment) uuid.UUID { return c.ID })
+	}
+	assert.Equal(t, []uuid.UUID{comments[3].ID, comments[2].ID, comments[1].ID}, ids(got.Todos[0].Comments))
+	assert.Equal(t, []uuid.UUID{comments[4].ID}, ids(got.Todos[1].Comments))
+	assert.NotNil(t, got.Todos[2].Comments, "loaded, with no comments")
+	assert.Empty(t, got.Todos[2].Comments)
 }

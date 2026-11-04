@@ -13,8 +13,12 @@ import (
 	"github.com/go-kanna/showcase/internal/messages"
 )
 
-// defaultPageSize is the size of a page that a request leaves at 0.
-const defaultPageSize = 20
+const (
+	// defaultPageSize is the size of a page that a request leaves at 0.
+	defaultPageSize = 20
+	// latestComments is how many comments of each to-do a list reads.
+	latestComments = 3
+)
 
 //kanna:validate
 type ListTodoInput struct {
@@ -63,7 +67,9 @@ type ListTodo struct {
 func (uc ListTodo) Do(ctx context.Context, in ListTodoInput) (ListTodoOutput, error) {
 	// Before Validate, which a nil pointer to a variant would panic in: a pointer
 	// implements ListFilter as well, and would otherwise list every to-do.
-	s := scopes.Todos().CreatedAtAsc()
+	// The limit keeps the latest comments of each to-do, not of the page.
+	s := scopes.Todos().CreatedAtAsc().
+		WithComments(scopes.Comments().CreatedAtDesc().Limit(latestComments))
 	switch f := in.Filter.(type) {
 	case nil:
 	case Completion:

@@ -1,6 +1,19 @@
 {
   "dialect": "postgresql",
   "tables": {
+    "comments": {
+      "columns": [
+        {"name": "id", "type": "uuid", "not_null": true, "default": true},
+        {"name": "todo_id", "type": "uuid", "not_null": true},
+        {"name": "body", "type": "text", "not_null": true},
+        {"name": "created_at", "type": "timestamptz", "not_null": true}
+      ],
+      "primary_key": ["id"],
+      "unique_keys": [],
+      "foreign_keys": [
+        {"columns": ["todo_id"], "references": "todos", "referenced_columns": ["id"]}
+      ]
+    },
     "goose_db_version": {
       "columns": [
         {"name": "id", "type": "int4", "not_null": true, "assigned": true, "writable": true, "assigned_by": "nextval(pg_get_serial_sequence('goose_db_version', 'id'))"},

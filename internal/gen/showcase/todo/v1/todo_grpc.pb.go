@@ -23,6 +23,7 @@ const (
 	TodoService_PutTodo_FullMethodName           = "/showcase.todo.v1.TodoService/PutTodo"
 	TodoService_SetTodoCompletion_FullMethodName = "/showcase.todo.v1.TodoService/SetTodoCompletion"
 	TodoService_DeleteTodo_FullMethodName        = "/showcase.todo.v1.TodoService/DeleteTodo"
+	TodoService_AddComment_FullMethodName        = "/showcase.todo.v1.TodoService/AddComment"
 )
 
 // TodoServiceClient is the client API for TodoService service.
@@ -33,6 +34,7 @@ type TodoServiceClient interface {
 	PutTodo(ctx context.Context, in *PutTodoRequest, opts ...grpc.CallOption) (*PutTodoResponse, error)
 	SetTodoCompletion(ctx context.Context, in *SetTodoCompletionRequest, opts ...grpc.CallOption) (*SetTodoCompletionResponse, error)
 	DeleteTodo(ctx context.Context, in *DeleteTodoRequest, opts ...grpc.CallOption) (*DeleteTodoResponse, error)
+	AddComment(ctx context.Context, in *AddCommentRequest, opts ...grpc.CallOption) (*AddCommentResponse, error)
 }
 
 type todoServiceClient struct {
@@ -83,6 +85,16 @@ func (c *todoServiceClient) DeleteTodo(ctx context.Context, in *DeleteTodoReques
 	return out, nil
 }
 
+func (c *todoServiceClient) AddComment(ctx context.Context, in *AddCommentRequest, opts ...grpc.CallOption) (*AddCommentResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AddCommentResponse)
+	err := c.cc.Invoke(ctx, TodoService_AddComment_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TodoServiceServer is the server API for TodoService service.
 // All implementations must embed UnimplementedTodoServiceServer
 // for forward compatibility.
@@ -91,6 +103,7 @@ type TodoServiceServer interface {
 	PutTodo(context.Context, *PutTodoRequest) (*PutTodoResponse, error)
 	SetTodoCompletion(context.Context, *SetTodoCompletionRequest) (*SetTodoCompletionResponse, error)
 	DeleteTodo(context.Context, *DeleteTodoRequest) (*DeleteTodoResponse, error)
+	AddComment(context.Context, *AddCommentRequest) (*AddCommentResponse, error)
 	mustEmbedUnimplementedTodoServiceServer()
 }
 
@@ -112,6 +125,9 @@ func (UnimplementedTodoServiceServer) SetTodoCompletion(context.Context, *SetTod
 }
 func (UnimplementedTodoServiceServer) DeleteTodo(context.Context, *DeleteTodoRequest) (*DeleteTodoResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteTodo not implemented")
+}
+func (UnimplementedTodoServiceServer) AddComment(context.Context, *AddCommentRequest) (*AddCommentResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method AddComment not implemented")
 }
 func (UnimplementedTodoServiceServer) mustEmbedUnimplementedTodoServiceServer() {}
 func (UnimplementedTodoServiceServer) testEmbeddedByValue()                     {}
@@ -206,6 +222,24 @@ func _TodoService_DeleteTodo_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TodoService_AddComment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddCommentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TodoServiceServer).AddComment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TodoService_AddComment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TodoServiceServer).AddComment(ctx, req.(*AddCommentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TodoService_ServiceDesc is the grpc.ServiceDesc for TodoService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -228,6 +262,10 @@ var TodoService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteTodo",
 			Handler:    _TodoService_DeleteTodo_Handler,
+		},
+		{
+			MethodName: "AddComment",
+			Handler:    _TodoService_AddComment_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

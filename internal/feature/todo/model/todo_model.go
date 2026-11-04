@@ -48,4 +48,16 @@ type Todo struct {
 	CompletedAt *CompletedAt
 	CreatedAt   time.Time `orm:",insertonly"`
 	UpdatedAt   time.Time
+
+	// Comments is read by comments.todo_id, which the names of Todo and of the
+	// field tell, and only when a scope asks for them with WithComments.
+	Comments []Comment
+}
+
+// Comment is a note left on a to-do.
+type Comment struct {
+	ID        uuid.UUID `orm:",default"` // the database's UUIDV7()
+	TodoID    uuid.UUID
+	Body      string
+	CreatedAt time.Time
 }

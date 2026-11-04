@@ -17,6 +17,13 @@ func TodoToProto(m model.Todo) *todov1.Todo {
 	if v2 := m.CompletedAt; v2 != nil {
 		v = timestamppb.New((*v2).Time())
 	}
+	var v3 []*todov1.Comment
+	if v4 := m.Comments; v4 != nil {
+		v3 = make([]*todov1.Comment, len(v4))
+		for i, e := range v4 {
+			v3[i] = CommentToProto(e)
+		}
+	}
 	return &todov1.Todo{
 		Id:          m.ID.String(),
 		Title:       m.Title,
@@ -24,6 +31,16 @@ func TodoToProto(m model.Todo) *todov1.Todo {
 		CreatedAt:   timestamppb.New(m.CreatedAt),
 		UpdatedAt:   timestamppb.New(m.UpdatedAt),
 		Priority:    priorityToTodov1(m.Priority),
+		Comments:    v3,
+	}
+}
+
+// CommentToProto maps model.Comment to *todov1.Comment.
+func CommentToProto(c model.Comment) *todov1.Comment {
+	return &todov1.Comment{
+		Id:        c.ID.String(),
+		Body:      c.Body,
+		CreatedAt: timestamppb.New(c.CreatedAt),
 	}
 }
 

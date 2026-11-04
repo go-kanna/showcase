@@ -19,9 +19,11 @@ import (
 type Handler struct {
 	todov1.UnimplementedTodoServiceServer
 
-	_ *di.Infra       `di:"arg"`
-	_ repository.Todo `di:"with=postgres.NewTodo"`
+	_ *di.Infra          `di:"arg"`
+	_ repository.Todo    `di:"with=postgres.NewTodo"`
+	_ repository.Comment `di:"with=postgres.NewComment"`
 
+	addComment    *usecase.AddComment
 	delete        *usecase.DeleteTodo
 	list          *usecase.ListTodo
 	put           *usecase.PutTodo
@@ -30,6 +32,16 @@ type Handler struct {
 
 func provideDBTX(reader db.Reader) postgres.DBTX {
 	return reader
+}
+
+func (h Handler) AddComment(
+	ctx context.Context, request *todov1.AddCommentRequest,
+) (*todov1.AddCommentResponse, error) {
+	out, err := h.addComment.Do(ctx, usecase.AddCommentInput{TodoID: request.GetTodoId(), Body: request.GetBody()})
+	if err != nil {
+		return nil, err
+	}
+	return &todov1.AddCommentResponse{Comment: mapper.CommentToProto(out.Comment)}, nil
 }
 
 func (h Handler) DeleteTodo(

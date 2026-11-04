@@ -423,6 +423,15 @@ func (s Todo) UpdatedAtDesc() Todo {
 	return Todo{ormScope(ormRuntime(s.q).OrderBy(`updated_at`, true))}
 }
 
+// WithComments loads Comments, from comments by todo_id. A limit or an offset of the scopes keeps a page of the Comments of each row.
+func (s Todo) WithComments(sub ...Comment) Todo {
+	qs := make([]impl.Of[model.Comment], len(sub))
+	for i, x := range sub {
+		qs[i] = ormRuntime(x.Of())
+	}
+	return Todo{ormScope(impl.PreloadEach(ormRuntime(s.q), "Comments", impl.Combine(qs...)))}
+}
+
 // Limit keeps the first n rows.
 func (s Todo) Limit(n int) Todo {
 	return Todo{ormScope(ormRuntime(s.q).Limit(n))}
@@ -489,6 +498,303 @@ func (s Todo) AfterCursor(cursor string) (Todo, error) {
 		`updated_at`: &row.UpdatedAt,
 	}); err != nil {
 		return Todo{}, err
+	}
+	return s.After(row), nil
+}
+
+// Comment is the scope of comments, whose rows are read into model.Comment, as //kanna:scopes implies it.
+type Comment struct{ q scope.Of[model.Comment] }
+
+// Comments returns a scope over all the rows of comments.
+func Comments() Comment { return Comment{} }
+
+// Of returns the scope as a repository reads it.
+func (s Comment) Of() scope.Of[model.Comment] { return s.q }
+
+// CommentChangeSet holds explicitly assigned columns of comments.
+type CommentChangeSet struct{ changes change.Set[model.Comment] }
+
+func CommentChanges() CommentChangeSet { return CommentChangeSet{} }
+
+func (c CommentChangeSet) Of() change.Set[model.Comment] { return c.changes }
+
+func (c CommentChangeSet) SetTodoID(v uuid.UUID) CommentChangeSet {
+	return CommentChangeSet{c.changes.Set("todo_id", v)}
+}
+
+func (c CommentChangeSet) SetBody(v string) CommentChangeSet {
+	return CommentChangeSet{c.changes.Set("body", v)}
+}
+
+func (c CommentChangeSet) SetCreatedAt(v time.Time) CommentChangeSet {
+	return CommentChangeSet{c.changes.Set("created_at", v)}
+}
+
+// IDEq narrows to the rows whose id is v.
+func (s Comment) IDEq(v uuid.UUID) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Where(`id = `, v))}
+}
+
+// IDNe narrows to the rows whose id is not v.
+func (s Comment) IDNe(v uuid.UUID) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Where(`id <> `, v))}
+}
+
+// IDIn narrows to the rows whose id is one of vs.
+func (s Comment) IDIn(vs ...uuid.UUID) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Where(`id = ANY(`, vs, `)`))}
+}
+
+// IDNotIn narrows to the rows whose id is none of vs.
+func (s Comment) IDNotIn(vs ...uuid.UUID) Comment {
+	if len(vs) == 0 {
+		return s
+	}
+	return Comment{ormScope(ormRuntime(s.q).Where(`id <> ALL(`, vs, `)`))}
+}
+
+// IDAsc orders the rows by id, in ascending order.
+func (s Comment) IDAsc() Comment {
+	return Comment{ormScope(ormRuntime(s.q).OrderBy(`id`, false))}
+}
+
+// IDDesc orders the rows by id, in descending order.
+func (s Comment) IDDesc() Comment {
+	return Comment{ormScope(ormRuntime(s.q).OrderBy(`id`, true))}
+}
+
+// TodoIDEq narrows to the rows whose todo_id is v.
+func (s Comment) TodoIDEq(v uuid.UUID) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Where(`todo_id = `, v))}
+}
+
+// TodoIDNe narrows to the rows whose todo_id is not v.
+func (s Comment) TodoIDNe(v uuid.UUID) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Where(`todo_id <> `, v))}
+}
+
+// TodoIDIn narrows to the rows whose todo_id is one of vs.
+func (s Comment) TodoIDIn(vs ...uuid.UUID) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Where(`todo_id = ANY(`, vs, `)`))}
+}
+
+// TodoIDNotIn narrows to the rows whose todo_id is none of vs.
+func (s Comment) TodoIDNotIn(vs ...uuid.UUID) Comment {
+	if len(vs) == 0 {
+		return s
+	}
+	return Comment{ormScope(ormRuntime(s.q).Where(`todo_id <> ALL(`, vs, `)`))}
+}
+
+// TodoIDAsc orders the rows by todo_id, in ascending order.
+func (s Comment) TodoIDAsc() Comment {
+	return Comment{ormScope(ormRuntime(s.q).OrderBy(`todo_id`, false))}
+}
+
+// TodoIDDesc orders the rows by todo_id, in descending order.
+func (s Comment) TodoIDDesc() Comment {
+	return Comment{ormScope(ormRuntime(s.q).OrderBy(`todo_id`, true))}
+}
+
+// BodyEq narrows to the rows whose body is v.
+func (s Comment) BodyEq(v string) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Where(`body = `, v))}
+}
+
+// BodyNe narrows to the rows whose body is not v.
+func (s Comment) BodyNe(v string) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Where(`body <> `, v))}
+}
+
+// BodyIn narrows to the rows whose body is one of vs.
+func (s Comment) BodyIn(vs ...string) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Where(`body = ANY(`, vs, `)`))}
+}
+
+// BodyNotIn narrows to the rows whose body is none of vs.
+func (s Comment) BodyNotIn(vs ...string) Comment {
+	if len(vs) == 0 {
+		return s
+	}
+	return Comment{ormScope(ormRuntime(s.q).Where(`body <> ALL(`, vs, `)`))}
+}
+
+// BodyLt narrows to the rows whose body is less than v.
+func (s Comment) BodyLt(v string) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Where(`body < `, v))}
+}
+
+// BodyLte narrows to the rows whose body is at most v.
+func (s Comment) BodyLte(v string) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Where(`body <= `, v))}
+}
+
+// BodyGt narrows to the rows whose body is greater than v.
+func (s Comment) BodyGt(v string) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Where(`body > `, v))}
+}
+
+// BodyGte narrows to the rows whose body is at least v.
+func (s Comment) BodyGte(v string) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Where(`body >= `, v))}
+}
+
+// BodyBetween narrows to the rows whose body is between lo and hi, both included.
+func (s Comment) BodyBetween(lo, hi string) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Where(`body BETWEEN `, lo, ` AND `, hi))}
+}
+
+// BodyLike narrows to the rows whose body matches pattern, as LIKE does.
+func (s Comment) BodyLike(pattern string) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Where(`body LIKE `, pattern))}
+}
+
+// BodyILike narrows to the rows whose body matches pattern, as ILIKE does, ignoring case.
+func (s Comment) BodyILike(pattern string) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Where(`body ILIKE `, pattern))}
+}
+
+// BodyHasPrefix narrows to the rows whose body starts with prefix.
+func (s Comment) BodyHasPrefix(prefix string) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Where(`body LIKE `, impl.EscapeLike(prefix)+"%", ` ESCAPE '!'`))}
+}
+
+// BodyContains narrows to the rows whose body contains substr.
+func (s Comment) BodyContains(substr string) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Where(`body LIKE `, "%"+impl.EscapeLike(substr)+"%", ` ESCAPE '!'`))}
+}
+
+// BodyAsc orders the rows by body, in ascending order.
+func (s Comment) BodyAsc() Comment {
+	return Comment{ormScope(ormRuntime(s.q).OrderBy(`body`, false))}
+}
+
+// BodyDesc orders the rows by body, in descending order.
+func (s Comment) BodyDesc() Comment {
+	return Comment{ormScope(ormRuntime(s.q).OrderBy(`body`, true))}
+}
+
+// CreatedAtEq narrows to the rows whose created_at is v.
+func (s Comment) CreatedAtEq(v time.Time) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Where(`created_at = `, v))}
+}
+
+// CreatedAtNe narrows to the rows whose created_at is not v.
+func (s Comment) CreatedAtNe(v time.Time) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Where(`created_at <> `, v))}
+}
+
+// CreatedAtIn narrows to the rows whose created_at is one of vs.
+func (s Comment) CreatedAtIn(vs ...time.Time) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Where(`created_at = ANY(`, vs, `)`))}
+}
+
+// CreatedAtNotIn narrows to the rows whose created_at is none of vs.
+func (s Comment) CreatedAtNotIn(vs ...time.Time) Comment {
+	if len(vs) == 0 {
+		return s
+	}
+	return Comment{ormScope(ormRuntime(s.q).Where(`created_at <> ALL(`, vs, `)`))}
+}
+
+// CreatedAtLt narrows to the rows whose created_at is less than v.
+func (s Comment) CreatedAtLt(v time.Time) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Where(`created_at < `, v))}
+}
+
+// CreatedAtLte narrows to the rows whose created_at is at most v.
+func (s Comment) CreatedAtLte(v time.Time) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Where(`created_at <= `, v))}
+}
+
+// CreatedAtGt narrows to the rows whose created_at is greater than v.
+func (s Comment) CreatedAtGt(v time.Time) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Where(`created_at > `, v))}
+}
+
+// CreatedAtGte narrows to the rows whose created_at is at least v.
+func (s Comment) CreatedAtGte(v time.Time) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Where(`created_at >= `, v))}
+}
+
+// CreatedAtBetween narrows to the rows whose created_at is between lo and hi, both included.
+func (s Comment) CreatedAtBetween(lo, hi time.Time) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Where(`created_at BETWEEN `, lo, ` AND `, hi))}
+}
+
+// CreatedAtAsc orders the rows by created_at, earliest first.
+func (s Comment) CreatedAtAsc() Comment {
+	return Comment{ormScope(ormRuntime(s.q).OrderBy(`created_at`, false))}
+}
+
+// CreatedAtDesc orders the rows by created_at, latest first.
+func (s Comment) CreatedAtDesc() Comment {
+	return Comment{ormScope(ormRuntime(s.q).OrderBy(`created_at`, true))}
+}
+
+// Limit keeps the first n rows.
+func (s Comment) Limit(n int) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Limit(n))}
+}
+
+// Offset skips the first n rows.
+func (s Comment) Offset(n int) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Offset(n))}
+}
+
+// Or narrows to the rows any of alternatives matches, each holding conditions alone.
+func (s Comment) Or(alternatives ...Comment) Comment {
+	qs := make([]impl.Of[model.Comment], len(alternatives))
+	for i, a := range alternatives {
+		qs[i] = ormRuntime(a.q)
+	}
+	return Comment{ormScope(ormRuntime(s.q).Or(qs...))}
+}
+
+// Not narrows to the rows other, holding conditions alone, does not match.
+func (s Comment) Not(other Comment) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Not(ormRuntime(other.q)))}
+}
+
+// values holds the value of each column of row, for After, Before, and Cursor. One that may be NULL
+// holds MayBeNull, since no page continues by it.
+func (Comment) values(row model.Comment) map[string]any {
+	return map[string]any{
+		`id`:         row.ID,
+		`todo_id`:    row.TodoID,
+		`body`:       row.Body,
+		`created_at`: row.CreatedAt,
+	}
+}
+
+// After narrows to the rows after row in the scope's order, for the page after the one row is the last of.
+func (s Comment) After(row model.Comment) Comment {
+	return Comment{ormScope(ormRuntime(s.q).After([]string{`id`}, s.values(row)))}
+}
+
+// Before narrows to the rows before row in the scope's order, for the page before the one row is the first of.
+func (s Comment) Before(row model.Comment) Comment {
+	return Comment{ormScope(ormRuntime(s.q).Before([]string{`id`}, s.values(row)))}
+}
+
+// Cursor encodes the position of row in the scope's order, for a client to hand back to AfterCursor.
+func (s Comment) Cursor(row model.Comment) (string, error) {
+	return ormRuntime(s.q).Cursor([]string{`id`}, s.values(row))
+}
+
+// AfterCursor is After the row cursor holds, as Cursor made it in the same order. An empty cursor is the start.
+func (s Comment) AfterCursor(cursor string) (Comment, error) {
+	if cursor == "" {
+		return s, nil
+	}
+	var row model.Comment
+	if err := ormRuntime(s.q).DecodeCursor(cursor, []string{`id`}, map[string]any{
+		`id`:         &row.ID,
+		`todo_id`:    &row.TodoID,
+		`body`:       &row.Body,
+		`created_at`: &row.CreatedAt,
+	}); err != nil {
+		return Comment{}, err
 	}
 	return s.After(row), nil
 }

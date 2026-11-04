@@ -5,6 +5,8 @@ errors:
     priority: 優先度
     completed_at: 完了日時
     page_size: 1 ページの件数
+    todo_id: やることの ID
+    body: 本文
 
 todo:
   not_found: やることが見つかりませんでした。

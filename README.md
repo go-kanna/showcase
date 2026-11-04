@@ -13,15 +13,15 @@ Requires Go 1.27, Docker with Compose, and the [buf](https://buf.build/docs/cli/
 
 ## What each generator does here
 
-| Tool                                                   | Where                               | What it writes                                                                                                                            |
-|--------------------------------------------------------|-------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|
-| [kanna-di](https://github.com/go-kanna/di)             | `internal/di`, `usecase`, `handler` | `NewInfra`, `NewPutTodo`, `NewHandler`, …: the constructor of each `//kanna:container` struct                                             |
-| [kanna-validate](https://github.com/go-kanna/validate) | `config`, `usecase`                 | `Validate` methods from the `validate` tags, `rule=model.CompletedAt` among them                                                          |
-| [kanna-mapper](https://github.com/go-kanna/mapper)     | `mapper`                            | `TodoToProto`, `TodoInputFromProto`, and `ListTodoInputFromProto`, value types, enums, and a oneof's sum type included                    |
-| [kanna-fixture](https://github.com/go-kanna/fixture)   | `model/fixture`                     | `fixture.Todo()`, for tests: every value filled, a pointer left nil, and the priority from `fixture.Priority()`, written by hand          |
-| [kanna-i18n](https://github.com/go-kanna/i18n)         | `internal/messages`                 | `messages.TodoNotFound()` and the texts of validation error codes, in English and Japanese                                                |
-| [kanna-value](https://github.com/go-kanna/value)       | `model`                             | `NewCompletedAt` and the JSON and SQL methods of `model.CompletedAt`, a time held between 2000 and 2100, and of `model.Priority`, an enum |
-| [kanna-orm](https://github.com/go-kanna/orm)           | `scopes`, `postgres`                | `postgres.Todo`, which implements `repository.Todo`, and the scopes it reads and pages through, as `scopes.Todos().CreatedAtAsc()`        |
+| Tool                                                   | Where                               | What it writes                                                                                                                                             |
+|--------------------------------------------------------|-------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [kanna-di](https://github.com/go-kanna/di)             | `internal/di`, `usecase`, `handler` | `NewInfra`, `NewPutTodo`, `NewHandler`, …: the constructor of each `//kanna:container` struct                                                              |
+| [kanna-validate](https://github.com/go-kanna/validate) | `config`, `usecase`                 | `Validate` methods from the `validate` tags, `rule=model.CompletedAt` among them                                                                           |
+| [kanna-mapper](https://github.com/go-kanna/mapper)     | `mapper`                            | `TodoToProto`, `CommentToProto`, `TodoInputFromProto`, and `ListTodoInputFromProto`, value types, enums, and a oneof's sum type included                   |
+| [kanna-fixture](https://github.com/go-kanna/fixture)   | `model/fixture`                     | `fixture.Todo()`, for tests: every value filled, a pointer left nil, and the priority from `fixture.Priority()`, written by hand                           |
+| [kanna-i18n](https://github.com/go-kanna/i18n)         | `internal/messages`                 | `messages.TodoNotFound()` and the texts of validation error codes, in English and Japanese                                                                 |
+| [kanna-value](https://github.com/go-kanna/value)       | `model`                             | `NewCompletedAt` and the JSON and SQL methods of `model.CompletedAt`, a time held between 2000 and 2100, and of `model.Priority`, an enum                  |
+| [kanna-orm](https://github.com/go-kanna/orm)           | `scopes`, `postgres`                | `postgres.Todo` and `postgres.Comment`, which implement the repositories, and the scopes they read and page through, as `scopes.Todos().WithComments(...)` |
 
 The rest of the stack: [buf](https://buf.build) for protobuf and gRPC, [goose](https://github.com/pressly/goose) for
 migrations, and [pgtestdb](https://github.com/peterldowns/pgtestdb) for a fresh database per test.
@@ -35,13 +35,13 @@ proto                     the TodoService definition
 internal/
   di                      the containers the server is built from: Config and Infra
   feature/todo/
-    model                 the domain type, and the fixtures generated for it
-    scopes                the scope types the repository reads through
-    repository            the interface the use cases depend on
-    postgres              its implementation, which kanna-orm writes, and the SQL written by hand for it
-    usecase               one struct per operation, given the repository and transactor it works through
+    model                 the domain types, and the fixtures generated for them
+    scopes                the scope types the repositories read through
+    repository            the interfaces the use cases depend on
+    postgres              their implementations, which kanna-orm writes, and the SQL written by hand for them
+    usecase               one struct per operation, given the repositories and transactor it works through
     mapper                the mappings between protobuf and the model or the use case inputs
-    handler               the gRPC handler, which puts the feature together and chooses the repository
+    handler               the gRPC handler, which puts the feature together and chooses the repositories
   gen                     the code buf writes from proto/
   messages                the messages compiled from locales/
   infra/storage           pgx pools, transactions, and migrations
@@ -67,6 +67,10 @@ buf curl --protocol grpc --http2-prior-knowledge --schema proto \
   http://localhost:8080/showcase.todo.v1.TodoService/PutTodo
 
 buf curl --protocol grpc --http2-prior-knowledge --schema proto \
+  --data '{"todoId": "01890a5d-ac96-774b-bcce-b302099a8057", "body": "Whole milk"}' \
+  http://localhost:8080/showcase.todo.v1.TodoService/AddComment
+
+buf curl --protocol grpc --http2-prior-knowledge --schema proto \
   http://localhost:8080/showcase.todo.v1.TodoService/ListTodo
 
 buf curl --protocol grpc --http2-prior-knowledge --schema proto \
@@ -78,7 +82,8 @@ buf curl --protocol grpc --http2-prior-knowledge --schema proto \
   http://localhost:8080/showcase.todo.v1.TodoService/ListTodo
 ```
 
-A page ends with a `nextPageToken` while to-dos follow it; pass it as `pageToken` to read the next page.
+Each to-do of a list comes with its three latest comments. A page ends with a `nextPageToken` while to-dos follow it;
+pass it as `pageToken` to read the next page.
 
 ## Develop
 

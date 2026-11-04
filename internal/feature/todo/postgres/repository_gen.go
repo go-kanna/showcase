@@ -66,6 +66,31 @@ func (d ormDatabase) QueryRow(ctx context.Context, query string, args ...any) pg
 	return trace.Row(d.dbtx.QueryRow(ctx, query, args...))
 }
 
+// Comment implements repository.Comment on PostgreSQL through pgx.
+type Comment struct{ db ormDatabase }
+
+func newComment(db DBTX, opts ...option.Option) Comment {
+	return Comment{db: ormDatabase{dbtx: db, options: impl.NewOptions(opts...)}}
+}
+
+// NewComment returns Comment running on db.
+func NewComment(db DBTX, opts ...option.Option) Comment { return newComment(db, opts...) }
+
+var _ repository.Comment = Comment{}
+
+func (r Comment) Insert(ctx context.Context, c model.Comment) (model.Comment, error) {
+	const q = `INSERT INTO comments (todo_id, body, created_at)
+VALUES ($1, $2, $3)
+RETURNING id, todo_id, body, created_at`
+	var row model.Comment
+	err := r.db.QueryRow(ctx, q, c.TodoID, c.Body, c.CreatedAt).
+		Scan(&row.ID, &row.TodoID, &row.Body, &row.CreatedAt)
+	if err != nil {
+		return model.Comment{}, fmt.Errorf("insert into comments: %w", err)
+	}
+	return row, nil
+}
+
 // Todo implements repository.Todo on PostgreSQL through pgx.
 type Todo struct{ db ormDatabase }
 
@@ -174,7 +199,46 @@ func (r Todo) Delete(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
-// ormSelectTodos reads the rows of todos that q matches, in its order. lock is the locking clause of the query, if any.
+// ormSelectComments reads the rows of comments that q matches, in its order. lock is the locking clause of the query, if any.
+func ormSelectComments(ctx context.Context, db ormDatabase, q impl.Of[model.Comment], lock string) ([]model.Comment, error) {
+	rd, err := q.Render(impl.Postgres, 1, []string{`id`})
+	if err != nil {
+		return nil, err
+	}
+	out, err := ormQueryComments(ctx, db, `SELECT id, todo_id, body, created_at FROM comments`+rd.Where()+rd.OrderBy()+rd.Limit()+lock, rd.Args()...)
+	if err != nil {
+		return nil, err
+	}
+	if rd.Reversed() {
+		slices.Reverse(out)
+	}
+	return out, nil
+}
+
+// ormQueryComments runs query, a query of the rows of comments, and reads them.
+func ormQueryComments(ctx context.Context, db ormDatabase, query string, args ...any) ([]model.Comment, error) {
+	rows, err := db.Query(ctx, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("read comments: %w", err)
+	}
+	defer rows.Close()
+	out := []model.Comment{}
+	var row model.Comment
+	dest := []any{&row.ID, &row.TodoID, &row.Body, &row.CreatedAt}
+	for rows.Next() {
+		row = model.Comment{}
+		if err := rows.Scan(dest...); err != nil {
+			return nil, fmt.Errorf("read comments: %w", err)
+		}
+		out = append(out, row)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("read comments: %w", err)
+	}
+	return out, nil
+}
+
+// ormSelectTodos reads the rows of todos that q matches, in its order, with the relations it loads. lock is the locking clause of the query, if any.
 func ormSelectTodos(ctx context.Context, db ormDatabase, q impl.Of[model.Todo], lock string) ([]model.Todo, error) {
 	rd, err := q.Render(impl.Postgres, 1, []string{`id`})
 	if err != nil {
@@ -186,6 +250,9 @@ func ormSelectTodos(ctx context.Context, db ormDatabase, q impl.Of[model.Todo], 
 	}
 	if rd.Reversed() {
 		slices.Reverse(out)
+	}
+	if err := ormPreloadTodos(ctx, db, out, q); err != nil {
+		return nil, err
 	}
 	return out, nil
 }
@@ -211,4 +278,67 @@ func ormQueryTodos(ctx context.Context, db ormDatabase, query string, args ...an
 		return nil, fmt.Errorf("read todos: %w", err)
 	}
 	return out, nil
+}
+
+// ormEachTodosComments reads the rows of comments for the keys of rows, as Comments loads them.
+var ormEachTodosComments = impl.NewEach(impl.Postgres, impl.Batch{Table: "comments", ChildKeys: []string{"todo_id"}, KeyTypes: []string{"uuid"}}, []string{`id`}, []string{"id", "todo_id", "body", "created_at"})
+
+// ormPreloadTodos loads into rows the relations q loads, each by the keys of the rows.
+func ormPreloadTodos(ctx context.Context, db ormDatabase, rows []model.Todo, q impl.Of[model.Todo]) error {
+	if len(rows) == 0 {
+		return nil
+	}
+	if sub, ok := impl.Preloaded[model.Comment](q, "Comments"); ok {
+		type parentKey struct{ k0 uuid.UUID }
+		keys0 := make([]uuid.UUID, 0, len(rows))
+		owners := make([]int, len(rows))
+		seen := make(map[parentKey]int, len(rows))
+		for i := range rows {
+			owners[i] = -1
+			key := parentKey{rows[i].ID}
+			at, ok := seen[key]
+			if !ok {
+				at = len(keys0)
+				seen[key] = at
+				keys0 = append(keys0, key.k0)
+			}
+			owners[i] = at
+		}
+		var flat []model.Comment
+		var numbers []int
+		if len(keys0) > 0 {
+			text, args, err := sub.RenderEach(ormEachTodosComments, []any{keys0}, 0)
+			if err != nil {
+				return fmt.Errorf("load Comments: %w", err)
+			}
+			related, err := db.Query(ctx, text, args...)
+			if err != nil {
+				return fmt.Errorf("load Comments: %w", err)
+			}
+			var number int
+			var row model.Comment
+			dest := []any{&number, &row.ID, &row.TodoID, &row.Body, &row.CreatedAt}
+			for related.Next() {
+				row = model.Comment{}
+				if err := related.Scan(dest...); err != nil {
+					related.Close()
+					return fmt.Errorf("load Comments: %w", err)
+				}
+				flat = append(flat, row)
+				numbers = append(numbers, number)
+			}
+			related.Close()
+			if err := related.Err(); err != nil {
+				return fmt.Errorf("load Comments: %w", err)
+			}
+		}
+		grouped := impl.Group(flat, numbers, len(keys0))
+		for i := range rows {
+			rows[i].Comments = []model.Comment{}
+			if owners[i] >= 0 && grouped[owners[i]] != nil {
+				rows[i].Comments = grouped[owners[i]]
+			}
+		}
+	}
+	return nil
 }
