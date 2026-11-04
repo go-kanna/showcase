@@ -5,7 +5,7 @@ go 1.27.3
 require (
 	github.com/caarlos0/env/v11 v11.4.1
 	github.com/go-kanna/i18n v0.0.17
-	github.com/go-kanna/orm v0.0.24
+	github.com/go-kanna/orm v0.0.25
 	github.com/go-kanna/validate v0.0.22
 	github.com/go-kanna/value v0.0.16
 	github.com/jackc/pgx/v5 v5.11.0
@@ -41,8 +41,8 @@ require (
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/go-faster/city v1.0.1 // indirect
 	github.com/go-faster/errors v0.8.0 // indirect
-	github.com/go-kanna/di v0.0.13 // indirect
-	github.com/go-kanna/fixture v0.0.19 // indirect
+	github.com/go-kanna/di v0.0.16 // indirect
+	github.com/go-kanna/fixture v0.0.20 // indirect
 	github.com/go-kanna/internal v0.0.25 // indirect
 	github.com/go-kanna/kanna v0.3.6 // indirect
 	github.com/go-kanna/mapper v0.0.23 // indirect
