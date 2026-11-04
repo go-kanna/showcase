@@ -36,7 +36,7 @@ internal/
     repository            the interface the use cases depend on
     postgres              its implementation, which kanna-orm writes, and the SQL written by hand for it
     usecase               one struct per operation, given the repository and transactor it works through
-    mapper                the model → protobuf mapping
+    mapper                the mappings between protobuf and the model or the use case inputs
     handler               the gRPC handler, which puts the feature together and chooses the repository
   gen                     the code buf writes from proto/
   messages                the messages compiled from locales/

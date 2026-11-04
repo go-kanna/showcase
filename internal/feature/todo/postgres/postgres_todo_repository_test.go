@@ -139,7 +139,7 @@ func TestTodo_UpdateAndGet(t *testing.T) {
 	got, err := sut.Get(t.Context(), m.ID)
 	require.NoError(t, err)
 	assert.WithinDuration(t, now, got.CompletedAt.Time(), time.Millisecond)
-	assert.WithinDuration(t, createdAt, got.CreatedAt, time.Millisecond, "keep=created_at leaves it as it was")
+	assert.WithinDuration(t, createdAt, got.CreatedAt, time.Millisecond, "insertonly leaves it as it was")
 	assert.WithinDuration(t, now, got.UpdatedAt, time.Millisecond)
 }
 

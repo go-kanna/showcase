@@ -37,7 +37,8 @@ func (uc PutTodo) Do(ctx context.Context, in PutTodoInput) (PutTodoOutput, error
 
 	id := either.Must(uuid.Parse(in.ID))
 	if err := uc.transactor.WithTx(ctx, func(tx tx.Tx) error {
-		// Upsert keeps the created_at of a to-do there is, as its //kanna:conflict says, so nothing needs reading first.
+		// Upsert keeps the created_at of a to-do there is, as the insertonly tag of CreatedAt says, so nothing needs
+		// reading first.
 		now := time.Now()
 		m := model.Todo{
 			ID:          id,
