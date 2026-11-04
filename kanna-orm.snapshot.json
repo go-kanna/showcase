@@ -48,6 +48,19 @@
       ],
       "columns": []
     },
+    "github.com/go-kanna/showcase/internal/feature/todo/postgres.ListWithCommentCounts": {
+      "digest": "f96019da71fc5692",
+      "params": [],
+      "columns": [
+        {"name": "id", "type": "uuid", "not_null": true},
+        {"name": "title", "type": "text", "not_null": true},
+        {"name": "priority", "type": "text", "not_null": true},
+        {"name": "completed_at", "type": "timestamptz", "nullable": true},
+        {"name": "created_at", "type": "timestamptz", "not_null": true},
+        {"name": "updated_at", "type": "timestamptz", "not_null": true},
+        {"name": "comment_count", "type": "int8"}
+      ]
+    },
     "github.com/go-kanna/showcase/internal/feature/todo/postgres.Uncomplete": {
       "digest": "fb970cef7d0a678b",
       "params": [

@@ -83,7 +83,9 @@ type Todo struct {
 	UpdatedAt   *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	Priority    Priority               `protobuf:"varint,6,opt,name=priority,proto3,enum=showcase.todo.v1.Priority" json:"priority,omitempty"`
 	// comments are the three latest comments on the to-do, newest first.
-	Comments      []*Comment `protobuf:"bytes,7,rep,name=comments,proto3" json:"comments,omitempty"`
+	Comments []*Comment `protobuf:"bytes,7,rep,name=comments,proto3" json:"comments,omitempty"`
+	// comment_count is how many comments the to-do has, comments among them.
+	CommentCount  int64 `protobuf:"varint,8,opt,name=comment_count,json=commentCount,proto3" json:"comment_count,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -165,6 +167,13 @@ func (x *Todo) GetComments() []*Comment {
 		return x.Comments
 	}
 	return nil
+}
+
+func (x *Todo) GetCommentCount() int64 {
+	if x != nil {
+		return x.CommentCount
+	}
+	return 0
 }
 
 type Comment struct {
@@ -1091,7 +1100,7 @@ var File_showcase_todo_v1_todo_proto protoreflect.FileDescriptor
 
 const file_showcase_todo_v1_todo_proto_rawDesc = "" +
 	"\n" +
-	"\x1bshowcase/todo/v1/todo.proto\x12\x10showcase.todo.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xeb\x02\n" +
+	"\x1bshowcase/todo/v1/todo.proto\x12\x10showcase.todo.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\x90\x03\n" +
 	"\x04Todo\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
 	"\x05title\x18\x02 \x01(\tB\x03\x80\x01\x01R\x05title\x12B\n" +
@@ -1101,7 +1110,8 @@ const file_showcase_todo_v1_todo_proto_rawDesc = "" +
 	"\n" +
 	"updated_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x126\n" +
 	"\bpriority\x18\x06 \x01(\x0e2\x1a.showcase.todo.v1.PriorityR\bpriority\x125\n" +
-	"\bcomments\x18\a \x03(\v2\x19.showcase.todo.v1.CommentR\bcommentsB\x0f\n" +
+	"\bcomments\x18\a \x03(\v2\x19.showcase.todo.v1.CommentR\bcomments\x12#\n" +
+	"\rcomment_count\x18\b \x01(\x03R\fcommentCountB\x0f\n" +
 	"\r_completed_at\"m\n" +
 	"\aComment\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +

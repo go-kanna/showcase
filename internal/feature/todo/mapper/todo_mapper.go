@@ -12,7 +12,11 @@ import (
 
 //kanna:mapper
 type _ interface {
-	TodoToProto(m model.Todo) *todov1.Todo
+	// TodoToProto converts a to-do of a list. Its fields come from the
+	// model.Todo it embeds, but for the ID, whose name differs in case.
+	//
+	//kanna:map Id=ID
+	TodoToProto(t repository.TodoWithCommentCount) *todov1.Todo
 	CommentToProto(c model.Comment) *todov1.Comment
 	CommentSummaryToProto(c repository.CommentSummary) *todov1.CommentSummary
 

@@ -54,7 +54,7 @@ func (Completion) isListFilter() {}
 func (Priority) isListFilter()   {}
 
 type ListTodoOutput struct {
-	Todos         []model.Todo
+	Todos         []repository.TodoWithCommentCount
 	NextPageToken string // empty on the last page
 }
 
@@ -67,8 +67,8 @@ type ListTodo struct {
 func (uc ListTodo) Do(ctx context.Context, in ListTodoInput) (ListTodoOutput, error) {
 	// Before Validate, which a nil pointer to a variant would panic in: a pointer
 	// implements ListFilter as well, and would otherwise list every to-do.
-	// The limit keeps the latest comments of each to-do, not of the page.
 	s := scopes.Todos().CreatedAtAsc().
+		// The limit keeps the latest comments of each to-do, not of the page.
 		WithComments(scopes.Comments().CreatedAtDesc().Limit(latestComments))
 	switch f := in.Filter.(type) {
 	case nil:
@@ -96,11 +96,11 @@ func (uc ListTodo) Do(ctx context.Context, in ListTodoInput) (ListTodoOutput, er
 	}
 	size := int(cmp.Or(in.PageSize, defaultPageSize))
 
-	var ms []model.Todo
+	var ms []repository.TodoWithCommentCount
 	if err := uc.transactor.WithReadTx(ctx, func(tx tx.Tx) error {
 		// One more than the page holds tells whether a page follows.
 		var err error
-		ms, err = uc.todos.Bind(tx).List(ctx, s.Limit(size+1))
+		ms, err = uc.todos.Bind(tx).ListWithCommentCounts(ctx, s.Limit(size+1))
 		if err != nil {
 			return fmt.Errorf("list todos: %w", err)
 		}
@@ -113,7 +113,7 @@ func (uc ListTodo) Do(ctx context.Context, in ListTodoInput) (ListTodoOutput, er
 	}
 
 	ms = ms[:size]
-	next, err := s.Cursor(ms[size-1])
+	next, err := s.Cursor(ms[size-1].Todo)
 	if err != nil {
 		return ListTodoOutput{}, fmt.Errorf("cursor: %w", err)
 	}

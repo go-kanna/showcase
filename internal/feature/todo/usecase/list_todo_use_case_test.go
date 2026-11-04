@@ -13,6 +13,7 @@ import (
 	"github.com/go-kanna/showcase/internal/feature/todo/model"
 	"github.com/go-kanna/showcase/internal/feature/todo/model/fixture"
 	"github.com/go-kanna/showcase/internal/feature/todo/postgres"
+	"github.com/go-kanna/showcase/internal/feature/todo/repository"
 	"github.com/go-kanna/showcase/internal/feature/todo/usecase"
 	"github.com/go-kanna/showcase/internal/infra/storage/tx"
 	"github.com/go-kanna/showcase/internal/lib/xslices"
@@ -260,4 +261,8 @@ func TestListTodo_LatestComments(t *testing.T) {
 	assert.Equal(t, []uuid.UUID{comments[4].ID}, ids(got.Todos[1].Comments))
 	assert.NotNil(t, got.Todos[2].Comments, "loaded, with no comments")
 	assert.Empty(t, got.Todos[2].Comments)
+	// The count, which the query written by hand adds, counts them all.
+	assert.Equal(t, []int64{4, 1, 0}, xslices.Map(got.Todos, func(t repository.TodoWithCommentCount) int64 {
+		return t.CommentCount
+	}))
 }
