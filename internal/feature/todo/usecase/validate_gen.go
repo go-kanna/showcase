@@ -33,6 +33,13 @@ func (x ListTodoInput) Validate() error {
 		errs.Nest("filter", x.Filter.Validate())
 	}
 
+	if x.PageSize < 0 {
+		errs.Add("page_size", validate.GreaterThanOrEqualTo[int32](0))
+	}
+	if x.PageSize > 100 {
+		errs.Add("page_size", validate.LessThanOrEqualTo[int32](100))
+	}
+
 	return errs.Err()
 }
 

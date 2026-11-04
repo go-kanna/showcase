@@ -1,18 +1,26 @@
 package usecase
 
 import (
+	"cmp"
 	"context"
 	"fmt"
 
+	"github.com/go-kanna/showcase/internal/errors/aerrors"
 	"github.com/go-kanna/showcase/internal/feature/todo/model"
 	"github.com/go-kanna/showcase/internal/feature/todo/repository"
 	"github.com/go-kanna/showcase/internal/feature/todo/scopes"
 	"github.com/go-kanna/showcase/internal/infra/storage/tx"
+	"github.com/go-kanna/showcase/internal/messages"
 )
+
+// defaultPageSize is the size of a page that a request leaves at 0.
+const defaultPageSize = 20
 
 //kanna:validate
 type ListTodoInput struct {
-	Filter ListFilter `json:"filter"` // nil lists every to-do
+	Filter    ListFilter `json:"filter"`                              // nil lists every to-do
+	PageSize  int32      `json:"page_size"  validate:"gte=0,lte=100"` // 0 for defaultPageSize
+	PageToken string     `json:"page_token"`                          // empty for the first page
 }
 
 // ListFilter narrows a list to one condition. It is a sum type: one of
@@ -42,7 +50,8 @@ func (Completion) isListFilter() {}
 func (Priority) isListFilter()   {}
 
 type ListTodoOutput struct {
-	Todos []model.Todo
+	Todos         []model.Todo
+	NextPageToken string // empty on the last page
 }
 
 //kanna:container
@@ -73,11 +82,19 @@ func (uc ListTodo) Do(ctx context.Context, in ListTodoInput) (ListTodoOutput, er
 		return ListTodoOutput{}, err
 	}
 
+	// The token holds the values of the last to-do of the page before, so the
+	// page goes on from it however many to-dos were put or deleted meanwhile.
+	s, err := s.AfterCursor(in.PageToken)
+	if err != nil {
+		return ListTodoOutput{}, aerrors.InvalidArgument("page_token").WithMessage(messages.TodoInvalidPageToken())
+	}
+	size := int(cmp.Or(in.PageSize, defaultPageSize))
+
 	var ms []model.Todo
 	if err := uc.transactor.WithReadTx(ctx, func(tx tx.Tx) error {
-		todos := uc.todos.Bind(tx)
+		// One more than the page holds tells whether a page follows.
 		var err error
-		ms, err = todos.List(ctx, s)
+		ms, err = uc.todos.Bind(tx).List(ctx, s.Limit(size+1))
 		if err != nil {
 			return fmt.Errorf("list todos: %w", err)
 		}
@@ -85,5 +102,14 @@ func (uc ListTodo) Do(ctx context.Context, in ListTodoInput) (ListTodoOutput, er
 	}); err != nil {
 		return ListTodoOutput{}, fmt.Errorf("list todos: %w", err)
 	}
-	return ListTodoOutput{Todos: ms}, nil
+	if len(ms) <= size {
+		return ListTodoOutput{Todos: ms}, nil
+	}
+
+	ms = ms[:size]
+	next, err := s.Cursor(ms[size-1])
+	if err != nil {
+		return ListTodoOutput{}, fmt.Errorf("cursor: %w", err)
+	}
+	return ListTodoOutput{Todos: ms, NextPageToken: next}, nil
 }

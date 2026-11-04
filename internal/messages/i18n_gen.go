@@ -6,6 +6,13 @@ import (
 	"github.com/go-kanna/i18n"
 )
 
+// TodoInvalidPageToken returns the message "todo.invalid_page_token":
+//
+//	The page token is not valid.
+func TodoInvalidPageToken() i18n.Message {
+	return i18n.Message{Key: "todo.invalid_page_token"}
+}
+
 // TodoNotFound returns the message "todo.not_found":
 //
 //	To-do not found.
@@ -25,14 +32,17 @@ func Localizer(langs ...string) i18n.Localizer {
 // default, first.
 var bundle = i18n.NewBundle(
 	i18n.Catalog{Lang: "en", Entries: map[string]i18n.Entry{
-		"errors.attributes.id": {Single: i18n.Template{{Text: "ID"}}},
-		"todo.not_found":       {Single: i18n.Template{{Text: "To-do not found."}}},
+		"errors.attributes.id":    {Single: i18n.Template{{Text: "ID"}}},
+		"todo.invalid_page_token": {Single: i18n.Template{{Text: "The page token is not valid."}}},
+		"todo.not_found":          {Single: i18n.Template{{Text: "To-do not found."}}},
 	}},
 	i18n.Catalog{Lang: "ja", Entries: map[string]i18n.Entry{
 		"errors.attributes.completed_at": {Single: i18n.Template{{Text: "完了日時"}}},
 		"errors.attributes.id":           {Single: i18n.Template{{Text: "ID"}}},
+		"errors.attributes.page_size":    {Single: i18n.Template{{Text: "1 ページの件数"}}},
 		"errors.attributes.priority":     {Single: i18n.Template{{Text: "優先度"}}},
 		"errors.attributes.title":        {Single: i18n.Template{{Text: "タイトル"}}},
+		"todo.invalid_page_token":        {Single: i18n.Template{{Text: "ページトークンが正しくありません。"}}},
 		"todo.not_found":                 {Single: i18n.Template{{Text: "やることが見つかりませんでした。"}}},
 	}},
 )

@@ -316,7 +316,11 @@ type ListTodoRequest struct {
 	//
 	//	*ListTodoRequest_Completion
 	//	*ListTodoRequest_Priority
-	Filter        isListTodoRequest_Filter `protobuf_oneof:"filter"`
+	Filter isListTodoRequest_Filter `protobuf_oneof:"filter"`
+	// page_size is how many to-dos a page holds: 20 when left 0, and 100 at most.
+	PageSize int32 `protobuf:"varint,3,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	// page_token is the next_page_token of the page before, or empty for the first page.
+	PageToken     string `protobuf:"bytes,4,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -376,6 +380,20 @@ func (x *ListTodoRequest) GetPriority() *PriorityFilter {
 	return nil
 }
 
+func (x *ListTodoRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+func (x *ListTodoRequest) GetPageToken() string {
+	if x != nil {
+		return x.PageToken
+	}
+	return ""
+}
+
 type isListTodoRequest_Filter interface {
 	isListTodoRequest_Filter()
 }
@@ -393,8 +411,10 @@ func (*ListTodoRequest_Completion) isListTodoRequest_Filter() {}
 func (*ListTodoRequest_Priority) isListTodoRequest_Filter() {}
 
 type ListTodoResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Todos         []*Todo                `protobuf:"bytes,1,rep,name=todos,proto3" json:"todos,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Todos []*Todo                `protobuf:"bytes,1,rep,name=todos,proto3" json:"todos,omitempty"`
+	// next_page_token reads the page after this one, and is empty on the last.
+	NextPageToken string `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -434,6 +454,13 @@ func (x *ListTodoResponse) GetTodos() []*Todo {
 		return x.Todos
 	}
 	return nil
+}
+
+func (x *ListTodoResponse) GetNextPageToken() string {
+	if x != nil {
+		return x.NextPageToken
+	}
+	return ""
 }
 
 type PutTodoRequest struct {
@@ -714,15 +741,19 @@ const file_showcase_todo_v1_todo_proto_rawDesc = "" +
 	"\x10CompletionFilter\x12\x1c\n" +
 	"\tcompleted\x18\x01 \x01(\bR\tcompleted\"H\n" +
 	"\x0ePriorityFilter\x126\n" +
-	"\bpriority\x18\x01 \x01(\x0e2\x1a.showcase.todo.v1.PriorityR\bpriority\"\xa1\x01\n" +
+	"\bpriority\x18\x01 \x01(\x0e2\x1a.showcase.todo.v1.PriorityR\bpriority\"\xdd\x01\n" +
 	"\x0fListTodoRequest\x12D\n" +
 	"\n" +
 	"completion\x18\x01 \x01(\v2\".showcase.todo.v1.CompletionFilterH\x00R\n" +
 	"completion\x12>\n" +
-	"\bpriority\x18\x02 \x01(\v2 .showcase.todo.v1.PriorityFilterH\x00R\bpriorityB\b\n" +
-	"\x06filter\"@\n" +
+	"\bpriority\x18\x02 \x01(\v2 .showcase.todo.v1.PriorityFilterH\x00R\bpriority\x12\x1b\n" +
+	"\tpage_size\x18\x03 \x01(\x05R\bpageSize\x12\x1d\n" +
+	"\n" +
+	"page_token\x18\x04 \x01(\tR\tpageTokenB\b\n" +
+	"\x06filter\"h\n" +
 	"\x10ListTodoResponse\x12,\n" +
-	"\x05todos\x18\x01 \x03(\v2\x16.showcase.todo.v1.TodoR\x05todos\"\x96\x01\n" +
+	"\x05todos\x18\x01 \x03(\v2\x16.showcase.todo.v1.TodoR\x05todos\x12&\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"\x96\x01\n" +
 	"\x0ePutTodoRequest\x12/\n" +
 	"\x04todo\x18\x01 \x01(\v2\x1b.showcase.todo.v1.TodoInputR\x04todo\x12B\n" +
 	"\fcompleted_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampH\x00R\vcompletedAt\x88\x01\x01B\x0f\n" +

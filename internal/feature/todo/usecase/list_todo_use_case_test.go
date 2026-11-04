@@ -8,11 +8,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/go-kanna/showcase/internal/errors/aerrors"
 	"github.com/go-kanna/showcase/internal/feature/todo/model"
 	"github.com/go-kanna/showcase/internal/feature/todo/model/fixture"
 	"github.com/go-kanna/showcase/internal/feature/todo/postgres"
 	"github.com/go-kanna/showcase/internal/feature/todo/usecase"
 	"github.com/go-kanna/showcase/internal/infra/storage/tx"
+	"github.com/go-kanna/showcase/internal/messages"
 	"github.com/go-kanna/showcase/test/infra"
 )
 
@@ -143,6 +145,80 @@ func TestListTodo_PointerFilter(t *testing.T) {
 
 			// assert
 			require.ErrorContains(t, err, "unsupported filter")
+		})
+	}
+}
+
+// A page goes on from the token of the page before, and the last page gives
+// none.
+func TestListTodo_Pages(t *testing.T) {
+	t.Parallel()
+
+	// arrange
+	ifr := infra.New(t)
+	ms := []model.Todo{fixture.Todo(), fixture.Todo(), fixture.Todo()}
+	for _, m := range ms {
+		ifr.InTx(t, func(tx tx.Tx) {
+			require.NoError(t, postgres.NewTodo(ifr.Reader).Bind(tx).Upsert(t.Context(), m))
+		})
+	}
+	sut := usecase.NewListTodo(ifr.ReadTransactor, postgres.NewTodo(ifr.Reader))
+
+	// act
+	first, err := sut.Do(t.Context(), usecase.ListTodoInput{PageSize: 2})
+	require.NoError(t, err)
+	second, err := sut.Do(t.Context(), usecase.ListTodoInput{PageSize: 2, PageToken: first.NextPageToken})
+	require.NoError(t, err)
+
+	// assert
+	require.Len(t, first.Todos, 2)
+	assert.Equal(t, ms[0].ID, first.Todos[0].ID)
+	assert.Equal(t, ms[1].ID, first.Todos[1].ID)
+	assert.NotEmpty(t, first.NextPageToken)
+	require.Len(t, second.Todos, 1)
+	assert.Equal(t, ms[2].ID, second.Todos[0].ID)
+	assert.Empty(t, second.NextPageToken)
+}
+
+// A token the service did not give is refused before any repository is called.
+func TestListTodo_InvalidPageToken(t *testing.T) {
+	t.Parallel()
+
+	// act
+	_, err := usecase.NewListTodo(nil, nil).Do(t.Context(), usecase.ListTodoInput{PageToken: "not a token"})
+
+	// assert
+	require.ErrorIs(t, err, aerrors.ErrInvalidArgument)
+	var aerr aerrors.Error
+	require.ErrorAs(t, err, &aerr)
+	m, ok := aerr.Message()
+	require.True(t, ok)
+	assert.Equal(t, messages.TodoInvalidPageToken(), m)
+}
+
+func TestListTodo_PageSizeOutOfRange(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		size int32
+		code string
+	}{
+		{size: -1, code: "greater_than_or_equal_to"},
+		{size: 101, code: "less_than_or_equal_to"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.code, func(t *testing.T) {
+			t.Parallel()
+
+			// act
+			_, err := usecase.NewListTodo(nil, nil).Do(t.Context(), usecase.ListTodoInput{PageSize: tt.size})
+
+			// assert
+			var verrs validate.Errors
+			require.ErrorAs(t, err, &verrs)
+			require.Len(t, verrs, 1)
+			assert.Equal(t, "page_size", verrs[0].Field)
+			assert.Equal(t, tt.code, verrs[0].Code())
 		})
 	}
 }

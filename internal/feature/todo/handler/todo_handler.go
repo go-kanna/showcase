@@ -53,7 +53,8 @@ func (h Handler) ListTodo(ctx context.Context, request *todov1.ListTodoRequest) 
 		return nil, err
 	}
 	return &todov1.ListTodoResponse{
-		Todos: xslices.Map(out.Todos, mapper.TodoToProto),
+		Todos:         xslices.Map(out.Todos, mapper.TodoToProto),
+		NextPageToken: out.NextPageToken,
 	}, nil
 }
 
