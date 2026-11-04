@@ -20,12 +20,13 @@ const (
 
 //kanna:container
 type Infra struct {
-	_              context.Context `di:"arg"` //nolint:containedctx // required by kanna-di
-	cfg            Config
-	Writer         db.Writer         `di:"with=provideWriter"`
-	Reader         db.Reader         `di:"with=provideReader"`
-	Transactor     tx.Transactor     `di:"with=provideTransactor"`
-	ReadTransactor tx.ReadTransactor `di:"with=provideReadTransactor"`
+	_ context.Context `di:"arg"`     //nolint:containedctx // required by kanna-di
+	_ Config          `di:"arg=cfg"` // its Database serves the providers below
+
+	Writer         db.Writer `di:"with=provideWriter"`
+	Reader         db.Reader `di:"with=provideReader"`
+	Transactor     tx.Transactor
+	ReadTransactor tx.ReadTransactor
 }
 
 func provideWriter(ctx context.Context, cfg config.Database) (db.Writer, func(), error) {
@@ -53,12 +54,4 @@ func poolOptions(cfg config.Database) []db.Option {
 		db.WithSessionTimeouts(dbStatementTimeout, dbIdleInTransactionTimeout),
 		db.WithStartupWait(dbStartupWait),
 	}
-}
-
-func provideTransactor(writer db.Writer) tx.Transactor {
-	return tx.NewTransactor(writer)
-}
-
-func provideReadTransactor(reader db.Reader) tx.ReadTransactor {
-	return tx.NewReadTransactor(reader)
 }

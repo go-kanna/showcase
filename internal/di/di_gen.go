@@ -6,6 +6,7 @@ import (
 	"context"
 
 	"github.com/go-kanna/showcase/config"
+	"github.com/go-kanna/showcase/internal/infra/storage/tx"
 )
 
 // NewConfig initializes dependencies and constructs Config.
@@ -20,27 +21,25 @@ func NewConfig() Config {
 }
 
 // NewInfra initializes dependencies and constructs Infra.
-func NewInfra(ctx context.Context) (*Infra, func(), error) {
-	cfg := NewConfig()
-	cfg2 := config.ParseDatabase()
-	writer, cleanup, err := provideWriter(ctx, cfg2)
+func NewInfra(ctx context.Context, cfg Config) (*Infra, func(), error) {
+	database := cfg.Database
+	writer, cleanup, err := provideWriter(ctx, database)
 	if err != nil {
 		return nil, nil, err
 	}
-	reader, cleanup2, err := provideReader(ctx, cfg2, writer)
+	reader, cleanup2, err := provideReader(ctx, database, writer)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
-	transactor := provideTransactor(writer)
-	readTransactor := provideReadTransactor(reader)
+	transactor := tx.NewTransactor(writer)
+	readTransactor := tx.NewReadTransactor(reader)
 	cleanupAll := func() {
 		cleanup2()
 		cleanup()
 	}
 
 	return &Infra{
-		cfg:            cfg,
 		Writer:         writer,
 		Reader:         reader,
 		Transactor:     transactor,

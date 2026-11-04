@@ -30,7 +30,7 @@ func run(cfg di.Config) error {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	infra, cu, err := di.NewInfra(ctx)
+	infra, cu, err := di.NewInfra(ctx, cfg)
 	if err != nil {
 		return fmt.Errorf("build infrastructure: %w", err)
 	}
