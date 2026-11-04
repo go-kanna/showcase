@@ -35,6 +35,9 @@ jobs:
       - name: Check generated code
         run: make gen-check
 
+      - name: Check the scopes handed to the repositories
+        run: make orm-vet
+
   test:
     runs-on: ubuntu-latest
     services:

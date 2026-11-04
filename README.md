@@ -88,6 +88,7 @@ A page ends with a `nextPageToken` while to-dos follow it; pass it as `pageToken
 | `make gen-check`              | fail if buf or the kanna generators would change what is committed              |
 | `make test`                   | run the tests, each against its own database                                    |
 | `make lint`                   | run golangci-lint                                                               |
+| `make orm-vet`                | report the calls handing a repository a scope it fails on, with kanna-orm vet   |
 | `make sql-lint`               | run sqlfluff over the migrations                                                |
 | `make db-reset`               | drop the database, create it again, and apply the migrations                    |
 | `make db-describe`            | record the schema of the migrated database in `kanna-orm.snapshot.json`         |
