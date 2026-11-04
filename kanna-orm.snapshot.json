@@ -3,7 +3,7 @@
   "tables": {
     "goose_db_version": {
       "columns": [
-        {"name": "id", "type": "int4", "not_null": true, "assigned": true},
+        {"name": "id", "type": "int4", "not_null": true, "assigned": true, "writable": true, "assigned_by": "nextval(pg_get_serial_sequence('goose_db_version', 'id'))"},
         {"name": "version_id", "type": "int8", "not_null": true},
         {"name": "is_applied", "type": "bool", "not_null": true},
         {"name": "tstamp", "type": "timestamp", "not_null": true, "default": true}

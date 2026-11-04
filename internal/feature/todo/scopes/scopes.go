@@ -2,4 +2,4 @@ package scopes
 
 //go:generate go tool kanna-orm
 
-//kanna:scopes ../model
+//kanna:scopes model-package=../model
