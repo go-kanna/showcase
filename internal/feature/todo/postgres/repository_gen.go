@@ -78,25 +78,25 @@ func (r Todo) Get(ctx context.Context, id uuid.UUID) (model.Todo, error) {
 	const q = `SELECT id, title, priority, completed_at, created_at, updated_at FROM todos WHERE id = $1`
 	rows, err := ormQueryTodos(ctx, r.db, q, id)
 	if err != nil {
-		return model.Todo{}, err
+		return model.Todo{}, r.mapError(err)
 	}
 	if len(rows) == 0 {
-		return model.Todo{}, fmt.Errorf("todos with id %v: %w", id, orm.ErrNotFound)
+		return model.Todo{}, r.mapError(fmt.Errorf("todos with id %v: %w", id, orm.ErrNotFound))
 	}
 	return rows[0], nil
 }
 
 func (r Todo) GetForUpdate(ctx context.Context, id uuid.UUID) (model.Todo, error) {
 	if !ormpgx.InTransaction(r.db.dbtx) {
-		return model.Todo{}, fmt.Errorf("orm: GetForUpdate needs a transaction to hold its lock: give the repository a pgx.Tx, or a DBTX wrapping one with an Unwrap method returning it")
+		return model.Todo{}, r.mapError(fmt.Errorf("orm: GetForUpdate needs a transaction to hold its lock: give the repository a pgx.Tx, or a DBTX wrapping one with an Unwrap method returning it"))
 	}
 	const q = `SELECT id, title, priority, completed_at, created_at, updated_at FROM todos WHERE id = $1 FOR UPDATE`
 	rows, err := ormQueryTodos(ctx, r.db, q, id)
 	if err != nil {
-		return model.Todo{}, err
+		return model.Todo{}, r.mapError(err)
 	}
 	if len(rows) == 0 {
-		return model.Todo{}, fmt.Errorf("todos with id %v: %w", id, orm.ErrNotFound)
+		return model.Todo{}, r.mapError(fmt.Errorf("todos with id %v: %w", id, orm.ErrNotFound))
 	}
 	return rows[0], nil
 }
@@ -107,7 +107,11 @@ func (r Todo) List(ctx context.Context, s ...scopes.Todo) ([]model.Todo, error) 
 		qs[i] = impl.Of[model.Todo](x.Of())
 	}
 	q := impl.Combine(qs...)
-	return ormSelectTodos(ctx, r.db, q, "")
+	rows, err := ormSelectTodos(ctx, r.db, q, "")
+	if err != nil {
+		return nil, r.mapError(err)
+	}
+	return rows, nil
 }
 
 func (r Todo) Upsert(ctx context.Context, m model.Todo) error {
@@ -115,7 +119,7 @@ func (r Todo) Upsert(ctx context.Context, m model.Todo) error {
 VALUES ($1, $2, $3, $4, $5, $6)
 ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, priority = EXCLUDED.priority, completed_at = EXCLUDED.completed_at, updated_at = EXCLUDED.updated_at`
 	if _, err := r.db.Exec(ctx, q, m.ID, m.Title, m.Priority, m.CompletedAt, m.CreatedAt, m.UpdatedAt); err != nil {
-		return fmt.Errorf("upsert into todos: %w", err)
+		return r.mapError(fmt.Errorf("upsert into todos: %w", err))
 	}
 	return nil
 }
@@ -131,7 +135,7 @@ WHERE
     AND completed_at IS NULL`
 	tag, err := r.db.Exec(ctx, q, completedAt, id)
 	if err != nil {
-		return 0, fmt.Errorf("query Complete: %w", err)
+		return 0, r.mapError(fmt.Errorf("query Complete: %w", err))
 	}
 	return tag.RowsAffected(), nil
 }
@@ -147,7 +151,7 @@ WHERE
     AND completed_at IS NOT NULL`
 	tag, err := r.db.Exec(ctx, q, updatedAt, id)
 	if err != nil {
-		return 0, fmt.Errorf("query Uncomplete: %w", err)
+		return 0, r.mapError(fmt.Errorf("query Uncomplete: %w", err))
 	}
 	return tag.RowsAffected(), nil
 }
@@ -156,10 +160,10 @@ func (r Todo) Delete(ctx context.Context, id uuid.UUID) error {
 	const q = `DELETE FROM todos WHERE id = $1`
 	tag, err := r.db.Exec(ctx, q, id)
 	if err != nil {
-		return fmt.Errorf("delete from todos: %w", err)
+		return r.mapError(fmt.Errorf("delete from todos: %w", err))
 	}
 	if tag.RowsAffected() == 0 {
-		return fmt.Errorf("todos with id %v: %w", id, orm.ErrNotFound)
+		return r.mapError(fmt.Errorf("todos with id %v: %w", id, orm.ErrNotFound))
 	}
 	return nil
 }

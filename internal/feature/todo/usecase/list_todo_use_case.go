@@ -2,10 +2,8 @@ package usecase
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
-	"github.com/go-kanna/showcase/internal/errors/aerrors"
 	"github.com/go-kanna/showcase/internal/feature/todo/model"
 	"github.com/go-kanna/showcase/internal/feature/todo/repository"
 	"github.com/go-kanna/showcase/internal/feature/todo/scopes"
@@ -80,12 +78,12 @@ func (uc ListTodo) Do(ctx context.Context, in ListTodoInput) (ListTodoOutput, er
 		todos := uc.todos.Bind(tx)
 		var err error
 		ms, err = todos.List(ctx, s)
-		if err != nil && !errors.Is(err, aerrors.ErrNotFound) {
-			return fmt.Errorf("find todo: %w", err)
+		if err != nil {
+			return fmt.Errorf("list todos: %w", err)
 		}
 		return nil
 	}); err != nil {
-		return ListTodoOutput{}, fmt.Errorf("put todo: %w", err)
+		return ListTodoOutput{}, fmt.Errorf("list todos: %w", err)
 	}
 	return ListTodoOutput{Todos: ms}, nil
 }
