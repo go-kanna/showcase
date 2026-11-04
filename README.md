@@ -85,9 +85,13 @@ buf curl --protocol grpc --http2-prior-knowledge --schema proto \
   http://localhost:8080/showcase.todo.v1.TodoService/ListTodo
 ```
 
-Each to-do of a list comes with its three latest comments. A page ends with a `nextPageToken` while to-dos follow it;
-pass it as `pageToken` to read the next page. `ListRecentComments` gives the latest comments, each with the to-do it
-is on, which kanna-orm joins in the same query from the nested struct of `repository.CommentSummary`.
+Each to-do of a list comes with its three latest comments, and with `commentCount`, which a query written by hand in
+`todo_queries.sql` adds to it. kanna-orm reads the query's rows as those of `todos`, so the scopes of ListTodo narrow,
+order, and page them as they would the table. A page ends with a `nextPageToken` while to-dos follow it; pass it as
+`pageToken` to read the next page.
+
+`ListRecentComments` gives the latest comments, each with the to-do it is on, which kanna-orm joins in the same query
+from the nested struct of `repository.CommentSummary`.
 
 ## Develop
 

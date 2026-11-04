@@ -29,6 +29,8 @@ message Todo {
   Priority priority = 6;
   // comments are the three latest comments on the to-do, newest first.
   repeated Comment comments = 7;
+  // comment_count is how many comments the to-do has, comments among them.
+  int64 comment_count = 8;
 }
 
 message Comment {

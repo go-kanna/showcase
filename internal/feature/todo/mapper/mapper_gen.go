@@ -12,27 +12,29 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-// TodoToProto maps model.Todo to *todov1.Todo.
-func TodoToProto(m model.Todo) *todov1.Todo {
+// TodoToProto converts a to-do of a list. Its fields come from the
+// model.Todo it embeds, but for the ID, whose name differs in case.
+func TodoToProto(t repository.TodoWithCommentCount) *todov1.Todo {
 	var v *timestamppb.Timestamp
-	if v2 := m.CompletedAt; v2 != nil {
+	if v2 := t.CompletedAt; v2 != nil {
 		v = timestamppb.New((*v2).Time())
 	}
 	var v3 []*todov1.Comment
-	if v4 := m.Comments; v4 != nil {
+	if v4 := t.Comments; v4 != nil {
 		v3 = make([]*todov1.Comment, len(v4))
 		for i, e := range v4 {
 			v3[i] = CommentToProto(e)
 		}
 	}
 	return &todov1.Todo{
-		Id:          m.ID.String(),
-		Title:       m.Title,
-		CompletedAt: v,
-		CreatedAt:   timestamppb.New(m.CreatedAt),
-		UpdatedAt:   timestamppb.New(m.UpdatedAt),
-		Priority:    priorityToTodov1(m.Priority),
-		Comments:    v3,
+		Id:           t.ID.String(),
+		Title:        t.Title,
+		CompletedAt:  v,
+		CreatedAt:    timestamppb.New(t.CreatedAt),
+		UpdatedAt:    timestamppb.New(t.UpdatedAt),
+		Priority:     priorityToTodov1(t.Priority),
+		Comments:     v3,
+		CommentCount: t.CommentCount,
 	}
 }
 

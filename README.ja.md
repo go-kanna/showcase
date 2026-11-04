@@ -80,7 +80,9 @@ buf curl --protocol grpc --http2-prior-knowledge --schema proto \
   http://localhost:8080/showcase.todo.v1.TodoService/ListTodo
 ```
 
-一覧の各 ToDo には、最新 3 件のコメントが付きます。続きの ToDo があるページには `nextPageToken` が付きます。それを `pageToken` に渡すと、次のページを読めます。`ListRecentComments` は最新のコメントを、それぞれの ToDo とともに返します。ToDo は、kanna-orm が `repository.CommentSummary` の入れ子の struct から、同じクエリで結合します。
+一覧の各 ToDo には、最新 3 件のコメントと、`todo_queries.sql` に手で書いたクエリが足す `commentCount` が付きます。kanna-orm はクエリの行を `todos` の行として読むので、ListTodo の scope は、表に対してと同じように絞り込み、並べ、ページを切ります。続きの ToDo があるページには `nextPageToken` が付きます。それを `pageToken` に渡すと、次のページを読めます。
+
+`ListRecentComments` は最新のコメントを、それぞれの ToDo とともに返します。ToDo は、kanna-orm が `repository.CommentSummary` の入れ子の struct から、同じクエリで結合します。
 
 ## 開発
 

@@ -9,6 +9,7 @@ import (
 	"github.com/go-kanna/showcase/internal/feature/todo/mapper"
 	"github.com/go-kanna/showcase/internal/feature/todo/model"
 	"github.com/go-kanna/showcase/internal/feature/todo/model/fixture"
+	"github.com/go-kanna/showcase/internal/feature/todo/repository"
 	"github.com/go-kanna/showcase/internal/feature/todo/usecase"
 	todov1 "github.com/go-kanna/showcase/internal/gen/showcase/todo/v1"
 )
@@ -20,10 +21,26 @@ func TestTodoToProto_Priority(t *testing.T) {
 	m := fixture.Todo(func(m *model.Todo) { m.Priority = model.PriorityHigh })
 
 	// act
-	got := mapper.TodoToProto(m)
+	got := mapper.TodoToProto(repository.TodoWithCommentCount{Todo: m})
 
 	// assert
 	assert.Equal(t, todov1.Priority_PRIORITY_HIGH, got.GetPriority())
+}
+
+// The fields come from the to-do the row embeds, and the count from the row.
+func TestTodoToProto_CommentCount(t *testing.T) {
+	t.Parallel()
+
+	// arrange
+	m := fixture.Todo()
+
+	// act
+	got := mapper.TodoToProto(repository.TodoWithCommentCount{Todo: m, CommentCount: 4})
+
+	// assert
+	assert.Equal(t, m.ID.String(), got.GetId())
+	assert.Equal(t, m.Title, got.GetTitle())
+	assert.Equal(t, int64(4), got.GetCommentCount())
 }
 
 func TestTodoInputFromProto_Priority(t *testing.T) {

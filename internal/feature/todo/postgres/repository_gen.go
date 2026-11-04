@@ -167,17 +167,62 @@ func (r Todo) GetForUpdate(ctx context.Context, id uuid.UUID) (model.Todo, error
 	return row, nil
 }
 
-func (r Todo) List(ctx context.Context, s ...scopes.Todo) ([]model.Todo, error) {
+// ListWithCommentCounts runs the query of its name in todo_queries.sql.
+func (r Todo) ListWithCommentCounts(ctx context.Context, s ...scopes.Todo) ([]repository.TodoWithCommentCount, error) {
 	qs := make([]impl.Of[model.Todo], len(s))
 	for i, x := range s {
 		qs[i] = impl.Of[model.Todo](x.Of())
 	}
 	q := impl.Combine(qs...)
-	rows, err := ormSelectTodos(ctx, r.db, q, "")
+	const text = `WITH list_with_comment_counts AS (SELECT
+    t.id,
+    t.title,
+    t.priority,
+    t.completed_at,
+    t.created_at,
+    t.updated_at,
+    COUNT(c.id) AS comment_count
+FROM todos AS t
+LEFT JOIN comments AS c ON t.id = c.todo_id
+GROUP BY t.id)
+SELECT todos.id, todos.title, todos.priority, todos.completed_at, todos.created_at, todos.updated_at, todos.comment_count FROM list_with_comment_counts AS todos`
+	args := []any{}
+	rd, err := q.Render(impl.Postgres, 1, []string{`id`})
 	if err != nil {
 		return nil, r.mapError(err)
 	}
-	return rows, nil
+	rows, err := r.db.Query(ctx, text+rd.Where()+rd.OrderBy()+rd.Limit(), append(args, rd.Args()...)...)
+	if err != nil {
+		return nil, r.mapError(fmt.Errorf("query ListWithCommentCounts: %w", err))
+	}
+	defer rows.Close()
+	out := []repository.TodoWithCommentCount{}
+	var row repository.TodoWithCommentCount
+	dest := []any{&row.Todo.ID, &row.Todo.Title, &row.Todo.Priority, &row.Todo.CompletedAt, &row.Todo.CreatedAt, &row.Todo.UpdatedAt, &row.CommentCount}
+	for rows.Next() {
+		row = repository.TodoWithCommentCount{}
+		if err := rows.Scan(dest...); err != nil {
+			return nil, r.mapError(fmt.Errorf("query ListWithCommentCounts: %w", err))
+		}
+		out = append(out, row)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, r.mapError(fmt.Errorf("query ListWithCommentCounts: %w", err))
+	}
+	if rd.Reversed() {
+		slices.Reverse(out)
+	}
+	todos := make([]model.Todo, len(out))
+	for i := range out {
+		todos[i] = out[i].Todo
+	}
+	if err := ormPreloadTodos(ctx, r.db, todos, q); err != nil {
+		return nil, r.mapError(err)
+	}
+	for i := range out {
+		out[i].Todo = todos[i]
+	}
+	return out, nil
 }
 
 func (r Todo) Upsert(ctx context.Context, m model.Todo) error {
