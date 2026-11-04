@@ -2,6 +2,7 @@ package mapper
 
 import (
 	"github.com/go-kanna/showcase/internal/feature/todo/model"
+	"github.com/go-kanna/showcase/internal/feature/todo/repository"
 	"github.com/go-kanna/showcase/internal/feature/todo/usecase"
 	todov1 "github.com/go-kanna/showcase/internal/gen/showcase/todo/v1"
 	"github.com/go-kanna/showcase/internal/lib/converter"
@@ -13,6 +14,7 @@ import (
 type _ interface {
 	TodoToProto(m model.Todo) *todov1.Todo
 	CommentToProto(c model.Comment) *todov1.Comment
+	CommentSummaryToProto(c repository.CommentSummary) *todov1.CommentSummary
 
 	// TodoInputFromProto reads the to-do a PutTodo request carries. The
 	// request carries its completion apart from it.
