@@ -69,9 +69,9 @@ func TestListTodo_Filter(t *testing.T) {
 		filter usecase.ListFilter
 		want   []model.Todo
 	}{
-		{name: "completed", filter: usecase.CompletionFilter{Completed: true}, want: []model.Todo{done}},
-		{name: "not completed", filter: usecase.CompletionFilter{}, want: []model.Todo{open}},
-		{name: "of a priority", filter: usecase.PriorityFilter{Priority: model.PriorityLow}, want: []model.Todo{open}},
+		{name: "completed", filter: usecase.Completion{Completed: true}, want: []model.Todo{done}},
+		{name: "not completed", filter: usecase.Completion{}, want: []model.Todo{open}},
+		{name: "of a priority", filter: usecase.Priority{Priority: model.PriorityLow}, want: []model.Todo{open}},
 		{name: "none", want: []model.Todo{done, open}},
 	}
 	for _, tt := range tests {
@@ -97,7 +97,7 @@ func TestListTodo_FilterWithoutPriority(t *testing.T) {
 	t.Parallel()
 
 	// act
-	_, err := usecase.NewListTodo(nil, nil).Do(t.Context(), usecase.ListTodoInput{Filter: usecase.PriorityFilter{}})
+	_, err := usecase.NewListTodo(nil, nil).Do(t.Context(), usecase.ListTodoInput{Filter: usecase.Priority{}})
 
 	// assert
 	var verrs validate.Errors
@@ -111,7 +111,7 @@ func TestListTodo_FilterWithUnknownPriority(t *testing.T) {
 	t.Parallel()
 
 	_, err := usecase.NewListTodo(nil, nil).Do(t.Context(), usecase.ListTodoInput{
-		Filter: usecase.PriorityFilter{Priority: model.Priority("urgent")},
+		Filter: usecase.Priority{Priority: model.Priority("urgent")},
 	})
 
 	var verrs validate.Errors
@@ -131,8 +131,8 @@ func TestListTodo_PointerFilter(t *testing.T) {
 		name   string
 		filter usecase.ListFilter
 	}{
-		{name: "to a variant", filter: &usecase.PriorityFilter{Priority: model.PriorityLow}},
-		{name: "nil", filter: (*usecase.CompletionFilter)(nil)},
+		{name: "to a variant", filter: &usecase.Priority{Priority: model.PriorityLow}},
+		{name: "nil", filter: (*usecase.Completion)(nil)},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

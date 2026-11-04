@@ -80,21 +80,21 @@ func TestListTodoInputFromProto(t *testing.T) {
 			req: &todov1.ListTodoRequest{Filter: &todov1.ListTodoRequest_Completion{
 				Completion: &todov1.CompletionFilter{Completed: true},
 			}},
-			want: usecase.CompletionFilter{Completed: true},
+			want: usecase.Completion{Completed: true},
 		},
 		{
 			name: "priority",
 			req: &todov1.ListTodoRequest{Filter: &todov1.ListTodoRequest_Priority{
 				Priority: &todov1.PriorityFilter{Priority: todov1.Priority_PRIORITY_HIGH},
 			}},
-			want: usecase.PriorityFilter{Priority: model.PriorityHigh},
+			want: usecase.Priority{Priority: model.PriorityHigh},
 		},
 		{
 			name: "a priority nobody declared",
 			req: &todov1.ListTodoRequest{Filter: &todov1.ListTodoRequest_Priority{
 				Priority: &todov1.PriorityFilter{Priority: todov1.Priority(9)},
 			}},
-			wantErr: "map usecase.ListTodoInput.Filter: map usecase.PriorityFilter.Priority: " +
+			wantErr: "map usecase.ListTodoInput.Filter: map usecase.Priority.Priority: " +
 				"model.Priority has no value for 9",
 		},
 	}

@@ -46,6 +46,6 @@ type Todo struct {
 	Title       string
 	Priority    Priority
 	CompletedAt *CompletedAt
-	CreatedAt   time.Time
+	CreatedAt   time.Time `orm:",insertonly"`
 	UpdatedAt   time.Time
 }

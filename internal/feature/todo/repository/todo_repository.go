@@ -12,13 +12,13 @@ import (
 
 //go:generate go tool kanna-orm -destination ../postgres
 
-//kanna:repository table=todos
+//kanna:repository
 type Todo interface {
 	Get(ctx context.Context, id uuid.UUID) (model.Todo, error)
 	//kanna:lock update
 	GetForUpdate(ctx context.Context, id uuid.UUID) (model.Todo, error)
 	List(ctx context.Context, s ...scopes.Todo) ([]model.Todo, error)
-	//kanna:conflict id keep=created_at
+	//kanna:conflict id
 	Upsert(ctx context.Context, m model.Todo) error
 	Complete(ctx context.Context, id uuid.UUID, completedAt time.Time) (int64, error)
 	Uncomplete(ctx context.Context, id uuid.UUID, updatedAt time.Time) (int64, error)

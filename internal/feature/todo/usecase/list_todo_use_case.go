@@ -18,30 +18,30 @@ type ListTodoInput struct {
 }
 
 // ListFilter narrows a list to one condition. It is a sum type: one of
-// CompletionFilter and PriorityFilter, which kanna-mapper matches to the arms
-// of the request's oneof by name.
+// Completion and Priority, which kanna-mapper matches to the arms of the
+// request's oneof by name.
 type ListFilter interface {
 	Validate() error
 	isListFilter()
 }
 
-// CompletionFilter lists the to-dos completed, or those not.
-type CompletionFilter struct {
+// Completion lists the to-dos completed, or those not.
+type Completion struct {
 	Completed bool `json:"completed"`
 }
 
-// PriorityFilter lists the to-dos of one priority.
+// Priority lists the to-dos of one priority.
 //
 //kanna:validate
-type PriorityFilter struct {
+type Priority struct {
 	Priority model.Priority `json:"priority" validate:"required"`
 }
 
-// Validate accepts any CompletionFilter: both answers are a filter.
-func (CompletionFilter) Validate() error { return nil }
+// Validate accepts any Completion: both answers are a filter.
+func (Completion) Validate() error { return nil }
 
-func (CompletionFilter) isListFilter() {}
-func (PriorityFilter) isListFilter()   {}
+func (Completion) isListFilter() {}
+func (Priority) isListFilter()   {}
 
 type ListTodoOutput struct {
 	Todos []model.Todo
@@ -59,13 +59,13 @@ func (uc ListTodo) Do(ctx context.Context, in ListTodoInput) (ListTodoOutput, er
 	s := scopes.Todos().CreatedAtAsc()
 	switch f := in.Filter.(type) {
 	case nil:
-	case CompletionFilter:
+	case Completion:
 		if f.Completed {
 			s = s.CompletedAtIsNotNull()
 		} else {
 			s = s.CompletedAtIsNull()
 		}
-	case PriorityFilter:
+	case Priority:
 		s = s.PriorityEq(f.Priority)
 	default:
 		return ListTodoOutput{}, fmt.Errorf("unsupported filter %T", f)
