@@ -88,7 +88,7 @@ buf curl --protocol grpc --http2-prior-knowledge --schema proto \
 | `make new-migration name=...` | add a migration file                                                            |
 
 `make gen` runs the kanna generators with `go tool kanna gen`, which works out their order from what each reads and
-writes, so a package that gains a `//go:generate` line needs nothing else. `go tool kanna gen --plan` shows the order and
+writes, so a package that gains a `//go:generate` line needs nothing else. `go tool kanna gen -plan` shows the order and
 why.
 
 kanna-orm generates from `kanna-orm.snapshot.json`, not from a database, so `make gen` needs none. After a migration,

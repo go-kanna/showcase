@@ -82,7 +82,7 @@ buf curl --protocol grpc --http2-prior-knowledge --schema proto \
 | `make db-describe` | マイグレーション済みのデータベースのスキーマを `kanna-orm.snapshot.json` に記録する |
 | `make new-migration name=...` | マイグレーションファイルを追加する |
 
-`make gen` は `go tool kanna gen` で kanna のジェネレータを実行します。順序は各ジェネレータが読むものと書くものから求められるので、`//go:generate` の行を追加したパッケージに、ほかの作業は要りません。順序とその理由は `go tool kanna gen --plan` で確認できます。
+`make gen` は `go tool kanna gen` で kanna のジェネレータを実行します。順序は各ジェネレータが読むものと書くものから求められるので、`//go:generate` の行を追加したパッケージに、ほかの作業は要りません。順序とその理由は `go tool kanna gen -plan` で確認できます。
 
 kanna-orm はデータベースではなく `kanna-orm.snapshot.json` から生成するので、`make gen` にデータベースは不要です。マイグレーションの後は、`make db-migrate` で適用し、`make db-describe` で記録して、スナップショットをマイグレーションと一緒にコミットしてください。両者が一致しないと CI が失敗します。
 

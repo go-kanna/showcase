@@ -40,7 +40,7 @@ gen-go:
 .PHONY: gen-check
 gen-check:
 	$(MAKE) gen-proto-check
-	go tool kanna gen --check
+	go tool kanna gen -check
 
 .PHONY: gen-proto
 gen-proto:
@@ -81,7 +81,7 @@ db-reset:
 	$(MAKE) db-create
 	$(MAKE) db-migrate
 
-.POHNY: new-migration
+.PHONY: new-migration
 new-migration:
 	@if [ -z "$(name)" ]; then \
 		echo "Error: name is required. Usage: make new-migration name=migration_name"; \
