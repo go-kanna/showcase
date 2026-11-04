@@ -10,6 +10,28 @@ import (
 	"github.com/go-kanna/value/rule"
 )
 
+// Validate checks x against the validate tags of AddCommentInput. It returns the
+// validate.Errors of every rule x breaks, or nil.
+func (x AddCommentInput) Validate() error {
+	var errs validate.Errors
+
+	if x.TodoID == "" {
+		errs.Add("todo_id", validate.Blank())
+	} else {
+		errs.Add("todo_id", rule.UUID(x.TodoID))
+	}
+
+	if x.Body == "" {
+		errs.Add("body", validate.Blank())
+	} else {
+		if utf8.RuneCountInString(x.Body) > 1000 {
+			errs.Add("body", validate.TooLong(1000))
+		}
+	}
+
+	return errs.Err()
+}
+
 // Validate checks x against the validate tags of DeleteTodoInput. It returns the
 // validate.Errors of every rule x breaks, or nil.
 func (x DeleteTodoInput) Validate() error {

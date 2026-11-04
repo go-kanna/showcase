@@ -14,11 +14,11 @@ Go 1.27 以上、Docker と Compose、[buf](https://buf.build/docs/cli/installat
 |---|---|---|
 | [kanna-di](https://github.com/go-kanna/di) | `internal/di`, `usecase`, `handler` | `NewInfra`, `NewPutTodo`, `NewHandler` など、各 `//kanna:container` 構造体のコンストラクタ |
 | [kanna-validate](https://github.com/go-kanna/validate) | `config`, `usecase` | `validate` タグから生成する `Validate` メソッド。`rule=model.CompletedAt` も含む |
-| [kanna-mapper](https://github.com/go-kanna/mapper) | `mapper` | `TodoToProto`, `TodoInputFromProto`, `ListTodoInputFromProto`。値オブジェクト、enum、oneof の直和型も含む |
+| [kanna-mapper](https://github.com/go-kanna/mapper) | `mapper` | `TodoToProto`, `CommentToProto`, `TodoInputFromProto`, `ListTodoInputFromProto`。値オブジェクト、enum、oneof の直和型も含む |
 | [kanna-fixture](https://github.com/go-kanna/fixture) | `model/fixture` | テスト用の `fixture.Todo()`。値はすべて埋まり、ポインタは nil のまま。優先度は手で書いた `fixture.Priority()` のもの |
 | [kanna-i18n](https://github.com/go-kanna/i18n) | `internal/messages` | `messages.TodoNotFound()` とバリデーションエラーコードの文言。英語と日本語 |
 | [kanna-value](https://github.com/go-kanna/value) | `model` | `NewCompletedAt` と、`model.CompletedAt`（2000 年から 2100 年の間に保たれる時刻）および enum の `model.Priority` の JSON と SQL のメソッド |
-| [kanna-orm](https://github.com/go-kanna/orm) | `scopes`, `postgres` | `repository.Todo` を実装する `postgres.Todo` と、`scopes.Todos().CreatedAtAsc()` のように読み取りとページングに使うスコープ |
+| [kanna-orm](https://github.com/go-kanna/orm) | `scopes`, `postgres` | リポジトリを実装する `postgres.Todo` と `postgres.Comment`、`scopes.Todos().WithComments(...)` のように読み取りとページングに使うスコープ |
 
 その他の構成要素: protobuf と gRPC に [buf](https://buf.build)、マイグレーションに [goose](https://github.com/pressly/goose)、テストごとの新しいデータベースに [pgtestdb](https://github.com/peterldowns/pgtestdb) を使っています。
 
@@ -31,13 +31,13 @@ proto                     the TodoService definition
 internal/
   di                      the containers the server is built from: Config and Infra
   feature/todo/
-    model                 the domain type, and the fixtures generated for it
-    scopes                the scope types the repository reads through
-    repository            the interface the use cases depend on
-    postgres              its implementation, which kanna-orm writes, and the SQL written by hand for it
-    usecase               one struct per operation, given the repository and transactor it works through
+    model                 the domain types, and the fixtures generated for them
+    scopes                the scope types the repositories read through
+    repository            the interfaces the use cases depend on
+    postgres              their implementations, which kanna-orm writes, and the SQL written by hand for them
+    usecase               one struct per operation, given the repositories and transactor it works through
     mapper                the mappings between protobuf and the model or the use case inputs
-    handler               the gRPC handler, which puts the feature together and chooses the repository
+    handler               the gRPC handler, which puts the feature together and chooses the repositories
   gen                     the code buf writes from proto/
   messages                the messages compiled from locales/
   infra/storage           pgx pools, transactions, and migrations
@@ -62,6 +62,10 @@ buf curl --protocol grpc --http2-prior-knowledge --schema proto \
   http://localhost:8080/showcase.todo.v1.TodoService/PutTodo
 
 buf curl --protocol grpc --http2-prior-knowledge --schema proto \
+  --data '{"todoId": "01890a5d-ac96-774b-bcce-b302099a8057", "body": "Whole milk"}' \
+  http://localhost:8080/showcase.todo.v1.TodoService/AddComment
+
+buf curl --protocol grpc --http2-prior-knowledge --schema proto \
   http://localhost:8080/showcase.todo.v1.TodoService/ListTodo
 
 buf curl --protocol grpc --http2-prior-knowledge --schema proto \
@@ -73,7 +77,7 @@ buf curl --protocol grpc --http2-prior-knowledge --schema proto \
   http://localhost:8080/showcase.todo.v1.TodoService/ListTodo
 ```
 
-続きの ToDo があるページには `nextPageToken` が付きます。それを `pageToken` に渡すと、次のページを読めます。
+一覧の各 ToDo には、最新 3 件のコメントが付きます。続きの ToDo があるページには `nextPageToken` が付きます。それを `pageToken` に渡すと、次のページを読めます。
 
 ## 開発
 

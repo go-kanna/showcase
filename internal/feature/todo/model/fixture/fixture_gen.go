@@ -11,6 +11,24 @@ import (
 	"github.com/go-kanna/showcase/internal/feature/todo/model"
 )
 
+var seqComment atomic.Int64
+
+// Comment returns a new model.Comment with every field it can fill set, then
+// applies setters in order.
+func Comment(setters ...func(*model.Comment)) model.Comment {
+	n := seqComment.Add(1)
+	x := model.Comment{
+		ID:        uuid.MustParse(fmt.Sprintf("00000000-0000-4000-8000-%012x", n)),
+		TodoID:    uuid.MustParse(fmt.Sprintf("00000000-0000-4000-8000-%012x", n)),
+		Body:      fmt.Sprintf("body-%d", n),
+		CreatedAt: time.Date(2000, time.January, 1, 0, 0, int(n), 0, time.UTC),
+	}
+	for _, set := range setters {
+		set(&x)
+	}
+	return x
+}
+
 var seqTodo atomic.Int64
 
 // Todo returns a new model.Todo with every field it can fill set, then

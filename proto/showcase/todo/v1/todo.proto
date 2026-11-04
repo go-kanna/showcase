@@ -9,6 +9,7 @@ service TodoService {
   rpc PutTodo(PutTodoRequest) returns (PutTodoResponse);
   rpc SetTodoCompletion(SetTodoCompletionRequest) returns (SetTodoCompletionResponse);
   rpc DeleteTodo(DeleteTodoRequest) returns (DeleteTodoResponse);
+  rpc AddComment(AddCommentRequest) returns (AddCommentResponse);
 }
 
 enum Priority {
@@ -25,6 +26,14 @@ message Todo {
   google.protobuf.Timestamp created_at = 4;
   google.protobuf.Timestamp updated_at = 5;
   Priority priority = 6;
+  // comments are the three latest comments on the to-do, newest first.
+  repeated Comment comments = 7;
+}
+
+message Comment {
+  string id = 1;
+  string body = 2 [debug_redact = true];
+  google.protobuf.Timestamp created_at = 3;
 }
 
 message TodoInput {
@@ -82,3 +91,12 @@ message DeleteTodoRequest {
 }
 
 message DeleteTodoResponse {}
+
+message AddCommentRequest {
+  string todo_id = 1;
+  string body = 2 [debug_redact = true];
+}
+
+message AddCommentResponse {
+  Comment comment = 1;
+}

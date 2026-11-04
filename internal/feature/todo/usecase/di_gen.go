@@ -7,6 +7,15 @@ import (
 	"github.com/go-kanna/showcase/internal/infra/storage/tx"
 )
 
+// NewAddComment initializes dependencies and constructs AddComment.
+func NewAddComment(transactor tx.Transactor, todos repository.Todo, comments repository.Comment) *AddComment {
+	return &AddComment{
+		transactor: transactor,
+		todos:      todos,
+		comments:   comments,
+	}
+}
+
 // NewDeleteTodo initializes dependencies and constructs DeleteTodo.
 func NewDeleteTodo(transactor tx.Transactor, todos repository.Todo) *DeleteTodo {
 	return &DeleteTodo{

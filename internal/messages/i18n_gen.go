@@ -37,11 +37,13 @@ var bundle = i18n.NewBundle(
 		"todo.not_found":          {Single: i18n.Template{{Text: "To-do not found."}}},
 	}},
 	i18n.Catalog{Lang: "ja", Entries: map[string]i18n.Entry{
+		"errors.attributes.body":         {Single: i18n.Template{{Text: "本文"}}},
 		"errors.attributes.completed_at": {Single: i18n.Template{{Text: "完了日時"}}},
 		"errors.attributes.id":           {Single: i18n.Template{{Text: "ID"}}},
 		"errors.attributes.page_size":    {Single: i18n.Template{{Text: "1 ページの件数"}}},
 		"errors.attributes.priority":     {Single: i18n.Template{{Text: "優先度"}}},
 		"errors.attributes.title":        {Single: i18n.Template{{Text: "タイトル"}}},
+		"errors.attributes.todo_id":      {Single: i18n.Template{{Text: "やることの ID"}}},
 		"todo.invalid_page_token":        {Single: i18n.Template{{Text: "ページトークンが正しくありません。"}}},
 		"todo.not_found":                 {Single: i18n.Template{{Text: "やることが見つかりませんでした。"}}},
 	}},
