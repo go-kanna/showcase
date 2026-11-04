@@ -3,10 +3,10 @@ package usecase_test
 import (
 	"testing"
 
-	"github.com/go-kanna/orm"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/go-kanna/showcase/internal/errors/aerrors"
 	"github.com/go-kanna/showcase/internal/feature/todo/model/fixture"
 	"github.com/go-kanna/showcase/internal/feature/todo/postgres"
 	"github.com/go-kanna/showcase/internal/feature/todo/usecase"
@@ -35,6 +35,6 @@ func TestDeleteTodo(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, again, "a retry after the todo is gone succeeds")
 	got, err := todos.Get(t.Context(), m.ID)
-	require.ErrorIs(t, err, orm.ErrNotFound)
+	require.ErrorIs(t, err, aerrors.ErrNotFound)
 	assert.Zero(t, got)
 }

@@ -5,12 +5,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-kanna/orm"
 	"github.com/go-kanna/value/rule"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/go-kanna/showcase/internal/errors/aerrors"
 	"github.com/go-kanna/showcase/internal/feature/todo/model"
 	"github.com/go-kanna/showcase/internal/feature/todo/model/fixture"
 	"github.com/go-kanna/showcase/internal/feature/todo/postgres"
@@ -29,7 +29,7 @@ func TestTodo_GetNotFound(t *testing.T) {
 	_, err := sut.Get(t.Context(), fixture.Todo().ID)
 
 	// assert
-	require.ErrorIs(t, err, orm.ErrNotFound)
+	require.ErrorIs(t, err, aerrors.ErrNotFound)
 }
 
 func TestTodo_GetForUpdateLocksRow(t *testing.T) {
@@ -219,7 +219,7 @@ func TestTodo_Delete(t *testing.T) {
 
 	// assert
 	got, err := sut.Get(t.Context(), m.ID)
-	require.ErrorIs(t, err, orm.ErrNotFound)
+	require.ErrorIs(t, err, aerrors.ErrNotFound)
 	assert.Zero(t, got)
 }
 
@@ -237,5 +237,5 @@ func TestTodo_DeleteNotFound(t *testing.T) {
 	})
 
 	// assert
-	require.ErrorIs(t, err, orm.ErrNotFound)
+	require.ErrorIs(t, err, aerrors.ErrNotFound)
 }

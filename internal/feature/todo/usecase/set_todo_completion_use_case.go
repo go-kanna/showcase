@@ -7,8 +7,6 @@ import (
 	"time"
 	"uuid"
 
-	"github.com/go-kanna/orm"
-
 	"github.com/go-kanna/showcase/internal/errors/aerrors"
 	"github.com/go-kanna/showcase/internal/feature/todo/repository"
 	"github.com/go-kanna/showcase/internal/infra/storage/tx"
@@ -40,7 +38,7 @@ func (uc SetTodoCompletion) Do(ctx context.Context, in SetTodoCompletionInput) (
 	if err := uc.transactor.WithTx(ctx, func(tx tx.Tx) error {
 		todos := uc.todos.Bind(tx)
 		_, err := todos.GetForUpdate(ctx, id)
-		if errors.Is(err, orm.ErrNotFound) {
+		if errors.Is(err, aerrors.ErrNotFound) {
 			return aerrors.NotFound("todo").WithMessage(messages.TodoNotFound())
 		}
 		if err != nil {

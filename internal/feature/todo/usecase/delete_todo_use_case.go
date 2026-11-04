@@ -6,8 +6,7 @@ import (
 	"fmt"
 	"uuid"
 
-	"github.com/go-kanna/orm"
-
+	"github.com/go-kanna/showcase/internal/errors/aerrors"
 	"github.com/go-kanna/showcase/internal/feature/todo/repository"
 	"github.com/go-kanna/showcase/internal/infra/storage/tx"
 	"github.com/go-kanna/showcase/internal/lib/either"
@@ -34,7 +33,7 @@ func (uc DeleteTodo) Do(ctx context.Context, in DeleteTodoInput) (DeleteTodoOutp
 
 	id := either.Must(uuid.Parse(in.TodoID))
 	if err := uc.transactor.WithTx(ctx, func(tx tx.Tx) error {
-		if err := uc.todos.Bind(tx).Delete(ctx, id); err != nil && !errors.Is(err, orm.ErrNotFound) {
+		if err := uc.todos.Bind(tx).Delete(ctx, id); err != nil && !errors.Is(err, aerrors.ErrNotFound) {
 			return fmt.Errorf("delete todo: %w", err)
 		}
 		return nil
