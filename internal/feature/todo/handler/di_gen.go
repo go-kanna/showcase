@@ -19,14 +19,16 @@ func NewHandler(infra *di.Infra) *Handler {
 	delete2 := usecase.NewDeleteTodo(transactor, todos)
 	readTransactor := infra.ReadTransactor
 	list := usecase.NewListTodo(readTransactor, todos)
+	listRecentComments := usecase.NewListRecentComments(readTransactor, comments)
 	put := usecase.NewPutTodo(transactor, todos)
 	setCompletion := usecase.NewSetTodoCompletion(transactor, todos)
 
 	return &Handler{
-		addComment:    addComment,
-		delete:        delete2,
-		list:          list,
-		put:           put,
-		setCompletion: setCompletion,
+		addComment:         addComment,
+		delete:             delete2,
+		list:               list,
+		listRecentComments: listRecentComments,
+		put:                put,
+		setCompletion:      setCompletion,
 	}
 }

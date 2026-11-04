@@ -13,15 +13,15 @@ Requires Go 1.27, Docker with Compose, and the [buf](https://buf.build/docs/cli/
 
 ## What each generator does here
 
-| Tool                                                   | Where                               | What it writes                                                                                                                                             |
-|--------------------------------------------------------|-------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [kanna-di](https://github.com/go-kanna/di)             | `internal/di`, `usecase`, `handler` | `NewInfra`, `NewPutTodo`, `NewHandler`, …: the constructor of each `//kanna:container` struct                                                              |
-| [kanna-validate](https://github.com/go-kanna/validate) | `config`, `usecase`                 | `Validate` methods from the `validate` tags, `rule=model.CompletedAt` among them                                                                           |
-| [kanna-mapper](https://github.com/go-kanna/mapper)     | `mapper`                            | `TodoToProto`, `CommentToProto`, `TodoInputFromProto`, and `ListTodoInputFromProto`, value types, enums, and a oneof's sum type included                   |
-| [kanna-fixture](https://github.com/go-kanna/fixture)   | `model/fixture`                     | `fixture.Todo()`, for tests: every value filled, a pointer left nil, and the priority from `fixture.Priority()`, written by hand                           |
-| [kanna-i18n](https://github.com/go-kanna/i18n)         | `internal/messages`                 | `messages.TodoNotFound()` and the texts of validation error codes, in English and Japanese                                                                 |
-| [kanna-value](https://github.com/go-kanna/value)       | `model`                             | `NewCompletedAt` and the JSON and SQL methods of `model.CompletedAt`, a time held between 2000 and 2100, and of `model.Priority`, an enum                  |
-| [kanna-orm](https://github.com/go-kanna/orm)           | `scopes`, `postgres`                | `postgres.Todo` and `postgres.Comment`, which implement the repositories, and the scopes they read and page through, as `scopes.Todos().WithComments(...)` |
+| Tool                                                   | Where                               | What it writes                                                                                                                                                    |
+|--------------------------------------------------------|-------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [kanna-di](https://github.com/go-kanna/di)             | `internal/di`, `usecase`, `handler` | `NewInfra`, `NewPutTodo`, `NewHandler`, …: the constructor of each `//kanna:container` struct                                                                     |
+| [kanna-validate](https://github.com/go-kanna/validate) | `config`, `usecase`                 | `Validate` methods from the `validate` tags, `rule=model.CompletedAt` among them                                                                                  |
+| [kanna-mapper](https://github.com/go-kanna/mapper)     | `mapper`                            | `TodoToProto`, `CommentToProto`, `CommentSummaryToProto`, `TodoInputFromProto`, and `ListTodoInputFromProto`, value types, enums, and a oneof's sum type included |
+| [kanna-fixture](https://github.com/go-kanna/fixture)   | `model/fixture`                     | `fixture.Todo()`, for tests: every value filled, a pointer left nil, and the priority from `fixture.Priority()`, written by hand                                  |
+| [kanna-i18n](https://github.com/go-kanna/i18n)         | `internal/messages`                 | `messages.TodoNotFound()` and the texts of validation error codes, in English and Japanese                                                                        |
+| [kanna-value](https://github.com/go-kanna/value)       | `model`                             | `NewCompletedAt` and the JSON and SQL methods of `model.CompletedAt`, a time held between 2000 and 2100, and of `model.Priority`, an enum                         |
+| [kanna-orm](https://github.com/go-kanna/orm)           | `scopes`, `postgres`                | `postgres.Todo` and `postgres.Comment`, which implement the repositories, and the scopes they read and page through, as `scopes.Todos().WithComments(...)`        |
 
 The rest of the stack: [buf](https://buf.build) for protobuf and gRPC, [goose](https://github.com/pressly/goose) for
 migrations, and [pgtestdb](https://github.com/peterldowns/pgtestdb) for a fresh database per test.
@@ -71,6 +71,9 @@ buf curl --protocol grpc --http2-prior-knowledge --schema proto \
   http://localhost:8080/showcase.todo.v1.TodoService/AddComment
 
 buf curl --protocol grpc --http2-prior-knowledge --schema proto \
+  http://localhost:8080/showcase.todo.v1.TodoService/ListRecentComments
+
+buf curl --protocol grpc --http2-prior-knowledge --schema proto \
   http://localhost:8080/showcase.todo.v1.TodoService/ListTodo
 
 buf curl --protocol grpc --http2-prior-knowledge --schema proto \
@@ -83,7 +86,8 @@ buf curl --protocol grpc --http2-prior-knowledge --schema proto \
 ```
 
 Each to-do of a list comes with its three latest comments. A page ends with a `nextPageToken` while to-dos follow it;
-pass it as `pageToken` to read the next page.
+pass it as `pageToken` to read the next page. `ListRecentComments` gives the latest comments, each with the to-do it
+is on, which kanna-orm joins in the same query from the nested struct of `repository.CommentSummary`.
 
 ## Develop
 

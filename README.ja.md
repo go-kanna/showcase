@@ -14,7 +14,7 @@ Go 1.27 以上、Docker と Compose、[buf](https://buf.build/docs/cli/installat
 |---|---|---|
 | [kanna-di](https://github.com/go-kanna/di) | `internal/di`, `usecase`, `handler` | `NewInfra`, `NewPutTodo`, `NewHandler` など、各 `//kanna:container` 構造体のコンストラクタ |
 | [kanna-validate](https://github.com/go-kanna/validate) | `config`, `usecase` | `validate` タグから生成する `Validate` メソッド。`rule=model.CompletedAt` も含む |
-| [kanna-mapper](https://github.com/go-kanna/mapper) | `mapper` | `TodoToProto`, `CommentToProto`, `TodoInputFromProto`, `ListTodoInputFromProto`。値オブジェクト、enum、oneof の直和型も含む |
+| [kanna-mapper](https://github.com/go-kanna/mapper) | `mapper` | `TodoToProto`, `CommentToProto`, `CommentSummaryToProto`, `TodoInputFromProto`, `ListTodoInputFromProto`。値オブジェクト、enum、oneof の直和型も含む |
 | [kanna-fixture](https://github.com/go-kanna/fixture) | `model/fixture` | テスト用の `fixture.Todo()`。値はすべて埋まり、ポインタは nil のまま。優先度は手で書いた `fixture.Priority()` のもの |
 | [kanna-i18n](https://github.com/go-kanna/i18n) | `internal/messages` | `messages.TodoNotFound()` とバリデーションエラーコードの文言。英語と日本語 |
 | [kanna-value](https://github.com/go-kanna/value) | `model` | `NewCompletedAt` と、`model.CompletedAt`（2000 年から 2100 年の間に保たれる時刻）および enum の `model.Priority` の JSON と SQL のメソッド |
@@ -66,6 +66,9 @@ buf curl --protocol grpc --http2-prior-knowledge --schema proto \
   http://localhost:8080/showcase.todo.v1.TodoService/AddComment
 
 buf curl --protocol grpc --http2-prior-knowledge --schema proto \
+  http://localhost:8080/showcase.todo.v1.TodoService/ListRecentComments
+
+buf curl --protocol grpc --http2-prior-knowledge --schema proto \
   http://localhost:8080/showcase.todo.v1.TodoService/ListTodo
 
 buf curl --protocol grpc --http2-prior-knowledge --schema proto \
@@ -77,7 +80,7 @@ buf curl --protocol grpc --http2-prior-knowledge --schema proto \
   http://localhost:8080/showcase.todo.v1.TodoService/ListTodo
 ```
 
-一覧の各 ToDo には、最新 3 件のコメントが付きます。続きの ToDo があるページには `nextPageToken` が付きます。それを `pageToken` に渡すと、次のページを読めます。
+一覧の各 ToDo には、最新 3 件のコメントが付きます。続きの ToDo があるページには `nextPageToken` が付きます。それを `pageToken` に渡すと、次のページを読めます。`ListRecentComments` は最新のコメントを、それぞれの ToDo とともに返します。ToDo は、kanna-orm が `repository.CommentSummary` の入れ子の struct から、同じクエリで結合します。
 
 ## 開発
 

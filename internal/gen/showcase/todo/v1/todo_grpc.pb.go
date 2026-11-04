@@ -19,11 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TodoService_ListTodo_FullMethodName          = "/showcase.todo.v1.TodoService/ListTodo"
-	TodoService_PutTodo_FullMethodName           = "/showcase.todo.v1.TodoService/PutTodo"
-	TodoService_SetTodoCompletion_FullMethodName = "/showcase.todo.v1.TodoService/SetTodoCompletion"
-	TodoService_DeleteTodo_FullMethodName        = "/showcase.todo.v1.TodoService/DeleteTodo"
-	TodoService_AddComment_FullMethodName        = "/showcase.todo.v1.TodoService/AddComment"
+	TodoService_ListTodo_FullMethodName           = "/showcase.todo.v1.TodoService/ListTodo"
+	TodoService_PutTodo_FullMethodName            = "/showcase.todo.v1.TodoService/PutTodo"
+	TodoService_SetTodoCompletion_FullMethodName  = "/showcase.todo.v1.TodoService/SetTodoCompletion"
+	TodoService_DeleteTodo_FullMethodName         = "/showcase.todo.v1.TodoService/DeleteTodo"
+	TodoService_AddComment_FullMethodName         = "/showcase.todo.v1.TodoService/AddComment"
+	TodoService_ListRecentComments_FullMethodName = "/showcase.todo.v1.TodoService/ListRecentComments"
 )
 
 // TodoServiceClient is the client API for TodoService service.
@@ -35,6 +36,7 @@ type TodoServiceClient interface {
 	SetTodoCompletion(ctx context.Context, in *SetTodoCompletionRequest, opts ...grpc.CallOption) (*SetTodoCompletionResponse, error)
 	DeleteTodo(ctx context.Context, in *DeleteTodoRequest, opts ...grpc.CallOption) (*DeleteTodoResponse, error)
 	AddComment(ctx context.Context, in *AddCommentRequest, opts ...grpc.CallOption) (*AddCommentResponse, error)
+	ListRecentComments(ctx context.Context, in *ListRecentCommentsRequest, opts ...grpc.CallOption) (*ListRecentCommentsResponse, error)
 }
 
 type todoServiceClient struct {
@@ -95,6 +97,16 @@ func (c *todoServiceClient) AddComment(ctx context.Context, in *AddCommentReques
 	return out, nil
 }
 
+func (c *todoServiceClient) ListRecentComments(ctx context.Context, in *ListRecentCommentsRequest, opts ...grpc.CallOption) (*ListRecentCommentsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListRecentCommentsResponse)
+	err := c.cc.Invoke(ctx, TodoService_ListRecentComments_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TodoServiceServer is the server API for TodoService service.
 // All implementations must embed UnimplementedTodoServiceServer
 // for forward compatibility.
@@ -104,6 +116,7 @@ type TodoServiceServer interface {
 	SetTodoCompletion(context.Context, *SetTodoCompletionRequest) (*SetTodoCompletionResponse, error)
 	DeleteTodo(context.Context, *DeleteTodoRequest) (*DeleteTodoResponse, error)
 	AddComment(context.Context, *AddCommentRequest) (*AddCommentResponse, error)
+	ListRecentComments(context.Context, *ListRecentCommentsRequest) (*ListRecentCommentsResponse, error)
 	mustEmbedUnimplementedTodoServiceServer()
 }
 
@@ -128,6 +141,9 @@ func (UnimplementedTodoServiceServer) DeleteTodo(context.Context, *DeleteTodoReq
 }
 func (UnimplementedTodoServiceServer) AddComment(context.Context, *AddCommentRequest) (*AddCommentResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method AddComment not implemented")
+}
+func (UnimplementedTodoServiceServer) ListRecentComments(context.Context, *ListRecentCommentsRequest) (*ListRecentCommentsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListRecentComments not implemented")
 }
 func (UnimplementedTodoServiceServer) mustEmbedUnimplementedTodoServiceServer() {}
 func (UnimplementedTodoServiceServer) testEmbeddedByValue()                     {}
@@ -240,6 +256,24 @@ func _TodoService_AddComment_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TodoService_ListRecentComments_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListRecentCommentsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TodoServiceServer).ListRecentComments(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TodoService_ListRecentComments_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TodoServiceServer).ListRecentComments(ctx, req.(*ListRecentCommentsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TodoService_ServiceDesc is the grpc.ServiceDesc for TodoService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -266,6 +300,10 @@ var TodoService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddComment",
 			Handler:    _TodoService_AddComment_Handler,
+		},
+		{
+			MethodName: "ListRecentComments",
+			Handler:    _TodoService_ListRecentComments_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

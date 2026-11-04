@@ -91,6 +91,41 @@ RETURNING id, todo_id, body, created_at`
 	return row, nil
 }
 
+func (r Comment) ListSummaries(ctx context.Context, s ...scopes.Comment) ([]repository.CommentSummary, error) {
+	qs := make([]impl.Of[model.Comment], len(s))
+	for i, x := range s {
+		qs[i] = impl.Of[model.Comment](x.Of())
+	}
+	q := impl.Combine(qs...)
+	if err := q.ProjectionOnly("ListSummaries"); err != nil {
+		return nil, err
+	}
+	text, args, reversed, err := q.RenderJoinedProjection(impl.Postgres, "comments", `SELECT comments.id, comments.body, comments.created_at, todo.id, todo.title`, ` INNER JOIN todos AS todo ON todo.id = comments.todo_id`, []string{"id", "body", "created_at", "todo_id"}, []string{"id", "todo_id", "body", "created_at"}, []string{`id`})
+	if err != nil {
+		return nil, err
+	}
+	rows, err := r.db.Query(ctx, text+"", args...)
+	if err != nil {
+		return nil, fmt.Errorf("project comments: %w", err)
+	}
+	defer rows.Close()
+	out := []repository.CommentSummary{}
+	for rows.Next() {
+		var row repository.CommentSummary
+		if err := rows.Scan(&row.ID, &row.Body, &row.CreatedAt, &row.Todo.ID, &row.Todo.Title); err != nil {
+			return nil, fmt.Errorf("project comments: %w", err)
+		}
+		out = append(out, row)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("project comments: %w", err)
+	}
+	if reversed {
+		slices.Reverse(out)
+	}
+	return out, nil
+}
+
 // Todo implements repository.Todo on PostgreSQL through pgx.
 type Todo struct{ db ormDatabase }
 

@@ -10,6 +10,7 @@ service TodoService {
   rpc SetTodoCompletion(SetTodoCompletionRequest) returns (SetTodoCompletionResponse);
   rpc DeleteTodo(DeleteTodoRequest) returns (DeleteTodoResponse);
   rpc AddComment(AddCommentRequest) returns (AddCommentResponse);
+  rpc ListRecentComments(ListRecentCommentsRequest) returns (ListRecentCommentsResponse);
 }
 
 enum Priority {
@@ -99,4 +100,25 @@ message AddCommentRequest {
 
 message AddCommentResponse {
   Comment comment = 1;
+}
+
+message ListRecentCommentsRequest {}
+
+message ListRecentCommentsResponse {
+  // comments are the 20 latest comments on any to-do, newest first.
+  repeated CommentSummary comments = 1;
+}
+
+// CommentSummary is a comment with the to-do it is on.
+message CommentSummary {
+  string id = 1;
+  string body = 2 [debug_redact = true];
+  google.protobuf.Timestamp created_at = 3;
+  TodoRef todo = 4;
+}
+
+// TodoRef names a to-do.
+message TodoRef {
+  string id = 1;
+  string title = 2 [debug_redact = true];
 }

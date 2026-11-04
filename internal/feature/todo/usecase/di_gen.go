@@ -24,6 +24,14 @@ func NewDeleteTodo(transactor tx.Transactor, todos repository.Todo) *DeleteTodo 
 	}
 }
 
+// NewListRecentComments initializes dependencies and constructs ListRecentComments.
+func NewListRecentComments(transactor tx.ReadTransactor, comments repository.Comment) *ListRecentComments {
+	return &ListRecentComments{
+		transactor: transactor,
+		comments:   comments,
+	}
+}
+
 // NewListTodo initializes dependencies and constructs ListTodo.
 func NewListTodo(transactor tx.ReadTransactor, todos repository.Todo) *ListTodo {
 	return &ListTodo{

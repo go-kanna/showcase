@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/go-kanna/showcase/internal/feature/todo/model"
+	"github.com/go-kanna/showcase/internal/feature/todo/repository"
 	"github.com/go-kanna/showcase/internal/feature/todo/usecase"
 	todov1 "github.com/go-kanna/showcase/internal/gen/showcase/todo/v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -41,6 +42,16 @@ func CommentToProto(c model.Comment) *todov1.Comment {
 		Id:        c.ID.String(),
 		Body:      c.Body,
 		CreatedAt: timestamppb.New(c.CreatedAt),
+	}
+}
+
+// CommentSummaryToProto maps repository.CommentSummary to *todov1.CommentSummary.
+func CommentSummaryToProto(c repository.CommentSummary) *todov1.CommentSummary {
+	return &todov1.CommentSummary{
+		Id:        c.ID.String(),
+		Body:      c.Body,
+		CreatedAt: timestamppb.New(c.CreatedAt),
+		Todo:      todoRefToTodov1(c.Todo),
 	}
 }
 
@@ -111,6 +122,14 @@ func priorityToTodov1(src model.Priority) todov1.Priority {
 		return todov1.Priority_PRIORITY_HIGH
 	}
 	return todov1.Priority_PRIORITY_UNSPECIFIED
+}
+
+// todoRefToTodov1 maps repository.TodoRef to *todov1.TodoRef.
+func todoRefToTodov1(src repository.TodoRef) *todov1.TodoRef {
+	return &todov1.TodoRef{
+		Id:    src.ID.String(),
+		Title: src.Title,
+	}
 }
 
 // completionFilterToCompletion maps *todov1.CompletionFilter to usecase.Completion.

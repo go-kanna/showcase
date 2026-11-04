@@ -884,6 +884,209 @@ func (x *AddCommentResponse) GetComment() *Comment {
 	return nil
 }
 
+type ListRecentCommentsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListRecentCommentsRequest) Reset() {
+	*x = ListRecentCommentsRequest{}
+	mi := &file_showcase_todo_v1_todo_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListRecentCommentsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListRecentCommentsRequest) ProtoMessage() {}
+
+func (x *ListRecentCommentsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_showcase_todo_v1_todo_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListRecentCommentsRequest.ProtoReflect.Descriptor instead.
+func (*ListRecentCommentsRequest) Descriptor() ([]byte, []int) {
+	return file_showcase_todo_v1_todo_proto_rawDescGZIP(), []int{15}
+}
+
+type ListRecentCommentsResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// comments are the 20 latest comments on any to-do, newest first.
+	Comments      []*CommentSummary `protobuf:"bytes,1,rep,name=comments,proto3" json:"comments,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListRecentCommentsResponse) Reset() {
+	*x = ListRecentCommentsResponse{}
+	mi := &file_showcase_todo_v1_todo_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListRecentCommentsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListRecentCommentsResponse) ProtoMessage() {}
+
+func (x *ListRecentCommentsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_showcase_todo_v1_todo_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListRecentCommentsResponse.ProtoReflect.Descriptor instead.
+func (*ListRecentCommentsResponse) Descriptor() ([]byte, []int) {
+	return file_showcase_todo_v1_todo_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *ListRecentCommentsResponse) GetComments() []*CommentSummary {
+	if x != nil {
+		return x.Comments
+	}
+	return nil
+}
+
+// CommentSummary is a comment with the to-do it is on.
+type CommentSummary struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Body          string                 `protobuf:"bytes,2,opt,name=body,proto3" json:"body,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	Todo          *TodoRef               `protobuf:"bytes,4,opt,name=todo,proto3" json:"todo,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CommentSummary) Reset() {
+	*x = CommentSummary{}
+	mi := &file_showcase_todo_v1_todo_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CommentSummary) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CommentSummary) ProtoMessage() {}
+
+func (x *CommentSummary) ProtoReflect() protoreflect.Message {
+	mi := &file_showcase_todo_v1_todo_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CommentSummary.ProtoReflect.Descriptor instead.
+func (*CommentSummary) Descriptor() ([]byte, []int) {
+	return file_showcase_todo_v1_todo_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *CommentSummary) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *CommentSummary) GetBody() string {
+	if x != nil {
+		return x.Body
+	}
+	return ""
+}
+
+func (x *CommentSummary) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *CommentSummary) GetTodo() *TodoRef {
+	if x != nil {
+		return x.Todo
+	}
+	return nil
+}
+
+// TodoRef names a to-do.
+type TodoRef struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TodoRef) Reset() {
+	*x = TodoRef{}
+	mi := &file_showcase_todo_v1_todo_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TodoRef) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TodoRef) ProtoMessage() {}
+
+func (x *TodoRef) ProtoReflect() protoreflect.Message {
+	mi := &file_showcase_todo_v1_todo_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TodoRef.ProtoReflect.Descriptor instead.
+func (*TodoRef) Descriptor() ([]byte, []int) {
+	return file_showcase_todo_v1_todo_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *TodoRef) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *TodoRef) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
 var File_showcase_todo_v1_todo_proto protoreflect.FileDescriptor
 
 const file_showcase_todo_v1_todo_proto_rawDesc = "" +
@@ -941,12 +1144,24 @@ const file_showcase_todo_v1_todo_proto_rawDesc = "" +
 	"\atodo_id\x18\x01 \x01(\tR\x06todoId\x12\x17\n" +
 	"\x04body\x18\x02 \x01(\tB\x03\x80\x01\x01R\x04body\"I\n" +
 	"\x12AddCommentResponse\x123\n" +
-	"\acomment\x18\x01 \x01(\v2\x19.showcase.todo.v1.CommentR\acomment*^\n" +
+	"\acomment\x18\x01 \x01(\v2\x19.showcase.todo.v1.CommentR\acomment\"\x1b\n" +
+	"\x19ListRecentCommentsRequest\"Z\n" +
+	"\x1aListRecentCommentsResponse\x12<\n" +
+	"\bcomments\x18\x01 \x03(\v2 .showcase.todo.v1.CommentSummaryR\bcomments\"\xa3\x01\n" +
+	"\x0eCommentSummary\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
+	"\x04body\x18\x02 \x01(\tB\x03\x80\x01\x01R\x04body\x129\n" +
+	"\n" +
+	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12-\n" +
+	"\x04todo\x18\x04 \x01(\v2\x19.showcase.todo.v1.TodoRefR\x04todo\"4\n" +
+	"\aTodoRef\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
+	"\x05title\x18\x02 \x01(\tB\x03\x80\x01\x01R\x05title*^\n" +
 	"\bPriority\x12\x18\n" +
 	"\x14PRIORITY_UNSPECIFIED\x10\x00\x12\x10\n" +
 	"\fPRIORITY_LOW\x10\x01\x12\x13\n" +
 	"\x0fPRIORITY_NORMAL\x10\x02\x12\x11\n" +
-	"\rPRIORITY_HIGH\x10\x032\xd0\x03\n" +
+	"\rPRIORITY_HIGH\x10\x032\xc1\x04\n" +
 	"\vTodoService\x12Q\n" +
 	"\bListTodo\x12!.showcase.todo.v1.ListTodoRequest\x1a\".showcase.todo.v1.ListTodoResponse\x12N\n" +
 	"\aPutTodo\x12 .showcase.todo.v1.PutTodoRequest\x1a!.showcase.todo.v1.PutTodoResponse\x12l\n" +
@@ -954,7 +1169,8 @@ const file_showcase_todo_v1_todo_proto_rawDesc = "" +
 	"\n" +
 	"DeleteTodo\x12#.showcase.todo.v1.DeleteTodoRequest\x1a$.showcase.todo.v1.DeleteTodoResponse\x12W\n" +
 	"\n" +
-	"AddComment\x12#.showcase.todo.v1.AddCommentRequest\x1a$.showcase.todo.v1.AddCommentResponseB\xc6\x01\n" +
+	"AddComment\x12#.showcase.todo.v1.AddCommentRequest\x1a$.showcase.todo.v1.AddCommentResponse\x12o\n" +
+	"\x12ListRecentComments\x12+.showcase.todo.v1.ListRecentCommentsRequest\x1a,.showcase.todo.v1.ListRecentCommentsResponseB\xc6\x01\n" +
 	"\x14com.showcase.todo.v1B\tTodoProtoP\x01ZAgithub.com/go-kanna/showcase/internal/gen/showcase/todo/v1;todov1\xa2\x02\x03STX\xaa\x02\x10Showcase.Todo.V1\xca\x02\x10Showcase\\Todo\\V1\xe2\x02\x1cShowcase\\Todo\\V1\\GPBMetadata\xea\x02\x12Showcase::Todo::V1b\x06proto3"
 
 var (
@@ -970,56 +1186,65 @@ func file_showcase_todo_v1_todo_proto_rawDescGZIP() []byte {
 }
 
 var file_showcase_todo_v1_todo_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_showcase_todo_v1_todo_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
+var file_showcase_todo_v1_todo_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
 var file_showcase_todo_v1_todo_proto_goTypes = []any{
-	(Priority)(0),                     // 0: showcase.todo.v1.Priority
-	(*Todo)(nil),                      // 1: showcase.todo.v1.Todo
-	(*Comment)(nil),                   // 2: showcase.todo.v1.Comment
-	(*TodoInput)(nil),                 // 3: showcase.todo.v1.TodoInput
-	(*CompletionFilter)(nil),          // 4: showcase.todo.v1.CompletionFilter
-	(*PriorityFilter)(nil),            // 5: showcase.todo.v1.PriorityFilter
-	(*ListTodoRequest)(nil),           // 6: showcase.todo.v1.ListTodoRequest
-	(*ListTodoResponse)(nil),          // 7: showcase.todo.v1.ListTodoResponse
-	(*PutTodoRequest)(nil),            // 8: showcase.todo.v1.PutTodoRequest
-	(*PutTodoResponse)(nil),           // 9: showcase.todo.v1.PutTodoResponse
-	(*SetTodoCompletionRequest)(nil),  // 10: showcase.todo.v1.SetTodoCompletionRequest
-	(*SetTodoCompletionResponse)(nil), // 11: showcase.todo.v1.SetTodoCompletionResponse
-	(*DeleteTodoRequest)(nil),         // 12: showcase.todo.v1.DeleteTodoRequest
-	(*DeleteTodoResponse)(nil),        // 13: showcase.todo.v1.DeleteTodoResponse
-	(*AddCommentRequest)(nil),         // 14: showcase.todo.v1.AddCommentRequest
-	(*AddCommentResponse)(nil),        // 15: showcase.todo.v1.AddCommentResponse
-	(*timestamppb.Timestamp)(nil),     // 16: google.protobuf.Timestamp
+	(Priority)(0),                      // 0: showcase.todo.v1.Priority
+	(*Todo)(nil),                       // 1: showcase.todo.v1.Todo
+	(*Comment)(nil),                    // 2: showcase.todo.v1.Comment
+	(*TodoInput)(nil),                  // 3: showcase.todo.v1.TodoInput
+	(*CompletionFilter)(nil),           // 4: showcase.todo.v1.CompletionFilter
+	(*PriorityFilter)(nil),             // 5: showcase.todo.v1.PriorityFilter
+	(*ListTodoRequest)(nil),            // 6: showcase.todo.v1.ListTodoRequest
+	(*ListTodoResponse)(nil),           // 7: showcase.todo.v1.ListTodoResponse
+	(*PutTodoRequest)(nil),             // 8: showcase.todo.v1.PutTodoRequest
+	(*PutTodoResponse)(nil),            // 9: showcase.todo.v1.PutTodoResponse
+	(*SetTodoCompletionRequest)(nil),   // 10: showcase.todo.v1.SetTodoCompletionRequest
+	(*SetTodoCompletionResponse)(nil),  // 11: showcase.todo.v1.SetTodoCompletionResponse
+	(*DeleteTodoRequest)(nil),          // 12: showcase.todo.v1.DeleteTodoRequest
+	(*DeleteTodoResponse)(nil),         // 13: showcase.todo.v1.DeleteTodoResponse
+	(*AddCommentRequest)(nil),          // 14: showcase.todo.v1.AddCommentRequest
+	(*AddCommentResponse)(nil),         // 15: showcase.todo.v1.AddCommentResponse
+	(*ListRecentCommentsRequest)(nil),  // 16: showcase.todo.v1.ListRecentCommentsRequest
+	(*ListRecentCommentsResponse)(nil), // 17: showcase.todo.v1.ListRecentCommentsResponse
+	(*CommentSummary)(nil),             // 18: showcase.todo.v1.CommentSummary
+	(*TodoRef)(nil),                    // 19: showcase.todo.v1.TodoRef
+	(*timestamppb.Timestamp)(nil),      // 20: google.protobuf.Timestamp
 }
 var file_showcase_todo_v1_todo_proto_depIdxs = []int32{
-	16, // 0: showcase.todo.v1.Todo.completed_at:type_name -> google.protobuf.Timestamp
-	16, // 1: showcase.todo.v1.Todo.created_at:type_name -> google.protobuf.Timestamp
-	16, // 2: showcase.todo.v1.Todo.updated_at:type_name -> google.protobuf.Timestamp
+	20, // 0: showcase.todo.v1.Todo.completed_at:type_name -> google.protobuf.Timestamp
+	20, // 1: showcase.todo.v1.Todo.created_at:type_name -> google.protobuf.Timestamp
+	20, // 2: showcase.todo.v1.Todo.updated_at:type_name -> google.protobuf.Timestamp
 	0,  // 3: showcase.todo.v1.Todo.priority:type_name -> showcase.todo.v1.Priority
 	2,  // 4: showcase.todo.v1.Todo.comments:type_name -> showcase.todo.v1.Comment
-	16, // 5: showcase.todo.v1.Comment.created_at:type_name -> google.protobuf.Timestamp
+	20, // 5: showcase.todo.v1.Comment.created_at:type_name -> google.protobuf.Timestamp
 	0,  // 6: showcase.todo.v1.TodoInput.priority:type_name -> showcase.todo.v1.Priority
 	0,  // 7: showcase.todo.v1.PriorityFilter.priority:type_name -> showcase.todo.v1.Priority
 	4,  // 8: showcase.todo.v1.ListTodoRequest.completion:type_name -> showcase.todo.v1.CompletionFilter
 	5,  // 9: showcase.todo.v1.ListTodoRequest.priority:type_name -> showcase.todo.v1.PriorityFilter
 	1,  // 10: showcase.todo.v1.ListTodoResponse.todos:type_name -> showcase.todo.v1.Todo
 	3,  // 11: showcase.todo.v1.PutTodoRequest.todo:type_name -> showcase.todo.v1.TodoInput
-	16, // 12: showcase.todo.v1.PutTodoRequest.completed_at:type_name -> google.protobuf.Timestamp
+	20, // 12: showcase.todo.v1.PutTodoRequest.completed_at:type_name -> google.protobuf.Timestamp
 	2,  // 13: showcase.todo.v1.AddCommentResponse.comment:type_name -> showcase.todo.v1.Comment
-	6,  // 14: showcase.todo.v1.TodoService.ListTodo:input_type -> showcase.todo.v1.ListTodoRequest
-	8,  // 15: showcase.todo.v1.TodoService.PutTodo:input_type -> showcase.todo.v1.PutTodoRequest
-	10, // 16: showcase.todo.v1.TodoService.SetTodoCompletion:input_type -> showcase.todo.v1.SetTodoCompletionRequest
-	12, // 17: showcase.todo.v1.TodoService.DeleteTodo:input_type -> showcase.todo.v1.DeleteTodoRequest
-	14, // 18: showcase.todo.v1.TodoService.AddComment:input_type -> showcase.todo.v1.AddCommentRequest
-	7,  // 19: showcase.todo.v1.TodoService.ListTodo:output_type -> showcase.todo.v1.ListTodoResponse
-	9,  // 20: showcase.todo.v1.TodoService.PutTodo:output_type -> showcase.todo.v1.PutTodoResponse
-	11, // 21: showcase.todo.v1.TodoService.SetTodoCompletion:output_type -> showcase.todo.v1.SetTodoCompletionResponse
-	13, // 22: showcase.todo.v1.TodoService.DeleteTodo:output_type -> showcase.todo.v1.DeleteTodoResponse
-	15, // 23: showcase.todo.v1.TodoService.AddComment:output_type -> showcase.todo.v1.AddCommentResponse
-	19, // [19:24] is the sub-list for method output_type
-	14, // [14:19] is the sub-list for method input_type
-	14, // [14:14] is the sub-list for extension type_name
-	14, // [14:14] is the sub-list for extension extendee
-	0,  // [0:14] is the sub-list for field type_name
+	18, // 14: showcase.todo.v1.ListRecentCommentsResponse.comments:type_name -> showcase.todo.v1.CommentSummary
+	20, // 15: showcase.todo.v1.CommentSummary.created_at:type_name -> google.protobuf.Timestamp
+	19, // 16: showcase.todo.v1.CommentSummary.todo:type_name -> showcase.todo.v1.TodoRef
+	6,  // 17: showcase.todo.v1.TodoService.ListTodo:input_type -> showcase.todo.v1.ListTodoRequest
+	8,  // 18: showcase.todo.v1.TodoService.PutTodo:input_type -> showcase.todo.v1.PutTodoRequest
+	10, // 19: showcase.todo.v1.TodoService.SetTodoCompletion:input_type -> showcase.todo.v1.SetTodoCompletionRequest
+	12, // 20: showcase.todo.v1.TodoService.DeleteTodo:input_type -> showcase.todo.v1.DeleteTodoRequest
+	14, // 21: showcase.todo.v1.TodoService.AddComment:input_type -> showcase.todo.v1.AddCommentRequest
+	16, // 22: showcase.todo.v1.TodoService.ListRecentComments:input_type -> showcase.todo.v1.ListRecentCommentsRequest
+	7,  // 23: showcase.todo.v1.TodoService.ListTodo:output_type -> showcase.todo.v1.ListTodoResponse
+	9,  // 24: showcase.todo.v1.TodoService.PutTodo:output_type -> showcase.todo.v1.PutTodoResponse
+	11, // 25: showcase.todo.v1.TodoService.SetTodoCompletion:output_type -> showcase.todo.v1.SetTodoCompletionResponse
+	13, // 26: showcase.todo.v1.TodoService.DeleteTodo:output_type -> showcase.todo.v1.DeleteTodoResponse
+	15, // 27: showcase.todo.v1.TodoService.AddComment:output_type -> showcase.todo.v1.AddCommentResponse
+	17, // 28: showcase.todo.v1.TodoService.ListRecentComments:output_type -> showcase.todo.v1.ListRecentCommentsResponse
+	23, // [23:29] is the sub-list for method output_type
+	17, // [17:23] is the sub-list for method input_type
+	17, // [17:17] is the sub-list for extension type_name
+	17, // [17:17] is the sub-list for extension extendee
+	0,  // [0:17] is the sub-list for field type_name
 }
 
 func init() { file_showcase_todo_v1_todo_proto_init() }
@@ -1039,7 +1264,7 @@ func file_showcase_todo_v1_todo_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_showcase_todo_v1_todo_proto_rawDesc), len(file_showcase_todo_v1_todo_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   15,
+			NumMessages:   19,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -23,11 +23,12 @@ type Handler struct {
 	_ repository.Todo    `di:"with=postgres.NewTodo"`
 	_ repository.Comment `di:"with=postgres.NewComment"`
 
-	addComment    *usecase.AddComment
-	delete        *usecase.DeleteTodo
-	list          *usecase.ListTodo
-	put           *usecase.PutTodo
-	setCompletion *usecase.SetTodoCompletion
+	addComment         *usecase.AddComment
+	delete             *usecase.DeleteTodo
+	list               *usecase.ListTodo
+	listRecentComments *usecase.ListRecentComments
+	put                *usecase.PutTodo
+	setCompletion      *usecase.SetTodoCompletion
 }
 
 func provideDBTX(reader db.Reader) postgres.DBTX {
@@ -42,6 +43,18 @@ func (h Handler) AddComment(
 		return nil, err
 	}
 	return &todov1.AddCommentResponse{Comment: mapper.CommentToProto(out.Comment)}, nil
+}
+
+func (h Handler) ListRecentComments(
+	ctx context.Context, _ *todov1.ListRecentCommentsRequest,
+) (*todov1.ListRecentCommentsResponse, error) {
+	out, err := h.listRecentComments.Do(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &todov1.ListRecentCommentsResponse{
+		Comments: xslices.Map(out.Comments, mapper.CommentSummaryToProto),
+	}, nil
 }
 
 func (h Handler) DeleteTodo(
