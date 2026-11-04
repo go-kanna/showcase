@@ -64,9 +64,6 @@ func (x PutTodoInput) Validate() error {
 	if x.Title == "" {
 		errs.Add("title", validate.Blank())
 	} else {
-		if utf8.RuneCountInString(x.Title) < 1 {
-			errs.Add("title", validate.TooShort(1))
-		}
 		if utf8.RuneCountInString(x.Title) > 200 {
 			errs.Add("title", validate.TooLong(200))
 		}

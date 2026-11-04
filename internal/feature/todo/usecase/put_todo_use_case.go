@@ -16,7 +16,7 @@ import (
 //kanna:validate
 type PutTodoInput struct {
 	ID          string         `json:"id"           validate:"required,uuid"`
-	Title       string         `json:"title"        validate:"required,min=1,max=200"`
+	Title       string         `json:"title"        validate:"required,max=200"`
 	Priority    model.Priority `json:"priority"     validate:"required"`
 	CompletedAt *time.Time     `json:"completed_at" validate:"rule=model.CompletedAt"`
 }
