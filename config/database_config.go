@@ -1,6 +1,5 @@
 package config
 
-//go:generate go tool kanna-validate
 //kanna:validate
 type Database struct {
 	AdminURL     string `env:"DATABASE_URL"`
