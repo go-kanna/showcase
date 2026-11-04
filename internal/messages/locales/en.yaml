@@ -4,3 +4,4 @@ errors:
 
 todo:
   not_found: To-do not found.
+  invalid_page_token: The page token is not valid.

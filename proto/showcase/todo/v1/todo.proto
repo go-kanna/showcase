@@ -51,10 +51,16 @@ message ListTodoRequest {
     CompletionFilter completion = 1;
     PriorityFilter priority = 2;
   }
+  // page_size is how many to-dos a page holds: 20 when left 0, and 100 at most.
+  int32 page_size = 3;
+  // page_token is the next_page_token of the page before, or empty for the first page.
+  string page_token = 4;
 }
 
 message ListTodoResponse {
   repeated Todo todos = 1;
+  // next_page_token reads the page after this one, and is empty on the last.
+  string next_page_token = 2;
 }
 
 message PutTodoRequest {

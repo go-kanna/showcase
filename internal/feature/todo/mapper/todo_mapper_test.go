@@ -116,3 +116,15 @@ func TestListTodoInputFromProto(t *testing.T) {
 		})
 	}
 }
+
+// The page of a request comes along by its fields' names.
+func TestListTodoInputFromProto_Page(t *testing.T) {
+	t.Parallel()
+
+	// act
+	got, err := mapper.ListTodoInputFromProto(&todov1.ListTodoRequest{PageSize: 2, PageToken: "token"})
+
+	// assert
+	require.NoError(t, err)
+	assert.Equal(t, usecase.ListTodoInput{PageSize: 2, PageToken: "token"}, got)
+}

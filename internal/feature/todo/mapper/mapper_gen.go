@@ -50,7 +50,10 @@ func ListTodoInputFromProto(req *todov1.ListTodoRequest) (usecase.ListTodoInput,
 	if req == nil {
 		req = new(todov1.ListTodoRequest)
 	}
-	dst := usecase.ListTodoInput{}
+	dst := usecase.ListTodoInput{
+		PageSize:  req.GetPageSize(),
+		PageToken: req.GetPageToken(),
+	}
 	switch v := req.GetFilter().(type) {
 	case *todov1.ListTodoRequest_Completion:
 		dst.Filter = completionFilterToCompletion(v.Completion)

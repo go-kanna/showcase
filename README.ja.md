@@ -18,7 +18,7 @@ Go 1.27 以上、Docker と Compose、[buf](https://buf.build/docs/cli/installat
 | [kanna-fixture](https://github.com/go-kanna/fixture) | `model/fixture` | テスト用の `fixture.Todo()`。値はすべて埋まり、ポインタは nil のまま。優先度は手で書いた `fixture.Priority()` のもの |
 | [kanna-i18n](https://github.com/go-kanna/i18n) | `internal/messages` | `messages.TodoNotFound()` とバリデーションエラーコードの文言。英語と日本語 |
 | [kanna-value](https://github.com/go-kanna/value) | `model` | `NewCompletedAt` と、`model.CompletedAt`（2000 年から 2100 年の間に保たれる時刻）および enum の `model.Priority` の JSON と SQL のメソッド |
-| [kanna-orm](https://github.com/go-kanna/orm) | `scopes`, `postgres` | `repository.Todo` を実装する `postgres.Todo` と、`scopes.Todos().CreatedAtAsc()` のように読み取りに使うスコープ |
+| [kanna-orm](https://github.com/go-kanna/orm) | `scopes`, `postgres` | `repository.Todo` を実装する `postgres.Todo` と、`scopes.Todos().CreatedAtAsc()` のように読み取りとページングに使うスコープ |
 
 その他の構成要素: protobuf と gRPC に [buf](https://buf.build)、マイグレーションに [goose](https://github.com/pressly/goose)、テストごとの新しいデータベースに [pgtestdb](https://github.com/peterldowns/pgtestdb) を使っています。
 
@@ -67,7 +67,13 @@ buf curl --protocol grpc --http2-prior-knowledge --schema proto \
 buf curl --protocol grpc --http2-prior-knowledge --schema proto \
   --data '{"priority": {"priority": "PRIORITY_HIGH"}}' \
   http://localhost:8080/showcase.todo.v1.TodoService/ListTodo
+
+buf curl --protocol grpc --http2-prior-knowledge --schema proto \
+  --data '{"pageSize": 1}' \
+  http://localhost:8080/showcase.todo.v1.TodoService/ListTodo
 ```
+
+続きの ToDo があるページには `nextPageToken` が付きます。それを `pageToken` に渡すと、次のページを読めます。
 
 ## 開発
 
