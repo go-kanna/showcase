@@ -15,7 +15,7 @@ Go 1.27 以上、Docker と Compose、[buf](https://buf.build/docs/cli/installat
 | [kanna-di](https://github.com/go-kanna/di) | `internal/di`, `usecase`, `handler` | `NewInfra`, `NewPutTodo`, `NewHandler` など、各 `//kanna:container` 構造体のコンストラクタ |
 | [kanna-validate](https://github.com/go-kanna/validate) | `config`, `usecase` | `validate` タグから生成する `Validate` メソッド。`rule=model.CompletedAt` も含む |
 | [kanna-mapper](https://github.com/go-kanna/mapper) | `mapper` | `TodoToProto`, `TodoInputFromProto`, `ListTodoInputFromProto`。値オブジェクト、enum、oneof の直和型も含む |
-| [kanna-fixture](https://github.com/go-kanna/fixture) | `model/fixture` | テスト用の `fixture.Todo()`。値はすべて埋まり、ポインタは nil のまま |
+| [kanna-fixture](https://github.com/go-kanna/fixture) | `model/fixture` | テスト用の `fixture.Todo()`。値はすべて埋まり、ポインタは nil のまま。優先度は手で書いた `fixture.Priority()` のもの |
 | [kanna-i18n](https://github.com/go-kanna/i18n) | `internal/messages` | `messages.TodoNotFound()` とバリデーションエラーコードの文言。英語と日本語 |
 | [kanna-value](https://github.com/go-kanna/value) | `model` | `NewCompletedAt` と、`model.CompletedAt`（2000 年から 2100 年の間に保たれる時刻）および enum の `model.Priority` の JSON と SQL のメソッド |
 | [kanna-orm](https://github.com/go-kanna/orm) | `scopes`, `postgres` | `repository.Todo` を実装する `postgres.Todo` と、`scopes.Todos().CreatedAtAsc()` のように読み取りに使うスコープ |
