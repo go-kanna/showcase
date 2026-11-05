@@ -26,7 +26,7 @@ func TestAddComment(t *testing.T) {
 	ifr.InTx(t, func(tx tx.Tx) {
 		require.NoError(t, postgres.NewTodo(ifr.Reader).Bind(tx).Upsert(t.Context(), m))
 	})
-	sut := usecase.NewAddComment(ifr.Transactor, postgres.NewTodo(ifr.Reader), postgres.NewComment(ifr.Reader))
+	sut := usecase.NewAddComment(ifr.Transactor, postgres.NewComment(ifr.Reader))
 
 	// act
 	got, err := sut.Do(t.Context(), usecase.AddCommentInput{TodoID: m.ID.String(), Body: "Whole milk"})
@@ -49,7 +49,7 @@ func TestAddComment_TodoNotFound(t *testing.T) {
 
 	// arrange
 	ifr := infra.New(t)
-	sut := usecase.NewAddComment(ifr.Transactor, postgres.NewTodo(ifr.Reader), postgres.NewComment(ifr.Reader))
+	sut := usecase.NewAddComment(ifr.Transactor, postgres.NewComment(ifr.Reader))
 
 	// act
 	_, err := sut.Do(t.Context(), usecase.AddCommentInput{TodoID: fixture.Todo().ID.String(), Body: "Whole milk"})
@@ -93,7 +93,7 @@ func TestAddComment_Invalid(t *testing.T) {
 			t.Parallel()
 
 			// act
-			_, err := usecase.NewAddComment(nil, nil, nil).Do(t.Context(), tt.in)
+			_, err := usecase.NewAddComment(nil, nil).Do(t.Context(), tt.in)
 
 			// assert
 			var verrs validate.Errors
