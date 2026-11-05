@@ -13,9 +13,9 @@ func NewHandler(infra *di.Infra) *Handler {
 	transactor := infra.Transactor
 	reader := infra.Reader
 	db := provideDBTX(reader)
-	todos := postgres.NewTodo(db)
 	comments := postgres.NewComment(db)
-	addComment := usecase.NewAddComment(transactor, todos, comments)
+	addComment := usecase.NewAddComment(transactor, comments)
+	todos := postgres.NewTodo(db)
 	delete2 := usecase.NewDeleteTodo(transactor, todos)
 	readTransactor := infra.ReadTransactor
 	list := usecase.NewListTodo(readTransactor, todos)

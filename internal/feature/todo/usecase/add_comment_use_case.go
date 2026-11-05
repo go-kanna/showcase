@@ -28,7 +28,6 @@ type AddCommentOutput struct {
 //kanna:container
 type AddComment struct {
 	transactor tx.Transactor      `di:"arg"`
-	todos      repository.Todo    `di:"arg"`
 	comments   repository.Comment `di:"arg"`
 }
 
@@ -40,15 +39,13 @@ func (uc AddComment) Do(ctx context.Context, in AddCommentInput) (AddCommentOutp
 	todoID := either.Must(uuid.Parse(in.TodoID))
 	var c model.Comment
 	if err := uc.transactor.WithTx(ctx, func(tx tx.Tx) error {
-		_, err := uc.todos.Bind(tx).Get(ctx, todoID)
+		// The database gives the comment its ID, which Insert reads back, and
+		// refuses a comment on a to-do that is not there.
+		var err error
+		c, err = uc.comments.Bind(tx).Insert(ctx, model.Comment{TodoID: todoID, Body: in.Body, CreatedAt: time.Now()})
 		if errors.Is(err, aerrors.ErrNotFound) {
 			return aerrors.NotFound("todo").WithMessage(messages.TodoNotFound())
 		}
-		if err != nil {
-			return fmt.Errorf("find todo: %w", err)
-		}
-		// The database gives the comment its ID, which Insert reads back.
-		c, err = uc.comments.Bind(tx).Insert(ctx, model.Comment{TodoID: todoID, Body: in.Body, CreatedAt: time.Now()})
 		if err != nil {
 			return fmt.Errorf("insert comment: %w", err)
 		}
