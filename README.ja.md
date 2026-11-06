@@ -92,7 +92,7 @@ buf curl --protocol grpc --http2-prior-knowledge --schema proto \
 | `make gen-check` | buf または kanna のジェネレータがコミット済みの内容を変更する場合に失敗する |
 | `make test` | テストを、それぞれ専用のデータベースに対して実行する |
 | `make lint` | golangci-lint を実行する |
-| `make vet` | 生成したものを呼び出すコードを、kanna-orm、kanna-value、kanna-i18n の vet で検査する: repository が必ず失敗する scope、enum のどの定数でもない定数、文言のないエラーコードを報告する |
+| `make vet` | 生成したものを呼び出すコードを `go tool kanna vet` で検査する |
 | `make sql-lint` | マイグレーションに sqlfluff を実行する |
 | `make db-reset` | データベースを削除して作り直し、マイグレーションを適用する |
 | `make db-describe` | マイグレーション済みのデータベースのスキーマを `kanna-orm.snapshot.json` に記録する |

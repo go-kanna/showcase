@@ -15,9 +15,7 @@ lint:
 
 .PHONY: vet
 vet:
-	go tool kanna-orm vet ./...
-	go tool kanna-value vet ./...
-	go tool kanna-i18n vet ./...
+	go tool kanna vet
 
 .PHONY: lint-fix
 lint-fix:

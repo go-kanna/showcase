@@ -44,7 +44,7 @@ require (
 	github.com/go-kanna/di v0.0.16 // indirect
 	github.com/go-kanna/fixture v0.0.21 // indirect
 	github.com/go-kanna/internal v0.0.27 // indirect
-	github.com/go-kanna/kanna v0.3.7 // indirect
+	github.com/go-kanna/kanna v0.3.8 // indirect
 	github.com/go-kanna/mapper v0.0.25 // indirect
 	github.com/go-sql-driver/mysql v1.10.1 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
