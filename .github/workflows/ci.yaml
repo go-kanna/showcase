@@ -35,8 +35,8 @@ jobs:
       - name: Check generated code
         run: make gen-check
 
-      - name: Check the scopes handed to the repositories
-        run: make orm-vet
+      - name: Check the code calling what the generators write
+        run: make vet
 
   test:
     runs-on: ubuntu-latest
