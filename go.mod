@@ -3,16 +3,16 @@ module github.com/go-kanna/showcase
 go 1.27.3
 
 require (
-	github.com/caarlos0/env/v11 v11.4.1
+	github.com/caarlos0/env/v11 v11.4.2
 	github.com/go-kanna/i18n v0.0.19
 	github.com/go-kanna/orm v0.0.31
 	github.com/go-kanna/validate v0.0.23
 	github.com/go-kanna/value v0.0.18
-	github.com/jackc/pgx/v5 v5.11.0
+	github.com/jackc/pgx/v5 v5.12.0
 	github.com/peterldowns/pgtestdb v0.1.1
 	github.com/pressly/goose/v3 v3.29.0
 	github.com/stretchr/testify v1.12.1
-	google.golang.org/grpc v1.84.0
+	google.golang.org/grpc v1.85.0
 	google.golang.org/protobuf v1.36.12
 )
 
