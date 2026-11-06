@@ -13,9 +13,11 @@ test:
 lint:
 	golangci-lint run
 
-.PHONY: orm-vet
-orm-vet:
+.PHONY: vet
+vet:
 	go tool kanna-orm vet ./...
+	go tool kanna-value vet ./...
+	go tool kanna-i18n vet ./...
 
 .PHONY: lint-fix
 lint-fix:
