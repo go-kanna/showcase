@@ -101,7 +101,7 @@ from the nested struct of `repository.CommentSummary`.
 | `make gen-check`              | fail if buf or the kanna generators would change what is committed              |
 | `make test`                   | run the tests, each against its own database                                    |
 | `make lint`                   | run golangci-lint                                                               |
-| `make vet`                    | report what kanna-orm, kanna-value, and kanna-i18n vet find in the code calling what they write: a scope a repository fails on, a constant none of an enum's, an error code without its text |
+| `make vet`                    | check the code calling what the generators write with `go tool kanna vet`       |
 | `make sql-lint`               | run sqlfluff over the migrations                                                |
 | `make db-reset`               | drop the database, create it again, and apply the migrations                    |
 | `make db-describe`            | record the schema of the migrated database in `kanna-orm.snapshot.json`         |
