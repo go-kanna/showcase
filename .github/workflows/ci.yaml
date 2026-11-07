@@ -55,7 +55,7 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     env:
-      DATABASE_URL: postgres://admin:password@127.0.0.1:5432/showcase?sslmode=disable
+      DATABASE_ADMIN_URL: postgres://admin:password@127.0.0.1:5432/showcase?sslmode=disable
       DATABASE_WRITER_URL: postgres://showcase_writer:password@127.0.0.1:5432/showcase?sslmode=disable
       DATABASE_READER_URL: postgres://showcase_reader:password@127.0.0.1:5432/showcase?sslmode=disable
     steps:

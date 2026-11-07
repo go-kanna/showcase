@@ -5,19 +5,26 @@ package di
 import (
 	"context"
 
+	"github.com/go-kanna/config/source"
 	"github.com/go-kanna/showcase/config"
 	"github.com/go-kanna/showcase/internal/infra/storage/tx"
 )
 
 // NewConfig initializes dependencies and constructs Config.
-func NewConfig() Config {
-	api := config.ParseAPI()
-	database := config.ParseDatabase()
+func NewConfig(src source.Source) (Config, error) {
+	api, err := config.LoadAPI(src)
+	if err != nil {
+		return Config{}, err
+	}
+	database, err := config.LoadDatabase(src)
+	if err != nil {
+		return Config{}, err
+	}
 
 	return Config{
 		API:      api,
 		Database: database,
-	}
+	}, nil
 }
 
 // NewInfra initializes dependencies and constructs Infra.

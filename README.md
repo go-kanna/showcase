@@ -2,10 +2,10 @@
 
 [![日本語](https://img.shields.io/badge/lang-%E6%97%A5%E6%9C%AC%E8%AA%9E-blue.svg)](README.ja.md)
 
-A to-do gRPC service in Go, written to show the [kanna](https://go-kanna.github.io/) code generators at work in
-one application. Each generator takes over a piece of code you would otherwise write by hand: constructors, validation,
-mappings between layers, test fixtures, typed messages, value types, and the database code behind a repository.
-Everything it writes is committed, so you can read it next to what it was generated from.
+A to-do gRPC service in Go, written to show the [kanna](https://go-kanna.github.io/) code generators at work in one
+application. Each generator takes over a piece of code you would otherwise write by hand: constructors, reading
+settings, validation, mappings between layers, test fixtures, typed messages, value types, and the database code behind
+a repository. Everything it writes is committed, so you can read it next to what it was generated from.
 
 To build a blog JSON API step by step with orm, validate, mapper, di, and fixture, follow the [tutorial](tutorial/README.md). Its VHS tape records the same walkthrough without manual screen capture.
 
@@ -16,7 +16,8 @@ Requires Go 1.27, Docker with Compose, and the [buf](https://buf.build/docs/cli/
 | Tool                                                   | Where                               | What it writes                                                                                                                                                    |
 |--------------------------------------------------------|-------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [kanna-di](https://github.com/go-kanna/di)             | `internal/di`, `usecase`, `handler` | `NewInfra`, `NewPutTodo`, `NewHandler`, …: the constructor of each `//kanna:container` struct                                                                     |
-| [kanna-validate](https://github.com/go-kanna/validate) | `config`, `usecase`                 | `Validate` methods from the `validate` tags, `rule=model.CompletedAt` among them                                                                                  |
+| [kanna-validate](https://github.com/go-kanna/validate) | `usecase`                           | `Validate` methods from the `validate` tags, `rule=model.CompletedAt` among them                                                                                  |
+| [kanna-config](https://github.com/go-kanna/config)     | `config`                            | `LoadAPI` and `LoadDatabase`, which read flags and the environment and check the `validate` tags, and `DefineAPIFlags` and `DefineDatabaseFlags`                  |
 | [kanna-mapper](https://github.com/go-kanna/mapper)     | `mapper`                            | `TodoToProto`, `CommentToProto`, `CommentSummaryToProto`, `TodoInputFromProto`, and `ListTodoInputFromProto`, value types, enums, and a oneof's sum type included |
 | [kanna-fixture](https://github.com/go-kanna/fixture)   | `model/fixture`                     | `fixture.Todo()`, for tests: every value filled, a pointer left nil, and the priority from `fixture.Priority()`, written by hand                                  |
 | [kanna-i18n](https://github.com/go-kanna/i18n)         | `internal/messages`                 | `messages.TodoNotFound()` and the texts of validation error codes, in English and Japanese                                                                        |
@@ -30,7 +31,7 @@ migrations, and [pgtestdb](https://github.com/peterldowns/pgtestdb) for a fresh 
 
 ```text
 cmd/api                   the server: gRPC over h2c, shut down on SIGTERM
-config                    settings read from the environment
+config                    settings read from flags and the environment
 proto                     the TodoService definition
 internal/
   di                      the containers the server is built from: Config and Infra
