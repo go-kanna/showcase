@@ -107,7 +107,7 @@ kanna-orm はデータベースではなく `kanna-orm.snapshot.json` から生�
 
 ```sh
 make db-migrate
-envsubst < .env.example > .env
+cp .env.example .env
 set -a && . ./.env && set +a
 make test
 ```

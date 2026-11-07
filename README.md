@@ -123,7 +123,7 @@ and its URLs in the environment:
 
 ```sh
 make db-migrate
-envsubst < .env.example > .env
+cp .env.example .env
 set -a && . ./.env && set +a
 make test
 ```
