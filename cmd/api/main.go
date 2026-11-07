@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"flag"
 	"fmt"
 	"log/slog"
 	"net"
@@ -13,20 +14,35 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/go-kanna/config/source"
+
+	"github.com/go-kanna/showcase/config"
 	"github.com/go-kanna/showcase/internal/di"
 	"github.com/go-kanna/showcase/internal/server"
 )
 
 func main() {
-	cfg := di.NewConfig()
+	config.DefineAPIFlags(flag.CommandLine)
+	config.DefineDatabaseFlags(flag.CommandLine)
+	flag.Parse()
+
 	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{AddSource: true})))
-	if err := run(cfg); err != nil {
+	if err := run(); err != nil {
 		slog.Error("server exited with error", "error", err)
 		os.Exit(1)
 	}
 }
 
-func run(cfg di.Config) error {
+func run() error {
+	src, err := source.Open(source.Sources{Flags: flag.CommandLine})
+	if err != nil {
+		return fmt.Errorf("open config sources: %w", err)
+	}
+	cfg, err := di.NewConfig(src)
+	if err != nil {
+		return fmt.Errorf("load config: %w", err)
+	}
+
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 

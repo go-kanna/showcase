@@ -6,7 +6,7 @@ services:
     environment:
       ENV: development
       MODULE_ROOT: /src
-      DATABASE_URL: postgres://admin:password@db:5432/showcase?sslmode=disable
+      DATABASE_ADMIN_URL: postgres://admin:password@db:5432/showcase?sslmode=disable
       DATABASE_WRITER_URL: postgres://showcase_writer:password@db:5432/showcase?sslmode=disable
       DATABASE_READER_URL: postgres://showcase_reader:password@db:5432/showcase?sslmode=disable
     ports:

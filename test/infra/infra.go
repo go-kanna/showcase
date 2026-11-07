@@ -10,6 +10,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/go-kanna/config/source"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/peterldowns/pgtestdb"
 	"github.com/stretchr/testify/require"
@@ -33,7 +34,8 @@ func New(t *testing.T) *Infra {
 	t.Helper()
 
 	requireDatabaseEnv(t)
-	dbCfg := config.ParseDatabase()
+	dbCfg, err := config.LoadDatabase(source.Env())
+	require.NoError(t, err)
 
 	cfg := pgtestdb.Custom(t, configFromURL(t, dbCfg.AdminURL), migrator{})
 
@@ -68,7 +70,7 @@ func requireDatabaseEnv(t *testing.T) {
 	t.Helper()
 
 	var missing []string
-	for _, key := range []string{"DATABASE_URL", "DATABASE_WRITER_URL", "DATABASE_READER_URL"} {
+	for _, key := range []string{"DATABASE_ADMIN_URL", "DATABASE_WRITER_URL", "DATABASE_READER_URL"} {
 		if os.Getenv(key) == "" {
 			missing = append(missing, key)
 		}

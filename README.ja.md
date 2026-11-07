@@ -2,7 +2,7 @@
 
 [![English](https://img.shields.io/badge/lang-English-blue.svg)](README.md)
 
-[kanna](https://go-kanna.github.io/ja/) コードジェネレータが 1 つのアプリケーションの中で働く様子を見せるために書かれた、Go の ToDo gRPC サービスです。各ジェネレータは、本来手で書くコードの一部を引き受けます。コンストラクタ、バリデーション、レイヤ間のマッピング、テストフィクスチャ、型付きのメッセージ、値オブジェクト、リポジトリの裏側のデータベースコードです。生成されたものはすべてコミットされているので、生成元と並べて読めます。
+[kanna](https://go-kanna.github.io/ja/) コードジェネレータが 1 つのアプリケーションの中で働く様子を見せるために書かれた、Go の ToDo gRPC サービスです。各ジェネレータは、本来手で書くコードの一部を引き受けます。コンストラクタ、設定の読み込み、バリデーション、レイヤ間のマッピング、テストフィクスチャ、型付きのメッセージ、値オブジェクト、リポジトリの裏側のデータベースコードです。生成されたものはすべてコミットされているので、生成元と並べて読めます。
 
 orm、validate、mapper、di、fixture でブログの JSON API を段階的に作る場合は、[チュートリアル](tutorial/README.ja.md) を参照してください。VHS の台本で同じ手順を録画でき、手作業の画面収録は不要です。
 
@@ -13,7 +13,8 @@ Go 1.27 以上、Docker と Compose、[buf](https://buf.build/docs/cli/installat
 | ツール | 場所 | 生成するもの |
 |---|---|---|
 | [kanna-di](https://github.com/go-kanna/di) | `internal/di`, `usecase`, `handler` | `NewInfra`, `NewPutTodo`, `NewHandler` など、各 `//kanna:container` 構造体のコンストラクタ |
-| [kanna-validate](https://github.com/go-kanna/validate) | `config`, `usecase` | `validate` タグから生成する `Validate` メソッド。`rule=model.CompletedAt` も含む |
+| [kanna-validate](https://github.com/go-kanna/validate) | `usecase` | `validate` タグから生成する `Validate` メソッド。`rule=model.CompletedAt` も含む |
+| [kanna-config](https://github.com/go-kanna/config) | `config` | フラグと環境変数から設定を読み、`validate` タグで確かめる `LoadAPI` と `LoadDatabase`、そのフラグを定義する `DefineAPIFlags` と `DefineDatabaseFlags` |
 | [kanna-mapper](https://github.com/go-kanna/mapper) | `mapper` | `TodoToProto`, `CommentToProto`, `CommentSummaryToProto`, `TodoInputFromProto`, `ListTodoInputFromProto`。値オブジェクト、enum、oneof の直和型も含む |
 | [kanna-fixture](https://github.com/go-kanna/fixture) | `model/fixture` | テスト用の `fixture.Todo()`。値はすべて埋まり、ポインタは nil のまま。優先度は手で書いた `fixture.Priority()` のもの |
 | [kanna-i18n](https://github.com/go-kanna/i18n) | `internal/messages` | `messages.TodoNotFound()` とバリデーションエラーコードの文言。英語と日本語 |
@@ -26,7 +27,7 @@ Go 1.27 以上、Docker と Compose、[buf](https://buf.build/docs/cli/installat
 
 ```text
 cmd/api                   the server: gRPC over h2c, shut down on SIGTERM
-config                    settings read from the environment
+config                    settings read from flags and the environment
 proto                     the TodoService definition
 internal/
   di                      the containers the server is built from: Config and Infra
