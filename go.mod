@@ -3,7 +3,7 @@ module github.com/go-kanna/showcase
 go 1.27.3
 
 require (
-	github.com/go-kanna/config v0.0.2
+	github.com/go-kanna/config v0.0.3
 	github.com/go-kanna/i18n v0.0.20
 	github.com/go-kanna/orm v0.0.32
 	github.com/go-kanna/validate v0.0.26
@@ -43,8 +43,8 @@ require (
 	github.com/go-faster/errors v0.8.0 // indirect
 	github.com/go-kanna/di v0.0.16 // indirect
 	github.com/go-kanna/fixture v0.0.21 // indirect
-	github.com/go-kanna/internal v0.0.29 // indirect
-	github.com/go-kanna/kanna v0.3.9 // indirect
+	github.com/go-kanna/internal v0.0.30 // indirect
+	github.com/go-kanna/kanna v0.3.10 // indirect
 	github.com/go-kanna/mapper v0.0.25 // indirect
 	github.com/go-sql-driver/mysql v1.10.1 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
