@@ -77,7 +77,7 @@ func requireDatabaseEnv(t *testing.T) {
 	}
 	if len(missing) > 0 {
 		t.Fatalf(
-			"missing env vars %v: create .env via `envsubst < .env.example > .env` and run tests through make",
+			"missing env vars %v: create .env via `cp .env.example .env` and run tests through make",
 			missing,
 		)
 	}
