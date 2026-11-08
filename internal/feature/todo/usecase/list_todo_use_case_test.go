@@ -5,7 +5,7 @@ import (
 	"time"
 	"uuid"
 
-	"github.com/go-kanna/validate"
+	"github.com/go-kanna/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -105,7 +105,7 @@ func TestListTodo_FilterWithoutPriority(t *testing.T) {
 	_, err := usecase.NewListTodo(nil, nil).Do(t.Context(), usecase.ListTodoInput{Filter: usecase.Priority{}})
 
 	// assert
-	var verrs validate.Errors
+	var verrs validator.Errors
 	require.ErrorAs(t, err, &verrs)
 	require.Len(t, verrs, 1)
 	assert.Equal(t, "filter.priority", verrs[0].Field)
@@ -119,7 +119,7 @@ func TestListTodo_FilterWithUnknownPriority(t *testing.T) {
 		Filter: usecase.Priority{Priority: model.Priority("urgent")},
 	})
 
-	var verrs validate.Errors
+	var verrs validator.Errors
 	require.ErrorAs(t, err, &verrs)
 	require.Len(t, verrs, 1)
 	assert.Equal(t, "filter.priority", verrs[0].Field)
@@ -217,7 +217,7 @@ func TestListTodo_PageSizeOutOfRange(t *testing.T) {
 			_, err := usecase.NewListTodo(nil, nil).Do(t.Context(), usecase.ListTodoInput{PageSize: tt.size})
 
 			// assert
-			var verrs validate.Errors
+			var verrs validator.Errors
 			require.ErrorAs(t, err, &verrs)
 			require.Len(t, verrs, 1)
 			assert.Equal(t, "page_size", verrs[0].Field)

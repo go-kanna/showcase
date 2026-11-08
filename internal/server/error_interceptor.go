@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/go-kanna/i18n"
-	"github.com/go-kanna/validate"
+	"github.com/go-kanna/validator"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -43,7 +43,7 @@ func errorInterceptor(
 
 // toStatus tells the client what it can act on, and logs the rest.
 func toStatus(ctx context.Context, method string, err error) error {
-	if verrs, ok := errors.AsType[validate.Errors](err); ok {
+	if verrs, ok := errors.AsType[validator.Errors](err); ok {
 		return status.Error(codes.InvalidArgument, validationMessage(ctx, verrs))
 	}
 	if aerr, ok := errors.AsType[aerrors.Error](err); ok {
@@ -73,7 +73,7 @@ func message(ctx context.Context, aerr aerrors.Error) string {
 	return localizer(ctx).Localize(m)
 }
 
-func validationMessage(ctx context.Context, verrs validate.Errors) string {
+func validationMessage(ctx context.Context, verrs validator.Errors) string {
 	return strings.Join(i18n.FullMessages(localizer(ctx), verrs), "; ")
 }
 

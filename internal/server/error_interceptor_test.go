@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/go-kanna/validate"
+	"github.com/go-kanna/validator"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -20,9 +20,9 @@ import (
 func TestToStatus(t *testing.T) {
 	t.Parallel()
 
-	var verrs validate.Errors
-	verrs.Add("id", validate.Blank())
-	verrs.Add("title", validate.TooLong(200))
+	var verrs validator.Errors
+	verrs.Add("id", validator.Blank())
+	verrs.Add("title", validator.TooLong(200))
 	notFound := aerrors.NotFound("todo").WithMessage(messages.TodoNotFound())
 
 	tests := []struct {

@@ -3,10 +3,10 @@ module github.com/go-kanna/showcase
 go 1.27.3
 
 require (
-	github.com/go-kanna/config v0.0.3
-	github.com/go-kanna/i18n v0.0.20
+	github.com/go-kanna/config v0.0.4
+	github.com/go-kanna/i18n v0.0.21
 	github.com/go-kanna/orm v0.0.34
-	github.com/go-kanna/validate v0.0.26
+	github.com/go-kanna/validator v0.0.27
 	github.com/go-kanna/value v0.0.18
 	github.com/jackc/pgx/v5 v5.12.0
 	github.com/peterldowns/pgtestdb v0.1.1
@@ -43,7 +43,7 @@ require (
 	github.com/go-faster/errors v0.8.0 // indirect
 	github.com/go-kanna/di v0.0.16 // indirect
 	github.com/go-kanna/fixture v0.0.21 // indirect
-	github.com/go-kanna/internal v0.0.30 // indirect
+	github.com/go-kanna/internal v0.0.31 // indirect
 	github.com/go-kanna/kanna v0.3.10 // indirect
 	github.com/go-kanna/mapper v0.0.25 // indirect
 	github.com/go-sql-driver/mysql v1.10.1 // indirect
@@ -121,7 +121,7 @@ tool (
 	github.com/go-kanna/kanna
 	github.com/go-kanna/mapper/cmd/kanna-mapper
 	github.com/go-kanna/orm/cmd/kanna-orm
-	github.com/go-kanna/validate/cmd/kanna-validate
+	github.com/go-kanna/validator/cmd/kanna-validator
 	github.com/go-kanna/value/cmd/kanna-value
 	github.com/pressly/goose/v3/cmd/goose
 )

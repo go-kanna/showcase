@@ -5,7 +5,7 @@ import (
 	"testing"
 	"uuid"
 
-	"github.com/go-kanna/validate"
+	"github.com/go-kanna/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -96,7 +96,7 @@ func TestAddComment_Invalid(t *testing.T) {
 			_, err := usecase.NewAddComment(nil, nil).Do(t.Context(), tt.in)
 
 			// assert
-			var verrs validate.Errors
+			var verrs validator.Errors
 			require.ErrorAs(t, err, &verrs)
 			require.Len(t, verrs, 1)
 			assert.Equal(t, tt.field, verrs[0].Field)

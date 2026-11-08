@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/go-kanna/orm/option"
-	"github.com/go-kanna/validate"
+	"github.com/go-kanna/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -128,7 +128,7 @@ func TestPutTodo_InvalidCompletedAt(t *testing.T) {
 	})
 
 	// assert
-	var verrs validate.Errors
+	var verrs validator.Errors
 	require.ErrorAs(t, err, &verrs)
 	require.Len(t, verrs, 1)
 	assert.Equal(t, "completed_at", verrs[0].Field)
@@ -152,7 +152,7 @@ func TestPutTodo_NoPriority(t *testing.T) {
 	})
 
 	// assert
-	var verrs validate.Errors
+	var verrs validator.Errors
 	require.ErrorAs(t, err, &verrs)
 	require.Len(t, verrs, 1)
 	assert.Equal(t, "priority", verrs[0].Field)
@@ -172,7 +172,7 @@ func TestPutTodo_UnknownPriority(t *testing.T) {
 		Priority: model.Priority("urgent"),
 	})
 
-	var verrs validate.Errors
+	var verrs validator.Errors
 	require.ErrorAs(t, err, &verrs)
 	require.Len(t, verrs, 1)
 	assert.Equal(t, "priority", verrs[0].Field)
