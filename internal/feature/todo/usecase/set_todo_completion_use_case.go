@@ -53,7 +53,7 @@ func (uc SetTodoCompletion) Do(ctx context.Context, in SetTodoCompletionInput) (
 		}
 
 		now := time.Now()
-		c := scopes.TodoChanges().SetUpdatedAt(now)
+		c := scopes.TodoChanges()
 		if in.Completed {
 			at, err := model.NewCompletedAt(now)
 			if err != nil {
