@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"slices"
-	"time"
 	"uuid"
 
 	"github.com/go-kanna/orm"
@@ -248,36 +247,22 @@ ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, priority = EXCLUDED.prior
 	return nil
 }
 
-// Complete runs the query of its name in todo_queries.sql.
-func (r Todo) Complete(ctx context.Context, id uuid.UUID, completedAt time.Time) (int64, error) {
-	const q = `UPDATE todos
-SET
-    completed_at = $1,
-    updated_at = $1
-WHERE
-    id = $2
-    AND completed_at IS NULL`
-	tag, err := r.db.Exec(ctx, q, completedAt, id)
+func (r Todo) Update(ctx context.Context, id uuid.UUID, c scopes.TodoChangeSet) error {
+	var q impl.Of[model.Todo]
+	changes := c.Of()
+	q = q.Where(`id = `, id)
+	text, args, err := changes.RenderUpdate(impl.Postgres, "todos", []string{"title", "priority", "completed_at", "updated_at"}, q)
 	if err != nil {
-		return 0, r.mapError(fmt.Errorf("query Complete: %w", err))
+		return r.mapError(err)
 	}
-	return tag.RowsAffected(), nil
-}
-
-// Uncomplete runs the query of its name in todo_queries.sql.
-func (r Todo) Uncomplete(ctx context.Context, id uuid.UUID, updatedAt time.Time) (int64, error) {
-	const q = `UPDATE todos
-SET
-    completed_at = NULL,
-    updated_at = $1
-WHERE
-    id = $2
-    AND completed_at IS NOT NULL`
-	tag, err := r.db.Exec(ctx, q, updatedAt, id)
+	tag, err := r.db.Exec(ctx, text, args...)
 	if err != nil {
-		return 0, r.mapError(fmt.Errorf("query Uncomplete: %w", err))
+		return r.mapError(fmt.Errorf(`update todos: %w`, err))
 	}
-	return tag.RowsAffected(), nil
+	if tag.RowsAffected() == 0 {
+		return r.mapError(fmt.Errorf("no row of todos matches: %w", orm.ErrNotFound))
+	}
+	return nil
 }
 
 func (r Todo) Delete(ctx context.Context, id uuid.UUID) error {

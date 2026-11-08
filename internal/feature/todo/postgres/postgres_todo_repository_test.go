@@ -14,6 +14,7 @@ import (
 	"github.com/go-kanna/showcase/internal/feature/todo/model"
 	"github.com/go-kanna/showcase/internal/feature/todo/model/fixture"
 	"github.com/go-kanna/showcase/internal/feature/todo/postgres"
+	"github.com/go-kanna/showcase/internal/feature/todo/scopes"
 	"github.com/go-kanna/showcase/internal/infra/storage/tx"
 	"github.com/go-kanna/showcase/test/infra"
 )
@@ -143,7 +144,8 @@ func TestTodo_UpdateAndGet(t *testing.T) {
 	assert.WithinDuration(t, now, got.UpdatedAt, time.Millisecond)
 }
 
-func TestTodo_Complete(t *testing.T) {
+// Update writes the columns of the change set, and leaves the others as they were.
+func TestTodo_Update(t *testing.T) {
 	t.Parallel()
 
 	// arrange
@@ -156,49 +158,37 @@ func TestTodo_Complete(t *testing.T) {
 		require.NoError(t, sut.Bind(tx).Upsert(t.Context(), m))
 	})
 	now := time.Now()
+	c := scopes.TodoChanges().SetCompletedAt(new(model.MustCompletedAt(now))).SetUpdatedAt(now)
 
 	// act
 	ifr.InTx(t, func(tx tx.Tx) {
-		n, err := sut.Bind(tx).Complete(t.Context(), m.ID, now)
-		require.NoError(t, err)
-		assert.EqualValues(t, 1, n)
+		require.NoError(t, sut.Bind(tx).Update(t.Context(), m.ID, c))
 	})
 
 	// assert
 	got, err := sut.Get(t.Context(), m.ID)
 	require.NoError(t, err)
+	require.NotNil(t, got.CompletedAt)
 	assert.WithinDuration(t, now, got.CompletedAt.Time(), time.Millisecond)
 	assert.WithinDuration(t, now, got.UpdatedAt, time.Millisecond)
+	assert.Equal(t, m.Title, got.Title)
 }
 
-func TestTodo_Uncomplete(t *testing.T) {
+func TestTodo_UpdateNotFound(t *testing.T) {
 	t.Parallel()
 
 	// arrange
 	ifr := infra.New(t)
 	sut := postgres.NewTodo(ifr.Reader)
-	m := fixture.Todo(func(m *model.Todo) {
-		m.CompletedAt = new(model.MustCompletedAt(time.Now()))
-		m.UpdatedAt = time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
-	})
-	ifr.InTx(t, func(tx tx.Tx) {
-		require.NoError(t, sut.Bind(tx).Upsert(t.Context(), m))
-	})
-
-	now := time.Now()
 
 	// act
+	var err error
 	ifr.InTx(t, func(tx tx.Tx) {
-		n, err := sut.Bind(tx).Uncomplete(t.Context(), m.ID, now)
-		require.NoError(t, err)
-		assert.EqualValues(t, 1, n)
+		err = sut.Bind(tx).Update(t.Context(), fixture.Todo().ID, scopes.TodoChanges().SetUpdatedAt(time.Now()))
 	})
 
 	// assert
-	got, err := sut.Get(t.Context(), m.ID)
-	require.NoError(t, err)
-	assert.Nil(t, got.CompletedAt)
-	assert.WithinDuration(t, now, got.UpdatedAt, time.Millisecond)
+	require.ErrorIs(t, err, aerrors.ErrNotFound)
 }
 
 func TestTodo_Delete(t *testing.T) {
