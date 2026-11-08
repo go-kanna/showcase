@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-kanna/showcase/internal/errors/aerrors"
 	"github.com/go-kanna/showcase/internal/feature/todo/model"
+	"github.com/go-kanna/showcase/internal/feature/todo/projection"
 	"github.com/go-kanna/showcase/internal/feature/todo/repository"
 	"github.com/go-kanna/showcase/internal/feature/todo/scopes"
 	"github.com/go-kanna/showcase/internal/infra/storage/tx"
@@ -54,7 +55,7 @@ func (Completion) isListFilter() {}
 func (Priority) isListFilter()   {}
 
 type ListTodoOutput struct {
-	Todos         []model.TodoWithCommentCount
+	Todos         []projection.TodoWithCommentCount
 	NextPageToken string // empty on the last page
 }
 
@@ -96,7 +97,7 @@ func (uc ListTodo) Do(ctx context.Context, in ListTodoInput) (ListTodoOutput, er
 	}
 	size := int(cmp.Or(in.PageSize, defaultPageSize))
 
-	var ms []model.TodoWithCommentCount
+	var ms []projection.TodoWithCommentCount
 	if err := uc.transactor.WithReadTx(ctx, func(tx tx.Tx) error {
 		// One more than the page holds tells whether a page follows.
 		var err error

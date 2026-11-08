@@ -2,6 +2,7 @@ package mapper
 
 import (
 	"github.com/go-kanna/showcase/internal/feature/todo/model"
+	"github.com/go-kanna/showcase/internal/feature/todo/projection"
 	"github.com/go-kanna/showcase/internal/feature/todo/usecase"
 	todov1 "github.com/go-kanna/showcase/internal/gen/showcase/todo/v1"
 	"github.com/go-kanna/showcase/internal/lib/converter"
@@ -15,9 +16,9 @@ type _ interface {
 	// model.Todo it embeds, but for the ID, whose name differs in case.
 	//
 	//kanna:map Id=ID
-	TodoToProto(t model.TodoWithCommentCount) *todov1.Todo
+	TodoToProto(t projection.TodoWithCommentCount) *todov1.Todo
 	CommentToProto(c model.Comment) *todov1.Comment
-	CommentSummaryToProto(c usecase.CommentSummary) *todov1.CommentSummary
+	CommentSummaryToProto(c projection.CommentSummary) *todov1.CommentSummary
 
 	// TodoInputFromProto reads the to-do a PutTodo request carries. The
 	// request carries its completion apart from it.

@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/go-kanna/showcase/internal/feature/todo/model"
+	"github.com/go-kanna/showcase/internal/feature/todo/projection"
 	"github.com/go-kanna/showcase/internal/feature/todo/usecase"
 	todov1 "github.com/go-kanna/showcase/internal/gen/showcase/todo/v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -13,7 +14,7 @@ import (
 
 // TodoToProto converts a to-do of a list. Its fields come from the
 // model.Todo it embeds, but for the ID, whose name differs in case.
-func TodoToProto(t model.TodoWithCommentCount) *todov1.Todo {
+func TodoToProto(t projection.TodoWithCommentCount) *todov1.Todo {
 	var v *timestamppb.Timestamp
 	if v2 := t.CompletedAt; v2 != nil {
 		v = timestamppb.New((*v2).Time())
@@ -46,8 +47,8 @@ func CommentToProto(c model.Comment) *todov1.Comment {
 	}
 }
 
-// CommentSummaryToProto maps usecase.CommentSummary to *todov1.CommentSummary.
-func CommentSummaryToProto(c usecase.CommentSummary) *todov1.CommentSummary {
+// CommentSummaryToProto maps projection.CommentSummary to *todov1.CommentSummary.
+func CommentSummaryToProto(c projection.CommentSummary) *todov1.CommentSummary {
 	return &todov1.CommentSummary{
 		Id:        c.ID.String(),
 		Body:      c.Body,
@@ -125,8 +126,8 @@ func priorityToTodov1(src model.Priority) todov1.Priority {
 	return todov1.Priority_PRIORITY_UNSPECIFIED
 }
 
-// todoRefToTodov1 maps usecase.TodoRef to *todov1.TodoRef.
-func todoRefToTodov1(src usecase.TodoRef) *todov1.TodoRef {
+// todoRefToTodov1 maps projection.TodoRef to *todov1.TodoRef.
+func todoRefToTodov1(src projection.TodoRef) *todov1.TodoRef {
 	return &todov1.TodoRef{
 		Id:    src.ID.String(),
 		Title: src.Title,

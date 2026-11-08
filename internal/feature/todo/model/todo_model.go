@@ -54,15 +54,6 @@ type Todo struct {
 	Comments []Comment
 }
 
-// TodoWithCommentCount is a to-do with how many comments it has, which the
-// query adds to its row. The count stays out of Todo, which every other method
-// reads without it.
-type TodoWithCommentCount struct {
-	Todo
-
-	CommentCount int64
-}
-
 // Comment is a note left on a to-do.
 type Comment struct {
 	ID        uuid.UUID `orm:",default"` // the database's UUIDV7()
