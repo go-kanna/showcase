@@ -20,7 +20,7 @@ func TestTodoToProto_Priority(t *testing.T) {
 	m := fixture.Todo(func(m *model.Todo) { m.Priority = model.PriorityHigh })
 
 	// act
-	got := mapper.TodoToProto(usecase.TodoWithCommentCount{Todo: m})
+	got := mapper.TodoToProto(model.TodoWithCommentCount{Todo: m})
 
 	// assert
 	assert.Equal(t, todov1.Priority_PRIORITY_HIGH, got.GetPriority())
@@ -34,7 +34,7 @@ func TestTodoToProto_CommentCount(t *testing.T) {
 	m := fixture.Todo()
 
 	// act
-	got := mapper.TodoToProto(usecase.TodoWithCommentCount{Todo: m, CommentCount: 4})
+	got := mapper.TodoToProto(model.TodoWithCommentCount{Todo: m, CommentCount: 4})
 
 	// assert
 	assert.Equal(t, m.ID.String(), got.GetId())

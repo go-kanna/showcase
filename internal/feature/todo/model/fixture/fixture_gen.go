@@ -47,3 +47,19 @@ func Todo(setters ...func(*model.Todo)) model.Todo {
 	}
 	return x
 }
+
+var seqTodoWithCommentCount atomic.Int64
+
+// TodoWithCommentCount returns a new model.TodoWithCommentCount with every field it can fill set, then
+// applies setters in order.
+func TodoWithCommentCount(setters ...func(*model.TodoWithCommentCount)) model.TodoWithCommentCount {
+	n := seqTodoWithCommentCount.Add(1)
+	x := model.TodoWithCommentCount{
+		Todo:         Todo(),
+		CommentCount: n,
+	}
+	for _, set := range setters {
+		set(&x)
+	}
+	return x
+}

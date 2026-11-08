@@ -6,14 +6,6 @@ import (
 	"github.com/go-kanna/showcase/internal/feature/todo/repository"
 )
 
-// todoFromRepository maps repository.TodoWithCommentCount to usecase.TodoWithCommentCount.
-func todoFromRepository(t repository.TodoWithCommentCount) TodoWithCommentCount {
-	return TodoWithCommentCount{
-		Todo:         t.Todo,
-		CommentCount: t.CommentCount,
-	}
-}
-
 // commentSummaryFromRepository maps repository.CommentSummary to usecase.CommentSummary.
 func commentSummaryFromRepository(c repository.CommentSummary) CommentSummary {
 	return CommentSummary{

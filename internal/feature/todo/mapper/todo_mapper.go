@@ -15,7 +15,7 @@ type _ interface {
 	// model.Todo it embeds, but for the ID, whose name differs in case.
 	//
 	//kanna:map Id=ID
-	TodoToProto(t usecase.TodoWithCommentCount) *todov1.Todo
+	TodoToProto(t model.TodoWithCommentCount) *todov1.Todo
 	CommentToProto(c model.Comment) *todov1.Comment
 	CommentSummaryToProto(c usecase.CommentSummary) *todov1.CommentSummary
 

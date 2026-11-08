@@ -13,7 +13,7 @@ import (
 
 // TodoToProto converts a to-do of a list. Its fields come from the
 // model.Todo it embeds, but for the ID, whose name differs in case.
-func TodoToProto(t usecase.TodoWithCommentCount) *todov1.Todo {
+func TodoToProto(t model.TodoWithCommentCount) *todov1.Todo {
 	var v *timestamppb.Timestamp
 	if v2 := t.CompletedAt; v2 != nil {
 		v = timestamppb.New((*v2).Time())

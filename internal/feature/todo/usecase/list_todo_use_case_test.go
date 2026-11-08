@@ -261,7 +261,7 @@ func TestListTodo_LatestComments(t *testing.T) {
 	assert.NotNil(t, got.Todos[2].Comments, "loaded, with no comments")
 	assert.Empty(t, got.Todos[2].Comments)
 	// The count, which the query written by hand adds, counts them all.
-	assert.Equal(t, []int64{4, 1, 0}, xslices.Map(got.Todos, func(t usecase.TodoWithCommentCount) int64 {
+	assert.Equal(t, []int64{4, 1, 0}, xslices.Map(got.Todos, func(t model.TodoWithCommentCount) int64 {
 		return t.CommentCount
 	}))
 }

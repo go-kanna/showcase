@@ -10,7 +10,6 @@ import (
 	"github.com/go-kanna/showcase/internal/feature/todo/repository"
 	"github.com/go-kanna/showcase/internal/feature/todo/scopes"
 	"github.com/go-kanna/showcase/internal/infra/storage/tx"
-	"github.com/go-kanna/showcase/internal/lib/xslices"
 	"github.com/go-kanna/showcase/internal/messages"
 )
 
@@ -55,15 +54,8 @@ func (Completion) isListFilter() {}
 func (Priority) isListFilter()   {}
 
 type ListTodoOutput struct {
-	Todos         []TodoWithCommentCount
+	Todos         []model.TodoWithCommentCount
 	NextPageToken string // empty on the last page
-}
-
-// TodoWithCommentCount is a to-do of a list, with how many comments it has.
-type TodoWithCommentCount struct {
-	model.Todo
-
-	CommentCount int64
 }
 
 //kanna:container
@@ -104,7 +96,7 @@ func (uc ListTodo) Do(ctx context.Context, in ListTodoInput) (ListTodoOutput, er
 	}
 	size := int(cmp.Or(in.PageSize, defaultPageSize))
 
-	var ms []repository.TodoWithCommentCount
+	var ms []model.TodoWithCommentCount
 	if err := uc.transactor.WithReadTx(ctx, func(tx tx.Tx) error {
 		// One more than the page holds tells whether a page follows.
 		var err error
@@ -117,7 +109,7 @@ func (uc ListTodo) Do(ctx context.Context, in ListTodoInput) (ListTodoOutput, er
 		return ListTodoOutput{}, fmt.Errorf("list todos: %w", err)
 	}
 	if len(ms) <= size {
-		return ListTodoOutput{Todos: xslices.Map(ms, todoFromRepository)}, nil
+		return ListTodoOutput{Todos: ms}, nil
 	}
 
 	ms = ms[:size]
@@ -125,5 +117,5 @@ func (uc ListTodo) Do(ctx context.Context, in ListTodoInput) (ListTodoOutput, er
 	if err != nil {
 		return ListTodoOutput{}, fmt.Errorf("cursor: %w", err)
 	}
-	return ListTodoOutput{Todos: xslices.Map(ms, todoFromRepository), NextPageToken: next}, nil
+	return ListTodoOutput{Todos: ms, NextPageToken: next}, nil
 }

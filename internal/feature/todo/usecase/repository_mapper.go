@@ -7,6 +7,5 @@ import "github.com/go-kanna/showcase/internal/feature/todo/repository"
 //
 //kanna:mapper
 type _ interface {
-	todoFromRepository(t repository.TodoWithCommentCount) TodoWithCommentCount
 	commentSummaryFromRepository(c repository.CommentSummary) CommentSummary
 }
