@@ -10,7 +10,6 @@ import (
 	"github.com/go-kanna/showcase/internal/feature/todo/model"
 	"github.com/go-kanna/showcase/internal/feature/todo/model/fixture"
 	"github.com/go-kanna/showcase/internal/feature/todo/postgres"
-	"github.com/go-kanna/showcase/internal/feature/todo/repository"
 	"github.com/go-kanna/showcase/internal/feature/todo/usecase"
 	"github.com/go-kanna/showcase/internal/infra/storage/tx"
 	"github.com/go-kanna/showcase/test/infra"
@@ -47,11 +46,11 @@ func TestListRecentComments(t *testing.T) {
 	require.Len(t, got.Comments, 3)
 	for i, want := range []struct {
 		comment model.Comment
-		todo    repository.TodoRef
+		todo    usecase.TodoRef
 	}{
-		{comment: comments[2], todo: repository.TodoRef{ID: milk.ID, Title: "Buy milk"}},
-		{comment: comments[1], todo: repository.TodoRef{ID: dog.ID, Title: "Walk the dog"}},
-		{comment: comments[0], todo: repository.TodoRef{ID: milk.ID, Title: "Buy milk"}},
+		{comment: comments[2], todo: usecase.TodoRef{ID: milk.ID, Title: "Buy milk"}},
+		{comment: comments[1], todo: usecase.TodoRef{ID: dog.ID, Title: "Walk the dog"}},
+		{comment: comments[0], todo: usecase.TodoRef{ID: milk.ID, Title: "Buy milk"}},
 	} {
 		assert.Equal(t, want.comment.ID, got.Comments[i].ID)
 		assert.Equal(t, want.comment.Body, got.Comments[i].Body)
