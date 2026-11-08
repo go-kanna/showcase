@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 	"uuid"
 
 	"github.com/go-kanna/showcase/internal/errors/aerrors"
@@ -42,7 +41,7 @@ func (uc AddComment) Do(ctx context.Context, in AddCommentInput) (AddCommentOutp
 		// The database gives the comment its ID, which Insert reads back, and
 		// refuses a comment on a to-do that is not there.
 		var err error
-		c, err = uc.comments.Bind(tx).Insert(ctx, model.Comment{TodoID: todoID, Body: in.Body, CreatedAt: time.Now()})
+		c, err = uc.comments.Bind(tx).Insert(ctx, model.Comment{TodoID: todoID, Body: in.Body})
 		if errors.Is(err, aerrors.ErrNotFound) {
 			return aerrors.NotFound("todo").WithMessage(messages.TodoNotFound())
 		}

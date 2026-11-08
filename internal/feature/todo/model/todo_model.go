@@ -46,7 +46,7 @@ type Todo struct {
 	Title       string
 	Priority    Priority
 	CompletedAt *CompletedAt
-	CreatedAt   time.Time `orm:",insertonly"`
+	CreatedAt   time.Time
 	UpdatedAt   time.Time
 
 	// Comments is read by comments.todo_id, which the names of Todo and of the

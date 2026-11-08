@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-kanna/orm/option"
 	"github.com/go-kanna/value/rule"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/stretchr/testify/assert"
@@ -69,7 +70,8 @@ func TestTodo_InsertAndGet(t *testing.T) {
 
 	// arrange
 	ifr := infra.New(t)
-	sut := postgres.NewTodo(ifr.Reader)
+	clock := &infra.Clock{T: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)}
+	sut := postgres.NewTodo(ifr.Reader, option.WithClock(clock))
 	m := fixture.Todo(func(m *model.Todo) {
 		m.CompletedAt = new(model.MustCompletedAt(time.Now()))
 	})
@@ -86,8 +88,8 @@ func TestTodo_InsertAndGet(t *testing.T) {
 	assert.Equal(t, m.Title, got.Title)
 	assert.Equal(t, m.Priority, got.Priority)
 	assert.WithinDuration(t, m.CompletedAt.Time(), got.CompletedAt.Time(), time.Millisecond)
-	assert.WithinDuration(t, m.CreatedAt, got.CreatedAt, time.Millisecond)
-	assert.WithinDuration(t, m.UpdatedAt, got.UpdatedAt, time.Millisecond)
+	assert.WithinDuration(t, clock.T, got.CreatedAt, 0, "the repository's clock, not the model's value")
+	assert.WithinDuration(t, clock.T, got.UpdatedAt, 0)
 }
 
 // A row holding a priority the model has no constant for, as one written by a
@@ -120,16 +122,15 @@ func TestTodo_UpdateAndGet(t *testing.T) {
 
 	// arrange
 	ifr := infra.New(t)
-	sut := postgres.NewTodo(ifr.Reader)
+	clock := &infra.Clock{T: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)}
+	sut := postgres.NewTodo(ifr.Reader, option.WithClock(clock))
 	m := fixture.Todo()
 	ifr.InTx(t, func(tx tx.Tx) {
 		require.NoError(t, sut.Bind(tx).Upsert(t.Context(), m))
 	})
-	createdAt := m.CreatedAt
-	now := time.Now()
-	m.CompletedAt = new(model.MustCompletedAt(now))
-	m.CreatedAt = now
-	m.UpdatedAt = now
+	created := clock.T
+	clock.T = clock.T.Add(time.Hour)
+	m.CompletedAt = new(model.MustCompletedAt(clock.T))
 
 	// act
 	ifr.InTx(t, func(tx tx.Tx) {
@@ -139,26 +140,27 @@ func TestTodo_UpdateAndGet(t *testing.T) {
 	// assert
 	got, err := sut.Get(t.Context(), m.ID)
 	require.NoError(t, err)
-	assert.WithinDuration(t, now, got.CompletedAt.Time(), time.Millisecond)
-	assert.WithinDuration(t, createdAt, got.CreatedAt, time.Millisecond, "insertonly leaves it as it was")
-	assert.WithinDuration(t, now, got.UpdatedAt, time.Millisecond)
+	assert.WithinDuration(t, clock.T, got.CompletedAt.Time(), 0)
+	assert.WithinDuration(t, created, got.CreatedAt, 0, "an upsert of a row there is leaves its created_at")
+	assert.WithinDuration(t, clock.T, got.UpdatedAt, 0)
 }
 
-// Update writes the columns of the change set, and leaves the others as they were.
+// Update writes the columns of the change set and the time of the update, and
+// leaves the others as they were.
 func TestTodo_Update(t *testing.T) {
 	t.Parallel()
 
 	// arrange
 	ifr := infra.New(t)
-	sut := postgres.NewTodo(ifr.Reader)
-	m := fixture.Todo(func(m *model.Todo) {
-		m.UpdatedAt = time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
-	})
+	clock := &infra.Clock{T: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)}
+	sut := postgres.NewTodo(ifr.Reader, option.WithClock(clock))
+	m := fixture.Todo()
 	ifr.InTx(t, func(tx tx.Tx) {
 		require.NoError(t, sut.Bind(tx).Upsert(t.Context(), m))
 	})
-	now := time.Now()
-	c := scopes.TodoChanges().SetCompletedAt(new(model.MustCompletedAt(now))).SetUpdatedAt(now)
+	created := clock.T
+	clock.T = clock.T.Add(time.Hour)
+	c := scopes.TodoChanges().SetCompletedAt(new(model.MustCompletedAt(clock.T)))
 
 	// act
 	ifr.InTx(t, func(tx tx.Tx) {
@@ -169,8 +171,9 @@ func TestTodo_Update(t *testing.T) {
 	got, err := sut.Get(t.Context(), m.ID)
 	require.NoError(t, err)
 	require.NotNil(t, got.CompletedAt)
-	assert.WithinDuration(t, now, got.CompletedAt.Time(), time.Millisecond)
-	assert.WithinDuration(t, now, got.UpdatedAt, time.Millisecond)
+	assert.WithinDuration(t, clock.T, got.CompletedAt.Time(), 0)
+	assert.WithinDuration(t, clock.T, got.UpdatedAt, 0)
+	assert.WithinDuration(t, created, got.CreatedAt, 0)
 	assert.Equal(t, m.Title, got.Title)
 }
 
@@ -184,7 +187,7 @@ func TestTodo_UpdateNotFound(t *testing.T) {
 	// act
 	var err error
 	ifr.InTx(t, func(tx tx.Tx) {
-		err = sut.Bind(tx).Update(t.Context(), fixture.Todo().ID, scopes.TodoChanges().SetUpdatedAt(time.Now()))
+		err = sut.Bind(tx).Update(t.Context(), fixture.Todo().ID, scopes.TodoChanges().SetTitle("renamed"))
 	})
 
 	// assert

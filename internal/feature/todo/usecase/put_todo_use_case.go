@@ -37,16 +37,13 @@ func (uc PutTodo) Do(ctx context.Context, in PutTodoInput) (PutTodoOutput, error
 
 	id := either.Must(uuid.Parse(in.ID))
 	if err := uc.transactor.WithTx(ctx, func(tx tx.Tx) error {
-		// Upsert keeps the created_at of a to-do there is, as the insertonly tag of CreatedAt says, so nothing needs
-		// reading first.
-		now := time.Now()
+		// Upsert writes created_at on an insert alone and updated_at on both, by
+		// the repository's clock, so nothing needs reading first.
 		m := model.Todo{
 			ID:          id,
 			Title:       in.Title,
 			Priority:    in.Priority,
 			CompletedAt: ptr.Map(in.CompletedAt, model.MustCompletedAt),
-			CreatedAt:   now,
-			UpdatedAt:   now,
 		}
 		if err := uc.todos.Bind(tx).Upsert(ctx, m); err != nil {
 			return fmt.Errorf("upsert todo: %w", err)

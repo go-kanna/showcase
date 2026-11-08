@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-kanna/orm/option"
 	"github.com/go-kanna/validate"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -51,7 +52,8 @@ func TestPutTodo_Update(t *testing.T) {
 
 	// arrange
 	ifr := infra.New(t)
-	todos := postgres.NewTodo(ifr.Reader)
+	clock := &infra.Clock{T: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)}
+	todos := postgres.NewTodo(ifr.Reader, option.WithClock(clock))
 	m := fixture.Todo(func(m *model.Todo) {
 		m.CompletedAt = new(model.MustCompletedAt(time.Now()))
 	})
@@ -59,6 +61,8 @@ func TestPutTodo_Update(t *testing.T) {
 		err := todos.Bind(tx).Upsert(t.Context(), m)
 		require.NoError(t, err)
 	})
+	created := clock.T
+	clock.T = clock.T.Add(time.Hour)
 	title := m.Title + " (updated)"
 
 	// act
@@ -75,8 +79,8 @@ func TestPutTodo_Update(t *testing.T) {
 	assert.Equal(t, m.ID, got.ID)
 	assert.Equal(t, title, got.Title)
 	assert.Nil(t, got.CompletedAt)
-	assert.WithinDuration(t, m.CreatedAt, got.CreatedAt, time.Millisecond)
-	assert.WithinDuration(t, time.Now(), got.UpdatedAt, time.Second)
+	assert.WithinDuration(t, created, got.CreatedAt, 0)
+	assert.WithinDuration(t, clock.T, got.UpdatedAt, 0)
 }
 
 // The rest need no database: the input is checked before any repository is
