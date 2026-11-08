@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"time"
 	"uuid"
 
 	"github.com/go-kanna/showcase/internal/feature/todo/model"
@@ -22,8 +21,7 @@ type Todo interface {
 	ListWithCommentCounts(ctx context.Context, s ...scopes.Todo) ([]TodoWithCommentCount, error)
 	//kanna:conflict id
 	Upsert(ctx context.Context, m model.Todo) error
-	Complete(ctx context.Context, id uuid.UUID, completedAt time.Time) (int64, error)
-	Uncomplete(ctx context.Context, id uuid.UUID, updatedAt time.Time) (int64, error)
+	Update(ctx context.Context, id uuid.UUID, c scopes.TodoChangeSet) error
 	Delete(ctx context.Context, id uuid.UUID) error
 	Bind(tx tx.Tx) Todo
 }

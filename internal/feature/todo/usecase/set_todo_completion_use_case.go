@@ -8,7 +8,9 @@ import (
 	"uuid"
 
 	"github.com/go-kanna/showcase/internal/errors/aerrors"
+	"github.com/go-kanna/showcase/internal/feature/todo/model"
 	"github.com/go-kanna/showcase/internal/feature/todo/repository"
+	"github.com/go-kanna/showcase/internal/feature/todo/scopes"
 	"github.com/go-kanna/showcase/internal/infra/storage/tx"
 	"github.com/go-kanna/showcase/internal/lib/either"
 	"github.com/go-kanna/showcase/internal/messages"
@@ -37,23 +39,32 @@ func (uc SetTodoCompletion) Do(ctx context.Context, in SetTodoCompletionInput) (
 	id := either.Must(uuid.Parse(in.TodoID))
 	if err := uc.transactor.WithTx(ctx, func(tx tx.Tx) error {
 		todos := uc.todos.Bind(tx)
-		_, err := todos.GetForUpdate(ctx, id)
+		m, err := todos.GetForUpdate(ctx, id)
 		if errors.Is(err, aerrors.ErrNotFound) {
 			return aerrors.NotFound("todo").WithMessage(messages.TodoNotFound())
 		}
 		if err != nil {
 			return fmt.Errorf("find todo: %w", err)
 		}
-		if in.Completed {
-			_, err := todos.Complete(ctx, id, time.Now())
-			if err != nil {
-				return fmt.Errorf("complete: %w", err)
-			}
+		// A to-do already in the state asked for is left as it is, its
+		// updated_at included.
+		if in.Completed == (m.CompletedAt != nil) {
 			return nil
 		}
-		_, err = todos.Uncomplete(ctx, id, time.Now())
-		if err != nil {
-			return fmt.Errorf("uncomplete: %w", err)
+
+		now := time.Now()
+		c := scopes.TodoChanges().SetUpdatedAt(now)
+		if in.Completed {
+			at, err := model.NewCompletedAt(now)
+			if err != nil {
+				return fmt.Errorf("completed at: %w", err)
+			}
+			c = c.SetCompletedAt(&at)
+		} else {
+			c = c.SetCompletedAt(nil)
+		}
+		if err := todos.Update(ctx, id, c); err != nil {
+			return fmt.Errorf("update todo: %w", err)
 		}
 		return nil
 	}); err != nil {
