@@ -14,6 +14,7 @@ import (
 	"github.com/go-kanna/orm/option"
 	kpgx "github.com/go-kanna/orm/pgx"
 	"github.com/go-kanna/showcase/internal/feature/todo/model"
+	"github.com/go-kanna/showcase/internal/feature/todo/projection"
 	"github.com/go-kanna/showcase/internal/feature/todo/repository"
 	"github.com/go-kanna/showcase/internal/feature/todo/scopes"
 	"github.com/go-kanna/showcase/internal/infra/storage/tx"
@@ -99,7 +100,7 @@ RETURNING id, todo_id, body, created_at`
 	return row, nil
 }
 
-func (r Comment) ListSummaries(ctx context.Context, s ...scopes.Comment) ([]repository.CommentSummary, error) {
+func (r Comment) ListSummaries(ctx context.Context, s ...scopes.Comment) ([]projection.CommentSummary, error) {
 	qs := make([]impl.Of[model.Comment], len(s))
 	for i, x := range s {
 		qs[i] = impl.Of[model.Comment](x.Of())
@@ -117,9 +118,9 @@ func (r Comment) ListSummaries(ctx context.Context, s ...scopes.Comment) ([]repo
 		return nil, r.mapError(commentOperationListSummaries, fmt.Errorf("project comments: %w", err))
 	}
 	defer rows.Close()
-	out := []repository.CommentSummary{}
+	out := []projection.CommentSummary{}
 	for rows.Next() {
-		var row repository.CommentSummary
+		var row projection.CommentSummary
 		if err := rows.Scan(&row.ID, &row.Body, &row.CreatedAt, &row.Todo.ID, &row.Todo.Title); err != nil {
 			return nil, r.mapError(commentOperationListSummaries, fmt.Errorf("project comments: %w", err))
 		}
@@ -180,7 +181,7 @@ func (r Todo) GetForUpdate(ctx context.Context, id uuid.UUID) (model.Todo, error
 }
 
 // ListWithCommentCounts runs the query of its name in todo_queries.sql.
-func (r Todo) ListWithCommentCounts(ctx context.Context, s ...scopes.Todo) ([]model.TodoWithCommentCount, error) {
+func (r Todo) ListWithCommentCounts(ctx context.Context, s ...scopes.Todo) ([]projection.TodoWithCommentCount, error) {
 	qs := make([]impl.Of[model.Todo], len(s))
 	for i, x := range s {
 		qs[i] = impl.Of[model.Todo](x.Of())
@@ -208,11 +209,11 @@ SELECT todos.id, todos.title, todos.priority, todos.completed_at, todos.created_
 		return nil, r.mapError(fmt.Errorf("query ListWithCommentCounts: %w", err))
 	}
 	defer rows.Close()
-	out := []model.TodoWithCommentCount{}
-	var row model.TodoWithCommentCount
+	out := []projection.TodoWithCommentCount{}
+	var row projection.TodoWithCommentCount
 	dest := []any{&row.Todo.ID, &row.Todo.Title, &row.Todo.Priority, &row.Todo.CompletedAt, &row.Todo.CreatedAt, &row.Todo.UpdatedAt, &row.CommentCount}
 	for rows.Next() {
-		row = model.TodoWithCommentCount{}
+		row = projection.TodoWithCommentCount{}
 		if err := rows.Scan(dest...); err != nil {
 			return nil, r.mapError(fmt.Errorf("query ListWithCommentCounts: %w", err))
 		}

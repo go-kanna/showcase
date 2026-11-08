@@ -9,6 +9,7 @@ import (
 	"github.com/go-kanna/showcase/internal/feature/todo/mapper"
 	"github.com/go-kanna/showcase/internal/feature/todo/model"
 	"github.com/go-kanna/showcase/internal/feature/todo/model/fixture"
+	"github.com/go-kanna/showcase/internal/feature/todo/projection"
 	"github.com/go-kanna/showcase/internal/feature/todo/usecase"
 	todov1 "github.com/go-kanna/showcase/internal/gen/showcase/todo/v1"
 )
@@ -20,7 +21,7 @@ func TestTodoToProto_Priority(t *testing.T) {
 	m := fixture.Todo(func(m *model.Todo) { m.Priority = model.PriorityHigh })
 
 	// act
-	got := mapper.TodoToProto(model.TodoWithCommentCount{Todo: m})
+	got := mapper.TodoToProto(projection.TodoWithCommentCount{Todo: m})
 
 	// assert
 	assert.Equal(t, todov1.Priority_PRIORITY_HIGH, got.GetPriority())
@@ -34,7 +35,7 @@ func TestTodoToProto_CommentCount(t *testing.T) {
 	m := fixture.Todo()
 
 	// act
-	got := mapper.TodoToProto(model.TodoWithCommentCount{Todo: m, CommentCount: 4})
+	got := mapper.TodoToProto(projection.TodoWithCommentCount{Todo: m, CommentCount: 4})
 
 	// assert
 	assert.Equal(t, m.ID.String(), got.GetId())
