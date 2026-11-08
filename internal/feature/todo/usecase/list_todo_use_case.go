@@ -54,7 +54,7 @@ func (Completion) isListFilter() {}
 func (Priority) isListFilter()   {}
 
 type ListTodoOutput struct {
-	Todos         []repository.TodoWithCommentCount
+	Todos         []model.TodoWithCommentCount
 	NextPageToken string // empty on the last page
 }
 
@@ -96,7 +96,7 @@ func (uc ListTodo) Do(ctx context.Context, in ListTodoInput) (ListTodoOutput, er
 	}
 	size := int(cmp.Or(in.PageSize, defaultPageSize))
 
-	var ms []repository.TodoWithCommentCount
+	var ms []model.TodoWithCommentCount
 	if err := uc.transactor.WithReadTx(ctx, func(tx tx.Tx) error {
 		// One more than the page holds tells whether a page follows.
 		var err error

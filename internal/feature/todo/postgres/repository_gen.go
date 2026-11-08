@@ -181,7 +181,7 @@ func (r Todo) GetForUpdate(ctx context.Context, id uuid.UUID) (model.Todo, error
 }
 
 // ListWithCommentCounts runs the query of its name in todo_queries.sql.
-func (r Todo) ListWithCommentCounts(ctx context.Context, s ...scopes.Todo) ([]repository.TodoWithCommentCount, error) {
+func (r Todo) ListWithCommentCounts(ctx context.Context, s ...scopes.Todo) ([]model.TodoWithCommentCount, error) {
 	qs := make([]impl.Of[model.Todo], len(s))
 	for i, x := range s {
 		qs[i] = impl.Of[model.Todo](x.Of())
@@ -209,11 +209,11 @@ SELECT todos.id, todos.title, todos.priority, todos.completed_at, todos.created_
 		return nil, r.mapError(fmt.Errorf("query ListWithCommentCounts: %w", err))
 	}
 	defer rows.Close()
-	out := []repository.TodoWithCommentCount{}
-	var row repository.TodoWithCommentCount
+	out := []model.TodoWithCommentCount{}
+	var row model.TodoWithCommentCount
 	dest := []any{&row.Todo.ID, &row.Todo.Title, &row.Todo.Priority, &row.Todo.CompletedAt, &row.Todo.CreatedAt, &row.Todo.UpdatedAt, &row.CommentCount}
 	for rows.Next() {
-		row = repository.TodoWithCommentCount{}
+		row = model.TodoWithCommentCount{}
 		if err := rows.Scan(dest...); err != nil {
 			return nil, r.mapError(fmt.Errorf("query ListWithCommentCounts: %w", err))
 		}
