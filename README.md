@@ -7,7 +7,7 @@ application. Each generator takes over a piece of code you would otherwise write
 settings, validation, mappings between layers, test fixtures, typed messages, value types, and the database code behind
 a repository. Everything it writes is committed, so you can read it next to what it was generated from.
 
-To build a blog JSON API step by step with orm, validator, mapper, di, and fixture, follow the [tutorial](tutorial/README.md). Its VHS tape records the same walkthrough without manual screen capture.
+To build a blog JSON API step by step with orm, validator, mapper, di, and fixture, follow the [tutorial](tutorial/README.md). Its VHS tape types and records the same walkthrough.
 
 Requires Go 1.27, Docker with Compose, and the [buf](https://buf.build/docs/cli/installation/) CLI.
 

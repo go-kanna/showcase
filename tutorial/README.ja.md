@@ -4,7 +4,7 @@
 
 Go で記事の作成・一覧・詳細・更新・削除を実装し、動くブログにコメントを追加します。[Rails 8: The Demo](https://www.youtube.com/watch?v=X_Hw9P1iZfQ) の構成を参考に、画面の代わりに JSON API を使います。モデルはタイトルと本文を持つ `Post` と、内容と記事 ID を持つ `Comment` です。どちらにも整数 ID と作成・更新日時を持たせます。
 
-[VHS の台本](demo.tape) は、Vim で 1 文字あたり 60〜90ms で入力し、保存・生成・API 呼び出しまで実行します。[render.go](render.go) がリンク先のソースから Vim のシーンを生成します。ツール別の紹介ではなく、記事、コメント、fixture とテストの順にアプリを育てます。録画の長さは、初見の読者が完成させるまでの所要時間とは異なります。
+[VHS の台本](demo.tape) は、Vim で 1 文字あたり 60〜90ms で入力し、保存・生成・API 呼び出しまで実行します。[render.go](render.go) がリンク先のソースから Vim のシーンを生成します。録画は、記事、コメント、fixture とテストの順に、アプリを作る流れをたどります。録画の長さは、初見の読者が完成させるまでの所要時間とは異なります。
 
 ## 準備
 
@@ -19,7 +19,7 @@ cd tmp/tutorial
 mkdir -p model scopes repository postgres mapper
 ```
 
-準備では、独立した `example.com/blog` モジュールを作り、固定バージョンのツールを登録し、専用 PostgreSQL コンテナを localhost の自動割り当てポートで起動して、[posts.sql](posts.sql) を適用します。共通の [HTTP/JSON ヘルパー](files/http.go.txt) と [不正なリクエストのテスト](files/api_test.go.txt) も配置します。この 2 ファイルは準備済みの土台であり、生成コードでも、動画中に入力するコードでもありません。初回のダウンロードと DB 起動は録画の前に済ませます。
+準備では、独立した `example.com/blog` モジュールを作り、固定バージョンのツールを登録し、専用 PostgreSQL コンテナを localhost の自動割り当てポートで起動して、[posts.sql](posts.sql) を適用します。共通の [HTTP/JSON ヘルパー](files/http.go.txt) と [不正なリクエストのテスト](files/api_test.go.txt) も配置します。どちらのファイルも、録画では入力せず、生成器も書きません。初回のダウンロードと DB 起動は録画の前に済ませます。
 
 アプリのファイルは `tmp/tutorial` に置かれます。既存の作業ディレクトリは上書きしません。`LESSON` は、このチュートリアルのソースディレクトリです。以下の `vim` コマンドでは、リンク先の内容を入力し、`Esc`、`:wq`、`Enter` で保存してください。
 
@@ -129,7 +129,7 @@ PATH="/opt/homebrew/bin:$PATH" vhs tutorial/demo.tape
 docker compose -p kanna-tutorial -f tutorial/compose.yaml down
 ```
 
-VHS は profile と rc ファイルを読まない Bash を使います。Apple Silicon の macOS では PATH の指定で Homebrew の Bash を選びます。他の環境では `vhs tutorial/demo.tape` で PATH 上の Bash を使います。出力は `tmp/blog-tutorial.mp4` です。各コマンドはプロンプトを待ち、失敗するとシェルを終了します。この例では UUID の変換を追加せず、mapper によるフィールドと入れ子の構造体の変換を見せます。
+VHS は profile と rc ファイルを読まない Bash を使います。Apple Silicon の macOS では PATH の指定で Homebrew の Bash を選びます。他の環境では `vhs tutorial/demo.tape` で PATH 上の Bash を使います。出力は `tmp/blog-tutorial.mp4` です。各コマンドはプロンプトを待ち、失敗するとシェルを終了します。
 
 録画し直す場合は、DB を停止し、`tmp/tutorial` を別の場所に移動してから、もう一度準備してください。専用 PostgreSQL のコンテナを停止するとデータは破棄されます。ソースと生成されたアプリは `tmp/tutorial` に残ります。HTTP の日時、kanna-orm が書き込む日時、実行時間は録画ごとに変わります。
 

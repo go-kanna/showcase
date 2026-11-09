@@ -4,7 +4,7 @@
 
 Write a blog in Go: create, list, read, update, and delete posts, then add comments to the working app. Inspired by [Rails 8: The Demo](https://www.youtube.com/watch?v=X_Hw9P1iZfQ), this walkthrough uses a JSON API instead of browser pages. Its models are `Post` with a title and body, and `Comment` with content and a post ID. Both have integer IDs and timestamps.
 
-The [VHS tape](demo.tape) types the code in Vim at 60–90 ms per character, saves it, runs the generators, and calls the API. [render.go](render.go) generates the Vim scenes from the linked source files. The recording follows the app's development: posts first, comments second, then fixtures and tests. Recording duration measures scripted typing, not a first-time reader's completion time.
+The [VHS tape](demo.tape) types the code in Vim at 60 to 90 ms per character, saves it, runs the generators, and calls the API. [render.go](render.go) generates the Vim scenes from the linked source files. The recording follows the app's development: posts first, comments second, then fixtures and tests. Recording duration measures scripted typing, not a first-time reader's completion time.
 
 ## Prepare
 
@@ -19,7 +19,7 @@ cd tmp/tutorial
 mkdir -p model scopes repository postgres mapper
 ```
 
-Preparation creates a separate `example.com/blog` module, installs pinned tool versions, starts a dedicated PostgreSQL container on an automatically assigned localhost port, and applies [posts.sql](posts.sql). It also provides the common [HTTP/JSON helpers](files/http.go.txt) and [invalid-request tests](files/api_test.go.txt). These two files are supplied infrastructure, not generator output or code typed during the recording. Initial downloads and database startup happen before recording.
+Preparation creates a separate `example.com/blog` module, installs pinned tool versions, starts a dedicated PostgreSQL container on an automatically assigned localhost port, and applies [posts.sql](posts.sql). It also provides the common [HTTP/JSON helpers](files/http.go.txt) and [invalid-request tests](files/api_test.go.txt). Neither file is typed in the recording or written by a generator. Initial downloads and database startup happen before recording.
 
 All app files live in `tmp/tutorial`. Preparation refuses to overwrite an existing workspace. `LESSON` points to this tutorial's source directory. For each `vim` command below, enter the linked file's contents and save with `Esc`, `:wq`, `Enter`.
 
@@ -129,7 +129,7 @@ PATH="/opt/homebrew/bin:$PATH" vhs tutorial/demo.tape
 docker compose -p kanna-tutorial -f tutorial/compose.yaml down
 ```
 
-VHS uses Bash without profile or rc files. The PATH prefix selects Homebrew Bash on Apple Silicon macOS; elsewhere, `vhs tutorial/demo.tape` uses Bash on PATH. The output is `tmp/blog-tutorial.mp4`. Each command waits for the prompt, and command failures exit the shell. UUID conversion is not part of this example; mapper demonstrates field and nested-struct mapping.
+VHS uses Bash without profile or rc files. The PATH prefix selects Homebrew Bash on Apple Silicon macOS; elsewhere, `vhs tutorial/demo.tape` uses Bash on PATH. The output is `tmp/blog-tutorial.mp4`. Each command waits for the prompt, and command failures exit the shell.
 
 Before recording again, stop the database and move `tmp/tutorial` aside, then prepare a fresh run. Stopping the dedicated PostgreSQL container discards its data. The source and generated app files remain available in `tmp/tutorial`. HTTP dates, generated timestamps, and timings vary between recordings.
 
