@@ -53,7 +53,7 @@ func TestTodoInputFromProto_Priority(t *testing.T) {
 		wantErr string
 	}{
 		{name: "a value the model has", in: todov1.Priority_PRIORITY_LOW, want: model.PriorityLow},
-		// validate's required reports the zero value as blank.
+		// kanna-validator's required reports the zero value as blank.
 		{name: "left unspecified", in: todov1.Priority_PRIORITY_UNSPECIFIED, want: ""},
 		{
 			name:    "a number nobody declared",
