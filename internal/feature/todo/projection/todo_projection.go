@@ -1,6 +1,5 @@
 // Package projection holds what the queries of the repositories return besides
-// the models, for every layer to read. It stays apart from package model, whose
-// structs kanna-orm takes for models once a table of their name is made.
+// the models, for every layer to read.
 package projection
 
 import (
