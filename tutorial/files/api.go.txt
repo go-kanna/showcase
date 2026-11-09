@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
@@ -38,10 +37,7 @@ func (a API) createPost(w http.ResponseWriter, r *http.Request) {
 	if !readJSON(w, r, &in) {
 		return
 	}
-	now := time.Now()
-	post, err := a.posts.Insert(r.Context(), model.Post{
-		Title: in.Title, Body: in.Body, CreatedAt: now, UpdatedAt: now,
-	})
+	post, err := a.posts.Insert(r.Context(), model.Post{Title: in.Title, Body: in.Body})
 	respond(w, http.StatusCreated, mapper.PostToResponse(post), err)
 }
 
@@ -72,13 +68,7 @@ func (a API) updatePost(w http.ResponseWriter, r *http.Request) {
 	if !readJSON(w, r, &in) {
 		return
 	}
-	post, err := a.posts.Get(r.Context(), id)
-	if err != nil {
-		respond(w, 0, nil, err)
-		return
-	}
-	post.Title, post.Body, post.UpdatedAt = in.Title, in.Body, time.Now()
-	err = a.posts.Update(r.Context(), post)
+	post, err := a.posts.Update(r.Context(), model.Post{ID: id, Title: in.Title, Body: in.Body})
 	respond(w, http.StatusOK, mapper.PostToResponse(post), err)
 }
 

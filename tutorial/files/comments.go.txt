@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"time"
 
 	"example.com/blog/mapper"
 	"example.com/blog/model"
@@ -22,10 +21,7 @@ func (a API) createComment(w http.ResponseWriter, r *http.Request) {
 		respond(w, 0, nil, err)
 		return
 	}
-	now := time.Now()
-	if _, err := a.comments.Insert(r.Context(), model.Comment{
-		PostID: id, Content: in.Content, CreatedAt: now, UpdatedAt: now,
-	}); err != nil {
+	if _, err := a.comments.Insert(r.Context(), model.Comment{PostID: id, Content: in.Content}); err != nil {
 		respond(w, 0, nil, err)
 		return
 	}

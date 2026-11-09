@@ -37,15 +37,15 @@ go tool kanna-orm describe ./...
 go generate ./scopes ./repository
 ```
 
-`postgres/orm_gen.go` には、INSERT・SELECT・UPDATE・DELETE と、行をモデルへ読み込む Go コードがあります。identity 列は PostgreSQL が採番します。日時は ORM が自動設定するのではなく、アプリで設定します。その後の生成は `kanna-orm.snapshot.json` を読み、DB への接続は不要です。
+`postgres/repository_gen.go` には、INSERT・SELECT・UPDATE・DELETE と、行をモデルへ読み込む Go コードがあります。identity 列は PostgreSQL が採番します。`CreatedAt` と `UpdatedAt` は、名前で決まる規約で kanna-orm が書き込みます。作成時は両方を、更新時は `UpdatedAt` を書き、更新は保存した行を返します。その後の生成は `kanna-orm.snapshot.json` を読み、DB への接続は不要です。
 
 ## 2. 入力・レスポンス変換・API を追加する
 
-[SavePost](files/input.go.txt)、[初期のレスポンス変換](files/post_mapper_base.go.txt)、[API の処理とコンテナ](files/api.go.txt)、[main](files/main.go.txt) を書きます。validate はタイトルの検証を、mapper はモデルから独立した JSON レスポンスへの変換を生成します。di は引数のプールから、指定した PostgreSQL の Repository を構築します。
+[SavePost](files/input.go.txt)、[初期のレスポンス変換](files/post_mapper_base.go.txt)、[API の処理とコンテナ](files/api.go.txt)、[main](files/main.go.txt) を書きます。validator はタイトルの検証を、mapper はモデルから独立した JSON レスポンスへの変換を生成します。di は引数のプールから、指定した PostgreSQL の Repository を構築します。
 
 ```sh
 vim input.go
-go tool kanna-validate
+go tool kanna-validator
 vim mapper/mapper.go
 go generate ./mapper
 vim api.go
@@ -90,11 +90,11 @@ vim api.go
 ```sh
 go tool kanna-orm describe ./...
 go generate ./scopes ./repository ./mapper
-go tool kanna-validate
+go tool kanna-validator
 go tool kanna-di
 ```
 
-[comments.sql](comments.sql) の外部キーから orm が関連を読み込みます。生成された mapper は、読み込んだコメントを入れ子のレスポンスへ変換します。`ON DELETE CASCADE` により、記事を削除するとコメントも削除されます。
+`Comments []Comment` は、名前から決まる `comments.post_id` で orm が読み込みます。生成された mapper は、読み込んだコメントを入れ子のレスポンスへ変換します。[comments.sql](comments.sql) の外部キーの `ON DELETE CASCADE` により、記事を削除するとコメントも削除されます。
 
 ## 4. fixture を生成し、テストして完成した API を使う
 
@@ -131,7 +131,7 @@ docker compose -p kanna-tutorial -f tutorial/compose.yaml down
 
 VHS は profile と rc ファイルを読まない Bash を使います。Apple Silicon の macOS では PATH の指定で Homebrew の Bash を選びます。他の環境では `vhs tutorial/demo.tape` で PATH 上の Bash を使います。出力は `tmp/blog-tutorial.mp4` です。各コマンドはプロンプトを待ち、失敗するとシェルを終了します。この例では UUID の変換を追加せず、mapper によるフィールドと入れ子の構造体の変換を見せます。
 
-録画し直す場合は、DB を停止し、`tmp/tutorial` を別の場所に移動してから、もう一度準備してください。専用 PostgreSQL のコンテナを停止するとデータは破棄されます。ソースと生成されたアプリは `tmp/tutorial` に残ります。HTTP の日時、モデルに設定する日時、実行時間は録画ごとに変わります。
+録画し直す場合は、DB を停止し、`tmp/tutorial` を別の場所に移動してから、もう一度準備してください。専用 PostgreSQL のコンテナを停止するとデータは破棄されます。ソースと生成されたアプリは `tmp/tutorial` に残ります。HTTP の日時、kanna-orm が書き込む日時、実行時間は録画ごとに変わります。
 
 ## キャプション
 
@@ -141,7 +141,7 @@ VHS は profile と rc ファイルを読まない Bash を使います。Apple 
 go run tutorial/caption.go
 ```
 
-元動画を残し、`tmp/blog-tutorial-captioned.mp4` と、同名の `.srt`・`.vtt` 字幕ファイルを出力します。コードが隠れないよう、ターミナルの下に字幕用の帯を追加します。文面と表示時刻は [captions.json](captions.json) で変更できます。現在の時刻は 14 分 48 秒の録画に合わせているため、録り直した場合は対応する場面を確認してください。既定のフォントは macOS の Helvetica です。他の環境では `-font DejaVu-Sans` のように、ImageMagick で使えるフォントを指定してください。
+元動画を残し、`tmp/blog-tutorial-captioned.mp4` と、同名の `.srt`・`.vtt` 字幕ファイルを出力します。コードが隠れないよう、ターミナルの下に字幕用の帯を追加します。文面と表示時刻は [captions.json](captions.json) で変更できます。現在の時刻は 14 分 30 秒の録画に合わせているため、録り直した場合は対応する場面を確認してください。既定のフォントは macOS の Helvetica です。他の環境では `-font DejaVu-Sans` のように、ImageMagick で使えるフォントを指定してください。
 
 日本語版は [captions.ja.json](captions.ja.json) と日本語フォントを指定します。macOS では以下を実行します。
 

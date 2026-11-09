@@ -1,6 +1,6 @@
 package main
 
-//go:generate go tool kanna-validate
+//go:generate go tool kanna-validator
 
 //kanna:validate
 type SavePost struct {
