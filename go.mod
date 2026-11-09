@@ -5,7 +5,7 @@ go 1.27.3
 require (
 	github.com/go-kanna/config v0.0.4
 	github.com/go-kanna/i18n v0.0.21
-	github.com/go-kanna/orm v0.0.34
+	github.com/go-kanna/orm v0.0.36
 	github.com/go-kanna/validator v0.0.27
 	github.com/go-kanna/value v0.0.18
 	github.com/jackc/pgx/v5 v5.12.0
