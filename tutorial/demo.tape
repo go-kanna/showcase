@@ -37,7 +37,7 @@ Wait+Line@5m /blog>/
 Type "go generate ./scopes ./repository"
 Enter
 Wait+Line@5m /blog>/
-Type "sed -n '55,95p' postgres/orm_gen.go"
+Type "sed -n '113,143p' postgres/repository_gen.go"
 Enter
 Wait+Line@5m /blog>/
 Sleep 3s
@@ -45,7 +45,7 @@ Ctrl+L
 
 # Give the API an input and a separate JSON response.
 Source tmp/tutorial-tapes/input.tape
-Type "go tool kanna-validate"
+Type "go tool kanna-validator"
 Enter
 Wait+Line@5m /blog>/
 Source tmp/tutorial-tapes/post_mapper_base.tape
@@ -173,13 +173,13 @@ Wait+Line@5m /blog>/
 Type "go generate ./scopes ./repository ./mapper"
 Enter
 Wait+Line@5m /blog>/
-Type "go tool kanna-validate"
+Type "go tool kanna-validator"
 Enter
 Wait+Line@5m /blog>/
 Type "go tool kanna-di"
 Enter
 Wait+Line@5m /blog>/
-Type "sed -n '8,36p' mapper/mapper_gen.go"
+Type "sed -n '9,37p' mapper/mapper_gen.go"
 Enter
 Wait+Line@5m /blog>/
 Sleep 3s

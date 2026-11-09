@@ -8,12 +8,12 @@ import (
 	"strconv"
 
 	"github.com/go-kanna/orm"
-	"github.com/go-kanna/validate"
+	"github.com/go-kanna/validator"
 )
 
-func readJSON(w http.ResponseWriter, r *http.Request, dst any) bool {
-	if err := validate.DecodeJSON(http.MaxBytesReader(w, r.Body, 1<<20), dst); err != nil {
-		if errs, ok := errors.AsType[validate.Errors](err); ok {
+func readJSON(w http.ResponseWriter, r *http.Request, dst interface{ Validate() error }) bool {
+	if err := validator.DecodeJSON(http.MaxBytesReader(w, r.Body, 1<<20), dst); err != nil {
+		if errs, ok := errors.AsType[validator.Errors](err); ok {
 			respond(w, http.StatusUnprocessableEntity, map[string]any{"errors": errs}, nil)
 		} else {
 			http.Error(w, "invalid JSON", http.StatusBadRequest)

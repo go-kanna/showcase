@@ -37,7 +37,7 @@ go tool kanna-orm describe ./...
 go generate ./scopes ./repository
 ```
 
-Read `postgres/orm_gen.go`: the INSERT, SELECT, UPDATE, DELETE, and row scanning are ordinary Go and SQL. Identity columns are assigned by PostgreSQL. Timestamps are set by the app, rather than automatically by the ORM. Subsequent generation reads `kanna-orm.snapshot.json` without connecting to the database.
+Read `postgres/repository_gen.go`: the INSERT, SELECT, UPDATE, DELETE, and row scanning are ordinary Go and SQL. Identity columns are assigned by PostgreSQL. kanna-orm writes `CreatedAt` and `UpdatedAt`, known by their names: both on an insert, and `UpdatedAt` on an update, which returns the row as stored. Subsequent generation reads `kanna-orm.snapshot.json` without connecting to the database.
 
 ## 2. Add the input, response mapping, and API
 
@@ -45,7 +45,7 @@ Write [SavePost](files/input.go.txt), the [initial response mapping](files/post_
 
 ```sh
 vim input.go
-go tool kanna-validate
+go tool kanna-validator
 vim mapper/mapper.go
 go generate ./mapper
 vim api.go
@@ -90,11 +90,11 @@ Make these edits to the existing files, as the tape demonstrates:
 ```sh
 go tool kanna-orm describe ./...
 go generate ./scopes ./repository ./mapper
-go tool kanna-validate
+go tool kanna-validator
 go tool kanna-di
 ```
 
-The foreign key in [comments.sql](comments.sql) gives orm the relation to load. The generated mapper converts the loaded comments into nested response values. Deleting a post also deletes its comments through `ON DELETE CASCADE`.
+orm reads `Comments []Comment` through `comments.post_id`, the column the names imply. The generated mapper converts the loaded comments into nested response values. Deleting a post also deletes its comments through the `ON DELETE CASCADE` of the foreign key in [comments.sql](comments.sql).
 
 ## 4. Generate fixtures, test, and use the complete API
 
@@ -141,7 +141,7 @@ After recording, use Go, ImageMagick (`magick`), and ffmpeg to add captions:
 go run tutorial/caption.go
 ```
 
-This preserves the original video and writes `tmp/blog-tutorial-captioned.mp4`, plus matching `.srt` and `.vtt` subtitle files. Captions appear in an added strip below the terminal, leaving the code visible. Edit [captions.json](captions.json) to change the text or timing. The current cues match the 14:48 recording; check their alignment after recording again. The default font is macOS Helvetica; on other systems, pass an installed ImageMagick font with `-font`, such as `-font DejaVu-Sans`.
+This preserves the original video and writes `tmp/blog-tutorial-captioned.mp4`, plus matching `.srt` and `.vtt` subtitle files. Captions appear in an added strip below the terminal, leaving the code visible. Edit [captions.json](captions.json) to change the text or timing. The current cues match the 14:30 recording; check their alignment after recording again. The default font is macOS Helvetica; on other systems, pass an installed ImageMagick font with `-font`, such as `-font DejaVu-Sans`.
 
 For Japanese captions, use [captions.ja.json](captions.ja.json) and a Japanese font. On macOS:
 
