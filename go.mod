@@ -3,7 +3,7 @@ module github.com/go-kanna/showcase
 go 1.27.3
 
 require (
-	github.com/go-kanna/config v0.0.4
+	github.com/go-kanna/config v0.0.5
 	github.com/go-kanna/i18n v0.0.21
 	github.com/go-kanna/orm v0.0.36
 	github.com/go-kanna/validator v0.0.27
