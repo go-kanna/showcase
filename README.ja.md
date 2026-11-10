@@ -33,16 +33,21 @@ internal/
   di                      the containers the server is built from: Config and Infra
   feature/todo/
     model                 the domain types, and the fixtures generated for them
+    projection            what the queries return besides the models, for every layer to read
     scopes                the scope types the repositories read through
     repository            the interfaces the use cases depend on
-    postgres              their implementations, which kanna-orm writes, and the SQL written by hand for them
+    postgres              their implementations, which kanna-orm writes, and the SQL and the error mapping written by hand for them
     usecase               one struct per operation, given the repositories and transactor it works through
     mapper                the mappings between protobuf and the model or the use case inputs
     handler               the gRPC handler, which puts the feature together and chooses the repositories
+  server                  the HTTP server for the handler, and the interceptor that turns errors into gRPC statuses
+  errors/aerrors          the application's errors, each of a kind the interceptor gives a gRPC code
   gen                     the code buf writes from proto/
   messages                the messages compiled from locales/
   infra/storage           pgx pools, transactions, and migrations
+  lib                     small helpers, and the converters kanna-mapper uses for UUIDs and timestamps
 test/infra                a database per test, migrated from a template
+tutorial                  the blog API tutorial, and the VHS tape that records it
 ```
 
 ## 実行
