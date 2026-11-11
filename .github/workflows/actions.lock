@@ -6,7 +6,7 @@ workflows:
     '.github/workflows/ci.yaml':
         - 'actions/checkout@v7.0.1'
         - 'actions/setup-go@v7.0.0'
-        - 'bufbuild/buf-action@v1.6.0'
+        - 'bufbuild/buf-action@v1.7.0'
         - 'golangci/golangci-lint-action@v9.3.0'
     '.github/workflows/verify-lockfile.yml':
         - 'actions/checkout@v7.0.1'
@@ -21,9 +21,9 @@ dependencies:
         commit: 'sha1-b7ad1dad31e06c5925ef5d2fc7ad053ef454303e'
         owner_id: 44036562
         repo_id: 192624594
-    'bufbuild/buf-action@v1.6.0':
-        ref: 'v1.6.0'
-        commit: 'sha1-85aebf73123b5c15fd5528aaecbf9129cddf7fa7'
+    'bufbuild/buf-action@v1.7.0':
+        ref: 'v1.7.0'
+        commit: 'sha1-37ac33d8960807670a6e9719080e885197b09cc6'
         owner_id: 54191850
         repo_id: 805538056
     'golangci/golangci-lint-action@v9.3.0':
