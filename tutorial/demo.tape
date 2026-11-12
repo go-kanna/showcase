@@ -34,7 +34,7 @@ Source tmp/tutorial-tapes/post_repository.tape
 Type `go tool kanna-orm describe ./...`
 Enter
 Wait+Line@5m /blog>/
-Type "go generate ./scopes ./repository"
+Type "go tool kanna gen ./scopes ./repository"
 Enter
 Wait+Line@5m /blog>/
 Type "sed -n '113,143p' postgres/repository_gen.go"
@@ -45,11 +45,11 @@ Ctrl+L
 
 # Give the API an input and a separate JSON response.
 Source tmp/tutorial-tapes/input.tape
-Type "go tool kanna-validator"
+Type "go tool kanna gen ."
 Enter
 Wait+Line@5m /blog>/
 Source tmp/tutorial-tapes/post_mapper_base.tape
-Type "go generate ./mapper"
+Type "go tool kanna gen ./mapper"
 Enter
 Wait+Line@5m /blog>/
 Type "cat mapper/mapper_gen.go"
@@ -60,7 +60,7 @@ Ctrl+L
 
 # Write the CRUD actions, generate the constructor, and start the blog.
 Source tmp/tutorial-tapes/api.tape
-Type "go tool kanna-di"
+Type "go tool kanna gen ."
 Enter
 Wait+Line@5m /blog>/
 Type "cat di_gen.go"
@@ -170,13 +170,7 @@ Wait+Line@5m /blog>/
 Type `go tool kanna-orm describe ./...`
 Enter
 Wait+Line@5m /blog>/
-Type "go generate ./scopes ./repository ./mapper"
-Enter
-Wait+Line@5m /blog>/
-Type "go tool kanna-validator"
-Enter
-Wait+Line@5m /blog>/
-Type "go tool kanna-di"
+Type "go tool kanna gen ."
 Enter
 Wait+Line@5m /blog>/
 Type "sed -n '9,37p' mapper/mapper_gen.go"
@@ -186,7 +180,7 @@ Sleep 3s
 Ctrl+L
 
 # Generate fixtures and test the real PostgreSQL relation and response mapping.
-Type "go generate ./model"
+Type "go tool kanna gen ./model"
 Enter
 Wait+Line@5m /blog>/
 Source tmp/tutorial-tapes/repository_test.tape
@@ -197,7 +191,7 @@ Type "go test -v ./..."
 Enter
 Wait+Line@5m /blog>/
 Sleep 3s
-Type "KANNA_CHECK=1 go generate ./..."
+Type "go tool kanna gen -check"
 Enter
 Wait+Line@5m /blog>/
 Type "go build -o blog ."
