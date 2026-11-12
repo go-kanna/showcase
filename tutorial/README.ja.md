@@ -34,10 +34,12 @@ vim model/post.go
 vim scopes/scopes.go
 vim repository/post.go
 go tool kanna-orm describe ./...
-go generate ./scopes ./repository
+go tool kanna gen ./scopes ./repository
 ```
 
 `postgres/repository_gen.go` には、INSERT・SELECT・UPDATE・DELETE と、行をモデルへ読み込む Go コードがあります。identity 列は PostgreSQL が採番します。`CreatedAt` と `UpdatedAt` は、名前で決まる規約で kanna-orm が書き込みます。作成時は両方を、更新時は `UpdatedAt` を書き、更新は保存した行を返します。その後の生成は `kanna-orm.snapshot.json` を読み、DB への接続は不要です。
+
+`go tool kanna gen` は、指定したパッケージの `//go:generate go tool kanna-*` の行を、出力を読む順に実行します。そのパッケージが読む出力を書く生成器も、あわせて実行します。`go tool kanna gen -check` は何も書かず、生成したファイルが古ければ失敗します。
 
 ## 2. 入力・レスポンス変換・API を追加する
 
@@ -45,11 +47,11 @@ go generate ./scopes ./repository
 
 ```sh
 vim input.go
-go tool kanna-validator
+go tool kanna gen .
 vim mapper/mapper.go
-go generate ./mapper
+go tool kanna gen ./mapper
 vim api.go
-go tool kanna-di
+go tool kanna gen .
 vim main.go
 go build -o blog .
 ./blog >server.log 2>&1 & server_pid=$!
@@ -89,9 +91,7 @@ vim api.go
 
 ```sh
 go tool kanna-orm describe ./...
-go generate ./scopes ./repository ./mapper
-go tool kanna-validator
-go tool kanna-di
+go tool kanna gen .
 ```
 
 `Comments []Comment` は、名前から決まる `comments.post_id` で orm が読み込みます。生成された mapper は、読み込んだコメントを入れ子のレスポンスへ変換します。[comments.sql](comments.sql) の外部キーの `ON DELETE CASCADE` により、記事を削除するとコメントも削除されます。
@@ -101,11 +101,11 @@ go tool kanna-di
 生成された fixture とロールバックするトランザクションを使う [Repository の統合テスト](files/repository_test.go.txt) を書きます。CRUD、コメントの関連取得、入れ子のレスポンス変換、記事削除時のコメント削除を検証します。フォーマットはすべての編集が終わった後に一度だけ実行します。
 
 ```sh
-go generate ./model
+go tool kanna gen ./model
 vim repository/repository_test.go
 gofmt -w .
 go test -v ./...
-KANNA_CHECK=1 go generate ./...
+go tool kanna gen -check
 go build -o blog .
 ./blog >server.log 2>&1 & server_pid=$!
 curl --retry 20 --retry-connrefused --retry-delay 1 -fsS localhost:18081/posts/1

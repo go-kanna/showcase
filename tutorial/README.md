@@ -34,10 +34,12 @@ vim model/post.go
 vim scopes/scopes.go
 vim repository/post.go
 go tool kanna-orm describe ./...
-go generate ./scopes ./repository
+go tool kanna gen ./scopes ./repository
 ```
 
 Read `postgres/repository_gen.go`: the INSERT, SELECT, UPDATE, DELETE, and row scanning are ordinary Go and SQL. Identity columns are assigned by PostgreSQL. kanna-orm writes `CreatedAt` and `UpdatedAt`, known by their names: both on an insert, and `UpdatedAt` on an update, which returns the row as stored. Subsequent generation reads `kanna-orm.snapshot.json` without connecting to the database.
+
+`go tool kanna gen` runs the `//go:generate go tool kanna-*` lines of the packages you name, in the order their outputs are read, and also runs the generators whose output those packages read. `go tool kanna gen -check` writes nothing and fails if a generated file is out of date.
 
 ## 2. Add the input, response mapping, and API
 
@@ -45,11 +47,11 @@ Write [SavePost](files/input.go.txt), the [initial response mapping](files/post_
 
 ```sh
 vim input.go
-go tool kanna-validator
+go tool kanna gen .
 vim mapper/mapper.go
-go generate ./mapper
+go tool kanna gen ./mapper
 vim api.go
-go tool kanna-di
+go tool kanna gen .
 vim main.go
 go build -o blog .
 ./blog >server.log 2>&1 & server_pid=$!
@@ -89,9 +91,7 @@ Make these edits to the existing files, as the tape demonstrates:
 
 ```sh
 go tool kanna-orm describe ./...
-go generate ./scopes ./repository ./mapper
-go tool kanna-validator
-go tool kanna-di
+go tool kanna gen .
 ```
 
 orm reads `Comments []Comment` through `comments.post_id`, the column the names imply. The generated mapper converts the loaded comments into nested response values. Deleting a post also deletes its comments through the `ON DELETE CASCADE` of the foreign key in [comments.sql](comments.sql).
@@ -101,11 +101,11 @@ orm reads `Comments []Comment` through `comments.post_id`, the column the names 
 Write the [Repository integration test](files/repository_test.go.txt), which uses generated fixtures and a rolled-back transaction. It checks CRUD, comment loading, nested response mapping, and cascade deletion. Run formatting once, after all edits.
 
 ```sh
-go generate ./model
+go tool kanna gen ./model
 vim repository/repository_test.go
 gofmt -w .
 go test -v ./...
-KANNA_CHECK=1 go generate ./...
+go tool kanna gen -check
 go build -o blog .
 ./blog >server.log 2>&1 & server_pid=$!
 curl --retry 20 --retry-connrefused --retry-delay 1 -fsS localhost:18081/posts/1

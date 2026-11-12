@@ -20,6 +20,7 @@ export GOWORK=off
 go mod init example.com/blog
 go mod edit -go=1.27.3
 go get -tool \
+    github.com/go-kanna/kanna@v0.3.10 \
     github.com/go-kanna/orm/cmd/kanna-orm@v0.0.36 \
     github.com/go-kanna/validator/cmd/kanna-validator@v0.0.27 \
     github.com/go-kanna/mapper/cmd/kanna-mapper@v0.0.25 \
