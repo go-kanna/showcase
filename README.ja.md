@@ -86,7 +86,7 @@ buf curl --protocol grpc --http2-prior-knowledge --schema proto \
   http://localhost:8080/showcase.todo.v1.TodoService/ListTodo
 ```
 
-一覧の各 ToDo には、最新 3 件のコメントと、`todo_queries.sql` に手で書いたクエリが足す `commentCount` が付きます。kanna-orm はクエリの行を `todos` の行として読むので、ListTodo の scope は、表に対してと同じように絞り込み、並べ、ページを切ります。続きの ToDo があるページには `nextPageToken` が付きます。それを `pageToken` に渡すと、次のページを読めます。
+一覧の各 ToDo には、最新 3 件のコメントと、`todo_queries.sql` に手で書いたクエリが加える `commentCount` が付きます。kanna-orm はクエリの行を `todos` の行として読むので、ListTodo の scope は、表に対してと同じように絞り込み、並べ、ページを切ります。続きの ToDo があるページには `nextPageToken` が付きます。それを `pageToken` に渡すと、次のページを読めます。
 
 `ListRecentComments` は最新のコメントを、それぞれの ToDo とともに返します。ToDo は、kanna-orm が `projection.CommentSummary` の入れ子の struct から、同じクエリで結合します。
 
@@ -108,7 +108,7 @@ buf curl --protocol grpc --http2-prior-knowledge --schema proto \
 
 kanna-orm はデータベースではなく `kanna-orm.snapshot.json` から生成するので、`make gen` にデータベースは不要です。マイグレーションの後は、`make db-migrate` で適用し、`make db-describe` で記録して、スナップショットをマイグレーションと一緒にコミットしてください。両者が一致しないと CI が失敗します。
 
-ユースケースはリポジトリとトランザクタを引数で受け取るので、入力の扱いをチェックするテストは、`put_todo_use_case_test.go` のようにフェイクを渡せばよく、データベースは不要です。SQL の動作は PostgreSQL に対してテストします。そのテストには、起動中のデータベースと、`make db-migrate` で 1 度マイグレーションしておくこと（接続に使うロールもこれで作られます）、環境変数の URL が必要です:
+ユースケースはリポジトリとトランザクタを引数で受け取るので、入力の扱いをチェックするテストは、`put_todo_use_case_test.go` のようにフェイクを渡せばよく、データベースは不要です。SQL の動作は PostgreSQL に対してテストします。そのテストを動かすには、データベースの起動と、`make db-migrate` での 1 度のマイグレーション（接続に使うロールもこれで作られます）、環境変数の URL が必要です:
 
 ```sh
 make db-migrate
