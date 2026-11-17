@@ -3,11 +3,11 @@ module github.com/go-kanna/showcase
 go 1.27.3
 
 require (
-	github.com/go-kanna/config v0.0.5
-	github.com/go-kanna/i18n v0.0.21
-	github.com/go-kanna/orm v0.0.36
-	github.com/go-kanna/validator v0.0.27
-	github.com/go-kanna/value v0.0.18
+	github.com/go-kanna/config v0.1.0
+	github.com/go-kanna/i18n v0.1.0
+	github.com/go-kanna/orm v0.1.0
+	github.com/go-kanna/validator v0.1.0
+	github.com/go-kanna/value v0.1.0
 	github.com/jackc/pgx/v5 v5.12.0
 	github.com/peterldowns/pgtestdb v0.1.1
 	github.com/pressly/goose/v3 v3.29.0
@@ -31,7 +31,7 @@ require (
 	github.com/bep/godartsass/v2 v2.5.0 // indirect
 	github.com/bep/golibsass v1.2.0 // indirect
 	github.com/bits-and-blooms/bitset v1.24.5 // indirect
-	github.com/brianvoe/gofakeit/v7 v7.18.0 // indirect
+	github.com/brianvoe/gofakeit/v7 v7.18.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/coder/websocket v1.8.15 // indirect
 	github.com/dustin/go-humanize v1.1.0 // indirect
@@ -41,11 +41,11 @@ require (
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/go-faster/city v1.0.1 // indirect
 	github.com/go-faster/errors v0.8.0 // indirect
-	github.com/go-kanna/di v0.0.16 // indirect
-	github.com/go-kanna/fixture v0.0.21 // indirect
-	github.com/go-kanna/internal v0.0.31 // indirect
-	github.com/go-kanna/kanna v0.3.10 // indirect
-	github.com/go-kanna/mapper v0.0.25 // indirect
+	github.com/go-kanna/di v0.1.0 // indirect
+	github.com/go-kanna/fixture v0.1.0 // indirect
+	github.com/go-kanna/internal v0.1.0 // indirect
+	github.com/go-kanna/kanna v0.3.12 // indirect
+	github.com/go-kanna/mapper v0.1.0 // indirect
 	github.com/go-sql-driver/mysql v1.10.1 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/gohugoio/hashstructure v0.6.0 // indirect

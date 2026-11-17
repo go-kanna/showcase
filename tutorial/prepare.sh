@@ -20,12 +20,12 @@ export GOWORK=off
 go mod init example.com/blog
 go mod edit -go=1.27.3
 go get -tool \
-    github.com/go-kanna/kanna@v0.3.10 \
-    github.com/go-kanna/orm/cmd/kanna-orm@v0.0.36 \
-    github.com/go-kanna/validator/cmd/kanna-validator@v0.0.27 \
-    github.com/go-kanna/mapper/cmd/kanna-mapper@v0.0.25 \
-    github.com/go-kanna/di/cmd/kanna-di@v0.0.16 \
-    github.com/go-kanna/fixture/cmd/kanna-fixture@v0.0.21
+    github.com/go-kanna/kanna@v0.3.12 \
+    github.com/go-kanna/orm/cmd/kanna-orm@v0.1.0 \
+    github.com/go-kanna/validator/cmd/kanna-validator@v0.1.0 \
+    github.com/go-kanna/mapper/cmd/kanna-mapper@v0.1.0 \
+    github.com/go-kanna/di/cmd/kanna-di@v0.1.0 \
+    github.com/go-kanna/fixture/cmd/kanna-fixture@v0.1.0
 go get github.com/jackc/pgx/v5/pgxpool@v5.12.0
 cp "$lesson/files/http.go.txt" http.go
 cp "$lesson/files/api_test.go.txt" api_test.go

@@ -21,8 +21,8 @@ func TestToStatus(t *testing.T) {
 	t.Parallel()
 
 	var verrs validator.Errors
-	verrs.Add("id", validator.Blank())
-	verrs.Add("title", validator.TooLong(200))
+	verrs.Add(validator.Field("id"), validator.Blank())
+	verrs.Add(validator.Field("title"), validator.TooLong(200))
 	notFound := aerrors.NotFound("todo").WithMessage(messages.TodoNotFound())
 
 	tests := []struct {
